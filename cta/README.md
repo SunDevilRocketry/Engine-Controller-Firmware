@@ -1,4 +1,3 @@
-<h1>Component Test Apparatus Firmware</h1>
+<h1>PCB Test Firmware</h1>
 
-<p>Put all firmware to be run on the microntroller to control 
-the component test apparatus here. </p>
+<p>Put all firmware for testing the PCB hardware here</p>
