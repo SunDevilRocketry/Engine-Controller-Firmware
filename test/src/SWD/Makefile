@@ -19,3 +19,38 @@
 # Program Name
 PROGRAM = testSWD
 
+# Library directory
+LIBDIR = ../../lib/
+
+# Cross Compiler
+CC = arm-none-eabi-gcc
+
+# Assembler 
+ASM = arm-none-eabi-as
+
+# Processor 
+MPU = cortex-m4
+
+# Compiler Arguments
+# Use hardware FPU, Optimize for space, add debuging functionality, 
+# use GNU dialiect of ISO C11, execute thumb instructions, 
+# generate warnings during compilation
+CCARG = -mcpu=$(MPU) -mfloat-abi=hard -O0 -std=gnu11 -mthumb -Wall
+
+# Linker arguments
+LLARG = -mcpu=$(MPU) -nostdlib -g -Wl,-Map=testSWD.map
+
+## Main Build
+all: testSWD.o startup.o testSWD.elf testSWD.bin
+
+testSWD.bin: testSWD.elf
+	arm-none-eabi-objcopy -O binary testSWD.elf testSWD.bin
+
+testSWD.elf: testSWD.o startup.o
+	$(CC) $(LLARG) -T testSWD.ld -o testSWD.elf testSWD.o startup.o
+
+startup.o: startup.c
+	$(CC) $(CCARG) -c -o startup.o startup.c
+
+testSWD.o: testSWD.c
+	$(CC) $(CCARG) -c -o testSWD.o testSWD.c
