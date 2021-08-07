@@ -5,7 +5,7 @@
 *                                                            * 
 * MCU: 	STM32L443VCT6 ARM Cortex-M4                          *
 *       - 64 KBytes of SRAM                                  *
-*       - 256 KBytes of Flash                                 *
+*       - 256 KBytes of Flash                                *
 *                                                            * 
 * Author: Colton Acosta, cacost12@asu.edu                    *
 *                                                            * 

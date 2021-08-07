@@ -32,10 +32,10 @@ ASM = arm-none-eabi-as
 MPU = cortex-m4
 
 # Compiler Arguments
-# Use hardware FPU, Optimize for space, add debuging functionality, 
-# use GNU dialiect of ISO C11, execute thumb instructions, 
-# generate warnings during compilation
-CCARG = -mcpu=$(MPU) -mfloat-abi=hard -O0 -std=gnu11 -mthumb -Wall
+# Use hardware FPU, Assume little endian, Optimize for space,
+#  add debuging functionality, use GNU dialiect of ISO C11, 
+# execute thumb instructions, generate warnings during compilation
+CCARG = -mcpu=$(MPU) -mfloat-abi=hard -mlittle-endian -O0 -std=gnu11 -mthumb -Wall
 
 # Linker arguments
 LLARG = -mcpu=$(MPU) -nostdlib -g -Wl,-Map=testSWD.map
