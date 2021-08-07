@@ -1,5 +1,5 @@
 ######################################################################
-#  ARM Cortex-M3 Example Makefile
+#  ARM Cortex-M4 Example Makefile
 #
 #  Main Build Process: 
 #      1. Compile program.c and startup.c sourcefiles to .o files
@@ -40,7 +40,9 @@ CCARG = -mcpu=$(MPU) -mfloat-abi=hard -O0 -std=gnu11 -mthumb -Wall
 # Linker arguments
 LLARG = -mcpu=$(MPU) -nostdlib -g -Wl,-Map=testSWD.map
 
+#########################################################################
 ## Main Build
+#########################################################################
 all: testSWD.o startup.o testSWD.elf testSWD.bin
 
 testSWD.bin: testSWD.elf
@@ -54,3 +56,30 @@ startup.o: startup.c
 
 testSWD.o: testSWD.c
 	$(CC) $(CCARG) -c -o testSWD.o testSWD.c
+
+#########################################################################
+## Flash to MCU
+#########################################################################
+flash:
+	st-flash write testSWD.bin 0x08000000
+
+#########################################################################
+## Additional Features
+#########################################################################
+
+# Generate the ARM Assembly language
+assembly: testSWD.c
+	$(CC) $(CCARG) -S -o testSWD.asm testSWD.c
+
+# Generate the output of the preprocessor
+pre-process: testSWD.c
+	$(CC) $(CCARG) -E -o testSWD.i testSWD.c
+
+# Print all the symbol produced by the linker
+printSymbols: testSWD.elf
+	arm-none-eabi-nm testSWD.elf
+
+# Remove all build files
+clean:
+	rm *.bin *.o *.elf *.map *.asm *.i
+# End
