@@ -1,8 +1,8 @@
 <h1>Liquids Engine Controller Firmware</h1>
 
 <p>PCB: Liquids Engine Controller L0002</p>
-<p>MCU: STM32L443VCT6 </p>
-<p>MPU Architecture: ARM Cortex-M4</p>
+<p>MCU: STM32H750VBT6 </p>
+<p>MPU Architecture: ARM Cortex-M7</p>
 
 <p>Description: The Liquids Engine Controller PCB is the main embedded processor of SDR's Liquid Engine. The controller is 
 equipped wth an STM32 ARM Cortex M4 processor and 4Mb of external flash for data logging. The board includes a 
