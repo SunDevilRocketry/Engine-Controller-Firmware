@@ -18,7 +18,7 @@ hotfire: firmware to be run during hotfire testing
 
 cta: firmware to be run on the component test apparatus
 
-test: testcode for verification of PCB functionality
+terminal: firmware to allow terminal access to all PCB hardware 
 </p>
 
 <p><b>Working Directory Structure</b></p>
