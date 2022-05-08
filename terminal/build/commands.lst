@@ -1,0 +1,103 @@
+ARM GAS  /tmp/ccTSKs5l.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"commands.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "Core/Src/commands.c"
+  19              		.section	.text.ping,"ax",%progbits
+  20              		.align	1
+  21              		.global	ping
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	ping:
+  27              	.LVL0:
+  28              	.LFB144:
+   1:Core/Src/commands.c **** /*******************************************************************************
+   2:Core/Src/commands.c ****   * @file           : commands.c
+   3:Core/Src/commands.c ****   * @brief          : Terminal command functions
+   4:Core/Src/commands.c ****   ******************************************************************************
+   5:Core/Src/commands.c ****   *
+   6:Core/Src/commands.c ****   * This source c file contains the implementation of all command processing
+   7:Core/Src/commands.c ****   * commands for the Liquid Engine Controller
+   8:Core/Src/commands.c ****   *
+   9:Core/Src/commands.c ****   *****************************************************************************/
+  10:Core/Src/commands.c **** 
+  11:Core/Src/commands.c **** /* Includes ------------------------------------------------------------------*/
+  12:Core/Src/commands.c **** #include "main.h"
+  13:Core/Src/commands.c **** #include "commands.h"
+  14:Core/Src/commands.c **** 
+  15:Core/Src/commands.c **** /* Ping Command: 
+  16:Core/Src/commands.c ****    Sends a response to the PC*/
+  17:Core/Src/commands.c **** void ping(UART_HandleTypeDef *huart){
+  29              		.loc 1 17 37 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 8
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		.loc 1 17 37 is_stmt 0 view .LVU1
+  34 0000 00B5     		push	{lr}
+  35              	.LCFI0:
+  36              		.cfi_def_cfa_offset 4
+  37              		.cfi_offset 14, -4
+  38 0002 83B0     		sub	sp, sp, #12
+  39              	.LCFI1:
+  40              		.cfi_def_cfa_offset 16
+  18:Core/Src/commands.c ****     // L0002 Rev 3.0 Response
+ARM GAS  /tmp/ccTSKs5l.s 			page 2
+
+
+  19:Core/Src/commands.c ****     uint8_t response = 0x01;
+  41              		.loc 1 19 5 is_stmt 1 view .LVU2
+  42              		.loc 1 19 13 is_stmt 0 view .LVU3
+  43 0004 0122     		movs	r2, #1
+  44 0006 8DF80720 		strb	r2, [sp, #7]
+  20:Core/Src/commands.c **** 
+  21:Core/Src/commands.c ****     // Send Response 
+  22:Core/Src/commands.c ****     HAL_UART_Transmit(huart, &response, 1, 1);
+  45              		.loc 1 22 5 is_stmt 1 view .LVU4
+  46 000a 1346     		mov	r3, r2
+  47 000c 0DF10701 		add	r1, sp, #7
+  48 0010 FFF7FEFF 		bl	HAL_UART_Transmit
+  49              	.LVL1:
+  23:Core/Src/commands.c **** }
+  50              		.loc 1 23 1 is_stmt 0 view .LVU5
+  51 0014 03B0     		add	sp, sp, #12
+  52              	.LCFI2:
+  53              		.cfi_def_cfa_offset 4
+  54              		@ sp needed
+  55 0016 5DF804FB 		ldr	pc, [sp], #4
+  56              		.cfi_endproc
+  57              	.LFE144:
+  59              		.text
+  60              	.Letext0:
+  61              		.file 2 "/usr/arm-none-eabi/include/machine/_default_types.h"
+  62              		.file 3 "/usr/arm-none-eabi/include/sys/_stdint.h"
+  63              		.file 4 "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h750xx.h"
+  64              		.file 5 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h"
+  65              		.file 6 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma.h"
+  66              		.file 7 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h"
+ARM GAS  /tmp/ccTSKs5l.s 			page 3
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 commands.c
+     /tmp/ccTSKs5l.s:20     .text.ping:0000000000000000 $t
+     /tmp/ccTSKs5l.s:26     .text.ping:0000000000000000 ping
+
+UNDEFINED SYMBOLS
+HAL_UART_Transmit

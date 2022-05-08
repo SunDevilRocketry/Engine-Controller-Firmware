@@ -15,6 +15,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "commands.h"
 
 // USB UART handler struct
 UART_HandleTypeDef huart1;
@@ -48,12 +49,21 @@ int main(void)
   // Event Loop
   while (1)
   {
-	// HAL_UART_Transmit(&huart2, &data[0], 2, 1);
-	HAL_UART_Receive(&huart1, &data, 1, 1);
-	if (data == '1'){
-            HAL_GPIO_TogglePin(GPIOE, STATUS); 
+	// Read data from UART reciever
+	uint8_t command_status = HAL_UART_Receive(&huart1, &data, 1, 1);
+
+	// Parse command input if HAL_UART_Receive doesn't timeout
+	if (command_status != HAL_TIMEOUT ){
+	    switch(data){
+	
+	        // Ping Command	    
+	        case PING_OP:
+		    ping(&huart1);
+	  	    break;
+
+	    }
+	
 	}
-	data = '0';
 
   }
 }

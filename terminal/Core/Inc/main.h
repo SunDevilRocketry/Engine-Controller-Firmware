@@ -30,7 +30,7 @@ extern "C" {
 #define FLASH_WP GPIO_PIN_1
 #define FLASH_HOLD GPIO_PIN_3
 #define SD_DETECT GPIO_PIN_4
-
+	
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
