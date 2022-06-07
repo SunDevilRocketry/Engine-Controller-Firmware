@@ -1,15 +1,34 @@
 /*******************************************************************************
-  * @file           : commands.c
-  * @brief          : Terminal command functions
-  ******************************************************************************
-  *
-  * This source c file contains the implementation of all command processing
-  * commands for the Liquid Engine Controller
-  *
-  *****************************************************************************/
+*
+* FILE: 
+* 		commands.c
+*
+* DESCRIPTION: 
+* 		Contains general command functions common to all embedded controllers
+*
+*******************************************************************************/
 
-// Command Opcodes
-#define PING_OP 0x01
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef COMMANDS_H
+#define COMMANDS_H
 
-// Function Prototypes
-void ping(UART_HandleTypeDef *huart);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+/*------------------------------------------------------------------------------
+ Macros 
+------------------------------------------------------------------------------*/
+#define PING_OP 0x01 /* ping command opcode */
+
+/*------------------------------------------------------------------------------
+ Function Prototypes 
+------------------------------------------------------------------------------*/
+void ping
+	(
+	UART_HandleTypeDef *huart /* UART handler */
+	); /* ping command */
+
+
+#endif /* COMMANDS_H */
