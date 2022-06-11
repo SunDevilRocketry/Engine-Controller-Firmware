@@ -20,7 +20,8 @@ extern "C" {
 /*------------------------------------------------------------------------------
  Macros 
 ------------------------------------------------------------------------------*/
-#define PING_OP 0x01 /* ping command opcode */
+#define PING_OP 	0x01 /* ping command opcode */
+#define CONNECT_OP	0x02 /* connect command opcode */
 
 /*------------------------------------------------------------------------------
  Function Prototypes 

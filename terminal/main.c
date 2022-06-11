@@ -80,6 +80,11 @@ while (1)
 				ping(&huart1);
 				break;
 
+			/* Connect Command */
+			case CONNECT_OP:
+				ping(&huart1);
+				break;
+
 			default:
 				/* Do nothing */
 			} 
