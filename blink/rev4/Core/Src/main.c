@@ -63,7 +63,7 @@ while (1)
 		HAL_GPIO_WritePin(GPIOE, bitmask, GPIO_PIN_RESET); 
 		HAL_GPIO_WritePin(GPIOE, ~bitmask, GPIO_PIN_SET); 
 	    bitmask = 0x0000;
-		HAL_Delay(1000);
+		HAL_Delay(500);
 		}
 
 	}
@@ -148,6 +148,8 @@ void Error_Handler(void)
 {
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
+  HAL_GPIO_WritePin(GPIOE, STATUS_R, GPIO_PIN_RESET); 
+  HAL_GPIO_WritePin(GPIOE, STATUS_B | STATUS_G, GPIO_PIN_RESET); 
   while (1)
   {
       // application hangs when error handler is invoked
