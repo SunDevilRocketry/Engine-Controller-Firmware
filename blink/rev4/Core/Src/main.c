@@ -20,31 +20,53 @@
 void SystemClock_Config(void); // clock configuration
 static void GPIO_Init(void); // GPIO configurations 
 
+/* Global variables ----------------------------------------------------------*/
+uint16_t bitmask = 0x0000;
+
+
 /**
   * @brief  The application entry point.
   * @retval int
   */
 int main(void)
 {
-  /* MCU Configuration--------------------------------------------------------*/
+/* MCU Configuration--------------------------------------------------------*/
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+HAL_Init();
 
-  /* Configure the system clock */
-  SystemClock_Config();
+/* Configure the system clock */
+SystemClock_Config();
 
-  /* Initialize all configured peripherals */
-  GPIO_Init();
+/* Initialize all configured peripherals */
+GPIO_Init();
 
-  // Event Loop
-  while (1)
-  {
-	// Blink LED
-        HAL_GPIO_TogglePin(GPIOE, STATUS); 
-	HAL_Delay(1000);
+// Event Loop
+while (1)
+	{
+	for (uint16_t i=0; i<8; ++i)
+		{		
+		if ((0x0001 & i) == 0x0001)
+			{
+			bitmask |= STATUS_R;
+			}
+		if((0x0002 & i) == 0x0002)
+			{
+			bitmask |= STATUS_G;
+			}
+		if((0x0004 & i) == 0x0004)
+			{
+			bitmask |= STATUS_B;
+			}
 
-  }
+		// Blink LED
+		HAL_GPIO_WritePin(GPIOE, bitmask, GPIO_PIN_RESET); 
+		HAL_GPIO_WritePin(GPIOE, ~bitmask, GPIO_PIN_SET); 
+	    bitmask = 0x0000;
+		HAL_Delay(1000);
+		}
+
+	}
 }
 
 /**
@@ -108,11 +130,11 @@ static void GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOE, STATUS_R | STATUS_B | STATUS_G, GPIO_PIN_SET);
 
   /*Configure GPIO pin : PE2 --> Status LED pin */
-  GPIO_InitStruct.Pin = STATUS;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP; // push-pull output
+  GPIO_InitStruct.Pin = STATUS_R | STATUS_B | STATUS_G;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD; // push-pull output
   GPIO_InitStruct.Pull = GPIO_NOPULL; // no pull up resistor
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW; // Low Frequency
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct); // Write to registers

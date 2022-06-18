@@ -26,7 +26,9 @@ extern "C" {
 #include "stm32h7xx_hal.h"
 
 // L0002 Microcontroller Pin Assignments
-#define STATUS GPIO_PIN_2  
+#define STATUS_B GPIO_PIN_12  
+#define STATUS_G GPIO_PIN_11  
+#define STATUS_R GPIO_PIN_10  
 #define FLASH_WP GPIO_PIN_1
 #define FLASH_HOLD GPIO_PIN_3
 #define SD_DETECT GPIO_PIN_4
