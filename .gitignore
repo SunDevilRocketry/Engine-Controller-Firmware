@@ -1,4 +1,5 @@
 # Build directories
 blink/rev3/build/*
 blink/rev4/build/*
-terminal/build/*
+terminal/rev3/build/*
+terminal/rev4/build/*
