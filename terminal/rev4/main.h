@@ -25,9 +25,13 @@ extern "C" {
 /*------------------------------------------------------------------------------
  MCU Pin Assignments                                                                     
 ------------------------------------------------------------------------------*/
-#define STATUS_B GPIO_PIN_12  
-#define STATUS_G GPIO_PIN_11  
-#define STATUS_R GPIO_PIN_10  
+/* Pins */
+#define STATUS_B    GPIO_PIN_12  
+#define STATUS_G    GPIO_PIN_11  
+#define STATUS_R    GPIO_PIN_10  
+
+/* Ports */
+#define STATUS_GPIO GPIOE
 	
 /*------------------------------------------------------------------------------
  Exported functions prototypes                                                                     

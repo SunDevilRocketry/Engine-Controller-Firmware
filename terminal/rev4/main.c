@@ -85,6 +85,11 @@ while (1)
 				ping(&huart1);
 				break;
 
+			/* Ignite Command */
+			case IGNITE_OP:
+				HAL_GPIO_TogglePin(STATUS_GPIO, STATUS_G | STATUS_B);
+				break;
+
 			default:
 				/* Do nothing */
 			} 
