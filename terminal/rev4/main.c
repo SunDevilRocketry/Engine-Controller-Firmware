@@ -9,11 +9,19 @@
 *
 *******************************************************************************/
 
+
 /*------------------------------------------------------------------------------
- Includes                                                                     
+ Standard Includes                                                                     
+------------------------------------------------------------------------------*/
+#include <stdbool.h>
+
+
+/*------------------------------------------------------------------------------
+ Project Includes                                                                     
 ------------------------------------------------------------------------------*/
 #include "main.h"
 #include "commands.h"
+#include "ignition.h"
 
 
 /*------------------------------------------------------------------------------
@@ -57,10 +65,11 @@ uint8_t data; /* USB Incoming Data Buffer */
 /*------------------------------------------------------------------------------
  MCU Initialization                                                                  
 ------------------------------------------------------------------------------*/
-HAL_Init(); /* Reset peripherals, initialize flash interface and Systick. */
-SystemClock_Config(); /* System clock */
-GPIO_Init(); /* GPIO  */
-USB_UART_Init(); /* USB UART */
+HAL_Init();           /* Reset peripherals, initialize flash interface and 
+                         Systick.                                             */
+SystemClock_Config(); /* System clock                                         */
+GPIO_Init();          /* GPIO                                                 */
+USB_UART_Init();      /* USB UART                                             */
 
 /*------------------------------------------------------------------------------
  Event Loop                                                                  
