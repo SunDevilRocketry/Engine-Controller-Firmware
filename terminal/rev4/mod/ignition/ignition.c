@@ -31,6 +31,53 @@
 /*******************************************************************************
 *                                                                              *
 * PROCEDURE:                                                                   * 
+* 		ign_cmd_execute                                                        *
+*                                                                              *
+* DESCRIPTION:                                                                 * 
+* 		Executes an ignition subcommand based on user input from the sdec      *
+*       terminal                                                               *
+*                                                                              *
+*******************************************************************************/
+uint8_t ign_cmd_execute
+	(
+    uint8_t ign_subcommand
+    )
+{
+/*------------------------------------------------------------------------------
+ Local Variables 
+------------------------------------------------------------------------------*/
+IGN_STAT ign_status; /* Status code returned by ignite API function */
+
+/*------------------------------------------------------------------------------
+ Call API function 
+------------------------------------------------------------------------------*/
+switch(ign_subcommand)
+	{
+    /* Light ematch */
+	case IGN_FIRE_CODE:
+		ign_status = ignite();
+		break;
+
+	/* Return continuity information */
+	case IGN_CONT_CODE:
+		ign_status = ign_get_cont_info();
+		break;
+
+    /* Unrecognized subcommand code: call error handler */
+	default:
+		Error_Handler();
+
+    }
+
+/* Return the response code */
+return ign_status;
+
+} /* ign_cmd_execute */
+
+
+/*******************************************************************************
+*                                                                              *
+* PROCEDURE:                                                                   * 
 * 		ignite                                                                 *
 *                                                                              *
 * DESCRIPTION:                                                                 * 
@@ -43,12 +90,80 @@ IGN_STAT ignite
 	void
     )
 {
+/*------------------------------------------------------------------------------
+ API function implementation
+------------------------------------------------------------------------------*/
+
 /* Check for e-match/switch continuity */
+if (!ematch_cont())
+	{
+    /* No continuity across ematch and/or switch */
+    return 0; 
+    }
 
-/* Assert ignition signal */
+/* Assert ignition signal for 10 ms */
+HAL_GPIO_WritePin(FIRE_GPIO_PORT, FIRE_PIN, GPIO_PIN_SET);
+HAL_Delay(10);
+HAL_GPIO_WritePin(FIRE_GPIO_PORT, FIRE_PIN, GPIO_PIN_RESET);
 
-return 0;
+/* Check ematch continuity to check that ematch was lit */
+if (!ematch_cont())
+	{
+    return IGN_SUCCESS;
+    }
+else /* Ignition unsuccessful */
+	{
+    return 0;
+    }
+
 } /* ignite */
+
+
+/*******************************************************************************
+*                                                                              *
+* PROCEDURE:                                                                   * 
+* 		ign_get_cont_info                                                      *
+*                                                                              *
+* DESCRIPTION:                                                                 * 
+* 		Polls each continuity pin and sets the continuity bits in the          *
+*       response code                                                          *   
+*                                                                              *
+*******************************************************************************/
+IGN_STAT ign_get_cont_info
+	(
+    void
+    )
+{
+/*------------------------------------------------------------------------------
+ Local Variables 
+------------------------------------------------------------------------------*/
+IGN_STAT ign_status = 0; /* Status code to be returned */
+
+/*------------------------------------------------------------------------------
+ Call API functions 
+------------------------------------------------------------------------------*/
+
+/* Poll the ematch continuity pin */
+if (ematch_cont())
+	{
+    ign_status |= IGN_E_CONT_MASK;
+    }
+
+/* Poll the solid propellant continuity pin */
+if (solid_prop_cont())
+	{
+    ign_status |= IGN_SP_CONT_MASK;
+    }
+
+/* Poll the nozzle continuity pin */
+if (nozzle_cont())
+	{
+    ign_status |= IGN_NOZ_CONT_MASK;
+    }
+
+/* Return the status code */
+return ign_status;
+}
 
 
 /*******************************************************************************

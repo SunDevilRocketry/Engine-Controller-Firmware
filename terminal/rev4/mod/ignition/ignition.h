@@ -1,7 +1,7 @@
 /*******************************************************************************
 *
 * FILE: 
-* 		ignition.c
+* 		ignition.h
 *
 * DESCRIPTION: 
 * 		Contains API function to the engine controller ignition system and 
@@ -21,12 +21,35 @@ extern "C" {
 /*------------------------------------------------------------------------------
  Typdefs 
 ------------------------------------------------------------------------------*/
+
+/* Ignition response code */
+/* IGN_STAT = bit7 | bit6 | bit5 | bit4 | bit3 | bit2 | bit1 | bit0 
+
+   bits7-4: not used
+   bit3: Ignition status, success (1) or fail (0)
+   bit2: Nozzle wire continuity, 1 indicates continuity between screw terminals
+   bit1: Solid propellant wire continuity, 1 indicates continuity between screw 
+         terminals
+   bit0: Ematch/switch continuity
+                                                                     */
 typedef uint8_t IGN_STAT;
+
 
 
 /*------------------------------------------------------------------------------
  Macros 
 ------------------------------------------------------------------------------*/
+
+/* Ignition subcommand codes */
+#define IGN_FIRE_CODE 0x01
+#define IGN_CONT_CODE 0x02
+
+/* Ignition response code bitmasks */
+#define IGN_E_CONT_MASK   0b00000001
+#define IGN_SP_CONT_MASK  0b00000010
+#define IGN_NOZ_CONT_MASK 0b00000100
+#define IGN_SUCCESS       0b00001000
+
 
 /*------------------------------------------------------------------------------
  Function Prototypes 
@@ -55,6 +78,12 @@ bool nozzle_cont
 bool ematch_cont
 	(
     void
+    );
+
+/* Execute a terminal command using API functions */
+uint8_t ign_cmd_execute
+	(
+    uint8_t ign_subcommand
     );
 
 

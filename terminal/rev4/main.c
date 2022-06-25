@@ -59,7 +59,9 @@ int main
 /*------------------------------------------------------------------------------
  Local Variables                                                                  
 ------------------------------------------------------------------------------*/
-uint8_t data; /* USB Incoming Data Buffer */
+uint8_t data;           /* USB Incoming Data Buffer */
+uint8_t ign_subcommand; /* Ignition subcommand code */
+uint8_t ign_status;     /* Ignition status code     */
 
 
 /*------------------------------------------------------------------------------
@@ -96,7 +98,24 @@ while (1)
 
 			/* Ignite Command */
 			case IGNITE_OP:
-				HAL_GPIO_TogglePin(STATUS_GPIO, STATUS_G | STATUS_B);
+
+                /* Recieve ignition subcommand over USB */
+                command_status = HAL_UART_Receive(&huart1, &ign_subcommand, 1, 1);
+
+                /* Execute subcommand */
+                if (command_status != HAL_TIMEOUT)
+					{
+					/* Execute subcommand*/
+                    ign_status = ign_cmd_execute(ign_subcommand);
+                    }
+				else
+					{
+                    /* Error: no subcommand recieved */
+                    Error_Handler();
+                    }
+
+                /* Return response code to terminal */
+                HAL_UART_Transmit(&huart1, &ign_status, 1, 1);
 				break;
 
 			default:
