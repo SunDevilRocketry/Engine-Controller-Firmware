@@ -25,13 +25,22 @@ extern "C" {
 /*------------------------------------------------------------------------------
  MCU Pin Assignments                                                                     
 ------------------------------------------------------------------------------*/
+
 /* Pins */
-#define STATUS_B    GPIO_PIN_12  
-#define STATUS_G    GPIO_PIN_11  
-#define STATUS_R    GPIO_PIN_10  
+#define STATUS_B     GPIO_PIN_12  /* Status LED                    */  
+#define STATUS_G     GPIO_PIN_11  
+#define STATUS_R     GPIO_PIN_10  
+#define FIRE_PIN     GPIO_PIN_6   /* Ignition MOSFET               */
+#define E_CONT_PIN   GPIO_PIN_7   /* E-match and switch continuity */
+#define NOZ_CONT_PIN GPIO_PIN_8   /* Engine nozzle continuity      */ 
+#define SP_CONT_PIN  GPIO_PIN_9   /* Solid propellant continuity   */
 
 /* Ports */
-#define STATUS_GPIO GPIOE
+#define STATUS_GPIO        GPIOE  /* Status LED                    */
+#define FIRE_GPIO_PORT     GPIOE  /* Ignition MOSFET               */
+#define E_CONT_GPIO_PORT   GPIOE  /* E-match and switch continuity */
+#define NOZ_CONT_GPIO_PORT GPIOE  /* Engine Nozzle continuity      */
+#define SP_CONT_GPIO_PORT  GPIOE  /* Solid Propellant continuity   */
 	
 /*------------------------------------------------------------------------------
  Exported functions prototypes                                                                     
