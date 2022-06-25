@@ -62,6 +62,12 @@ IGN_STAT ignite
     void
 	); 
 
+/* Poll continuity terminals and report continuity info              */
+IGN_STAT ign_get_cont_info
+	(
+    void
+    );
+
 /* Check for continuity across solid propellant wire screw terminals */
 bool solid_prop_cont
 	(

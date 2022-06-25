@@ -46,7 +46,7 @@ uint8_t ign_cmd_execute
 /*------------------------------------------------------------------------------
  Local Variables 
 ------------------------------------------------------------------------------*/
-IGN_STAT ign_status; /* Status code returned by ignite API function */
+IGN_STAT ign_status = 0; /* Status code returned by ignite API function */
 
 /*------------------------------------------------------------------------------
  Call API function 
