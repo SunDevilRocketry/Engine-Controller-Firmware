@@ -287,7 +287,7 @@ HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);      /* Write to registers  */
 /*------------------------- IGNITION MCU PIN ---------------------------------*/
 
 /* Configure Output Level */
-HAL_GPIO_WritePin(FIRE_GPIO_PORT, FIRE_PIN, GPIO_PIN_SET);
+HAL_GPIO_WritePin(FIRE_GPIO_PORT, FIRE_PIN, GPIO_PIN_RESET);
 
 /* Configure pin */
 GPIO_InitStruct.Pin   = FIRE_PIN;
@@ -318,7 +318,7 @@ void Error_Handler(void)
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
   HAL_GPIO_WritePin(GPIOE, STATUS_R, GPIO_PIN_RESET); 
-  HAL_GPIO_WritePin(GPIOE, STATUS_B | STATUS_G, GPIO_PIN_RESET); 
+  HAL_GPIO_WritePin(GPIOE, STATUS_B | STATUS_G, GPIO_PIN_SET); 
   while (1)
   {
       /* application hangs when error handler is invoked */
