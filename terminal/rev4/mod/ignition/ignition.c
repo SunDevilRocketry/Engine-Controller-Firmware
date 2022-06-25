@@ -47,6 +47,7 @@ IGN_STAT ignite
 
 /* Assert ignition signal */
 
+return 0;
 } /* ignite */
 
 
@@ -65,6 +66,7 @@ bool solid_prop_cont
 	void
 	)
 {
+return false;
 } /* solid_prop_cont */
 
 
@@ -83,6 +85,7 @@ bool nozzle_cont
 	void
 	)
 {
+return false;
 } /* nozzle_cont */
 
 
@@ -101,6 +104,7 @@ bool ematch_cont
 	void
 	)
 {
+return false;
 } /* ematch_cont */
 
 
