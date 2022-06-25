@@ -32,6 +32,7 @@ C_SOURCES =  \
 main.c \
 mod/commands/commands.c \
 mod/ignition/ignition.c \
+mod/led/led.c \
 lib/Core/Src/stm32h7xx_it.c \
 lib/Core/Src/stm32h7xx_hal_msp.c \
 lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.c \
@@ -118,7 +119,8 @@ C_INCLUDES =  \
 -Ilib/Drivers/CMSIS/Device/ST/STM32H7xx/Include \
 -Ilib/Drivers/CMSIS/Include \
 -Imod/commands \
--Imod/ignition
+-Imod/ignition \
+-Imod/led
 
 # compile gcc flags
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections

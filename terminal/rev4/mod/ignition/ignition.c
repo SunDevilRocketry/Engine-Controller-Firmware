@@ -95,12 +95,11 @@ IGN_STAT ignite
 ------------------------------------------------------------------------------*/
 
 /* Check for e-match/switch continuity */
-
-//if (!ematch_cont())
-//	{
+if (!ematch_cont())
+	{
     /* No continuity across ematch and/or switch */
     return 0; 
- //   }
+    }
 
 /* Assert ignition signal for 10 ms */
 HAL_GPIO_WritePin(FIRE_GPIO_PORT, FIRE_PIN, GPIO_PIN_SET);
@@ -249,14 +248,14 @@ bool ematch_cont
 /* Check MCU GPIO State */
 uint8_t ematch_cont_pinstate = HAL_GPIO_ReadPin(E_CONT_GPIO_PORT, E_CONT_PIN);
 
-/* Return true if GPIO state is high*/
+/* Return true if GPIO state is low */
 if (ematch_cont_pinstate == 0)
 	{
-    return true;
+    return false;
 	}
 else
 	{
-    return false;
+    return true;
     }
 
 } /* ematch_cont */

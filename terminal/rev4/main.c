@@ -22,6 +22,7 @@
 #include "main.h"
 #include "commands.h"
 #include "ignition.h"
+#include "led.h"
 
 
 /*------------------------------------------------------------------------------
@@ -119,7 +120,11 @@ while (1)
 				break;
 
 			default:
-				/* Do nothing */
+				/* Unsupported command code flash the red LED */
+			    HAL_GPIO_WritePin(GPIOE, STATUS_R, GPIO_PIN_RESET); 
+			    HAL_GPIO_WritePin(GPIOE, STATUS_B | STATUS_G, GPIO_PIN_SET); 
+				HAL_Delay(100);
+			    HAL_GPIO_WritePin(GPIOE, STATUS_R, GPIO_PIN_SET); 
 			} 
 		} 
 	else /* USB connection times out */
