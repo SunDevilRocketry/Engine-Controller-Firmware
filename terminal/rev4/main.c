@@ -251,15 +251,43 @@ GPIO_InitTypeDef GPIO_InitStruct = {0};
 __HAL_RCC_GPIOE_CLK_ENABLE();
 __HAL_RCC_GPIOA_CLK_ENABLE();
 
+/*--------------------------- LED MCU PINS -----------------------------------*/
+
 /* Configure GPIO pin Output Level */
 HAL_GPIO_WritePin(GPIOE, STATUS_R | STATUS_B | STATUS_G, GPIO_PIN_SET);
 
 /* Configure GPIO pin : PE2 --> Status LED pin */
-GPIO_InitStruct.Pin = STATUS_R | STATUS_B | STATUS_G;
-GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD; /* push-pull output */
-GPIO_InitStruct.Pull = GPIO_NOPULL; /* no pull up resistor */
-GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW; /* Low Frequency */
-HAL_GPIO_Init(GPIOE, &GPIO_InitStruct); /* Write to registers */
+GPIO_InitStruct.Pin   = STATUS_R | 
+                        STATUS_B | 
+                        STATUS_G;
+GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_OD; /* open-drain output   */
+GPIO_InitStruct.Pull  = GPIO_NOPULL;         /* no pull up resistor */
+GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW; /* Low Frequency       */
+HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);      /* Write to registers  */
+
+/*------------------------- IGNITION MCU PIN ---------------------------------*/
+
+/* Configure Output Level */
+HAL_GPIO_WritePin(FIRE_GPIO_PORT, FIRE_PIN, GPIO_PIN_SET);
+
+/* Configure pin */
+GPIO_InitStruct.Pin   = FIRE_PIN;
+GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP; /* push-pull output    */
+GPIO_InitStruct.Pull  = GPIO_NOPULL;         /* no pull up resistor */
+GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW; /* Low Frequency       */
+HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);      /* Write to registers  */
+
+/*--------------------- IGNITION CONTINUITY MCU PIN --------------------------*/
+
+/* Configure pin */
+GPIO_InitStruct.Pin   = E_CONT_PIN   |
+                        NOZ_CONT_PIN |
+                        SP_CONT_PIN;
+GPIO_InitStruct.Mode  = GPIO_MODE_INPUT;     /* push-pull output    */
+GPIO_InitStruct.Pull  = GPIO_NOPULL;         /* no pull up resistor */
+GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW; /* Low Frequency       */
+HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);      /* Write to registers  */
+
 } /* GPIO_Init */
 
 /**
