@@ -41,7 +41,30 @@ PWR_SRC pwr_get_source
     void
     )
 {
+/*------------------------------------------------------------------------------
+ Local Variables 
+------------------------------------------------------------------------------*/
+uint8_t pwr_source; /* USB or buck converter power supply */
 
+
+/*------------------------------------------------------------------------------
+ API Function Implementation 
+------------------------------------------------------------------------------*/
+
+/* Read the MCU pin */
+pwr_source = HAL_GPIO_ReadPin(PWR_SRC_GPIO_PORT, PWR_SRC_PIN);
+
+/* Return the corresponding code */
+if (pwr_source == GPIO_PIN_SET)
+	{
+	/* Buck converter 5V source */
+	return BUCK_5V_SRC; 
+    }
+else
+	{
+	/* USB 5V source */
+	return USB_5V_SRC;
+	}
 
 }
 

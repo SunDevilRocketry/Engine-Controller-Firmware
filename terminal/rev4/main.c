@@ -23,6 +23,7 @@
 #include "commands.h"
 #include "ignition.h"
 #include "led.h"
+#include "power.h"
 
 
 /*------------------------------------------------------------------------------
@@ -323,11 +324,11 @@ HAL_GPIO_Init(E_CONT_GPIO_PORT, &GPIO_InitStruct); /* Write to registers  */
 /*----------------------- 5V SOURCE INDICATION PIN ----------------------------*/
 
 /* Configure pin */
-GPIO_InitStruct.Pin   = PWR_SOURCE_PIN;
-GPIO_InitStruct.Mode  = GPIO_MODE_INPUT;               /* push-pull output    */
-GPIO_InitStruct.Pull  = GPIO_NOPULL;                   /* no pull up resistor */
-GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;           /* Low Frequency       */
-HAL_GPIO_Init(PWR_SOURCE_GPIO_PORT, &GPIO_InitStruct); /* Write to registers  */
+GPIO_InitStruct.Pin   = PWR_SRC_PIN;
+GPIO_InitStruct.Mode  = GPIO_MODE_INPUT;            /* push-pull output    */
+GPIO_InitStruct.Pull  = GPIO_NOPULL;                /* no pull up resistor */
+GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;        /* Low Frequency       */
+HAL_GPIO_Init(PWR_SRC_GPIO_PORT, &GPIO_InitStruct); /* Write to registers  */
 
 } /* GPIO_Init */
 
