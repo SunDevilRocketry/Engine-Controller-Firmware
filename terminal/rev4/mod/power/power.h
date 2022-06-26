@@ -1,25 +1,35 @@
 /*******************************************************************************
 *
 * FILE: 
-* 		led.h
+* 		power.h
 *
 * DESCRIPTION: 
-* 		Contains API functions to set the behavior of the on-board rgb led
+* 		Contains API functions to manage the engine controller power supply
 *
 *******************************************************************************/
 
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef LED_H
-#define LED_H
+#ifndef POWER_H
+#define POWER_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+
 /*------------------------------------------------------------------------------
  Typdefs 
 ------------------------------------------------------------------------------*/
+
+/* Power source enumeration. Indicates if the power multiplexor is supplying 
+   5V from USB or from the buck converter */
+enum pwr_source
+	{
+    USB_5V_SRC = 0U,
+    BUCK_5V_SRC
+    }
+typedef enum pwr_source PWR_SRC;
 
 
 /*------------------------------------------------------------------------------
@@ -31,24 +41,12 @@ extern "C" {
  Function Prototypes 
 ------------------------------------------------------------------------------*/
 
-/* Display Red to indicate software exception */
-void led_error_assert
-	(
-    void
-    );
-
-/* Reset the led */
-void led_reset
-	(
-    void
-    );
-
-/* Flash Red to indicate that the code hit a block of code not meant to be run
-   without blocking the program from running  */
-void led_error_flash
+/* Determine if the MCU is being powered by USB or by the buck converter */
+PWR_SRC pwr_get_source
 	(
     void
     );
 
 
-#endif /* LED_H */
+
+#endif /* POWER_H */

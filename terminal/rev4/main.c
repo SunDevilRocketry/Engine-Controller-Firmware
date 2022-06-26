@@ -121,10 +121,7 @@ while (1)
 
 			default:
 				/* Unsupported command code flash the red LED */
-			    HAL_GPIO_WritePin(GPIOE, STATUS_R, GPIO_PIN_RESET); 
-			    HAL_GPIO_WritePin(GPIOE, STATUS_B | STATUS_G, GPIO_PIN_SET); 
-				HAL_Delay(100);
-			    HAL_GPIO_WritePin(GPIOE, STATUS_R, GPIO_PIN_SET); 
+				led_error_flash();
 			} 
 		} 
 	else /* USB connection times out */
@@ -254,6 +251,7 @@ if (HAL_UARTEx_DisableFifoMode(&huart1) != HAL_OK)
 	}
 } /* USB_UART_Init */
 
+
 /*******************************************************************************
 *                                                                              *
 * PROCEDURE:                                                                   *
@@ -275,19 +273,27 @@ GPIO_InitTypeDef GPIO_InitStruct = {0};
 __HAL_RCC_GPIOE_CLK_ENABLE();
 __HAL_RCC_GPIOA_CLK_ENABLE();
 
+
 /*--------------------------- LED MCU PINS -----------------------------------*/
 
 /* Configure GPIO pin Output Level */
-HAL_GPIO_WritePin(GPIOE, STATUS_R | STATUS_B | STATUS_G, GPIO_PIN_SET);
+HAL_GPIO_WritePin(
+                 STATUS_GPIO_PORT, 
+                 STATUS_R_PIN | 
+                 STATUS_B_PIN | 
+                 STATUS_G_PIN ,
+                 GPIO_PIN_SET
+                 );
 
 /* Configure GPIO pin : PE2 --> Status LED pin */
-GPIO_InitStruct.Pin   = STATUS_R | 
-                        STATUS_B | 
-                        STATUS_G;
+GPIO_InitStruct.Pin   = STATUS_R_PIN | 
+                        STATUS_B_PIN | 
+                        STATUS_G_PIN;
 GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_OD; /* open-drain output   */
 GPIO_InitStruct.Pull  = GPIO_NOPULL;         /* no pull up resistor */
 GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW; /* Low Frequency       */
-HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);      /* Write to registers  */
+HAL_GPIO_Init(STATUS_GPIO_PORT, &GPIO_InitStruct);      /* Write to registers  */
+
 
 /*------------------------- IGNITION MCU PIN ---------------------------------*/
 
@@ -301,18 +307,30 @@ GPIO_InitStruct.Pull  = GPIO_NOPULL;         /* no pull up resistor */
 GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW; /* Low Frequency       */
 HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);      /* Write to registers  */
 
+
 /*--------------------- IGNITION CONTINUITY MCU PIN --------------------------*/
 
 /* Configure pin */
 GPIO_InitStruct.Pin   = E_CONT_PIN   |
                         NOZ_CONT_PIN |
                         SP_CONT_PIN;
-GPIO_InitStruct.Mode  = GPIO_MODE_INPUT;     /* push-pull output    */
-GPIO_InitStruct.Pull  = GPIO_NOPULL;         /* no pull up resistor */
-GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW; /* Low Frequency       */
-HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);      /* Write to registers  */
+GPIO_InitStruct.Mode  = GPIO_MODE_INPUT;           /* push-pull output    */
+GPIO_InitStruct.Pull  = GPIO_NOPULL;               /* no pull up resistor */
+GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;       /* Low Frequency       */
+HAL_GPIO_Init(E_CONT_GPIO_PORT, &GPIO_InitStruct); /* Write to registers  */
+
+
+/*----------------------- 5V SOURCE INDICATION PIN ----------------------------*/
+
+/* Configure pin */
+GPIO_InitStruct.Pin   = PWR_SOURCE_PIN;
+GPIO_InitStruct.Mode  = GPIO_MODE_INPUT;               /* push-pull output    */
+GPIO_InitStruct.Pull  = GPIO_NOPULL;                   /* no pull up resistor */
+GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;           /* Low Frequency       */
+HAL_GPIO_Init(PWR_SOURCE_GPIO_PORT, &GPIO_InitStruct); /* Write to registers  */
 
 } /* GPIO_Init */
+
 
 /**
   * @brief  This function is executed in case of error occurrence.
@@ -320,14 +338,13 @@ HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);      /* Write to registers  */
   */
 void Error_Handler(void)
 {
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  HAL_GPIO_WritePin(GPIOE, STATUS_R, GPIO_PIN_RESET); 
-  HAL_GPIO_WritePin(GPIOE, STATUS_B | STATUS_G, GPIO_PIN_SET); 
-  while (1)
-  {
+    /* User can add his own implementation to report the HAL error return state */
+    __disable_irq();
+	led_error_assert();
+    while (1)
+    {
       /* application hangs when error handler is invoked */
-  }
+    }
 }
 
 #ifdef  USE_FULL_ASSERT

@@ -25,8 +25,12 @@ extern "C" {
 /* Ignition response code */
 /* IGN_STAT = bit7 | bit6 | bit5 | bit4 | bit3 | bit2 | bit1 | bit0 
 
-   bits7-4: not used
-   bit3: Ignition status, success (1) or fail (0)
+   bit7: not used
+   bit6: Ignition status, success (1) or fail (0)
+   bit5: Ignition failure due to ematch continuity detected after ignition 
+         signal is asserted, failure (1) or pass (0)
+   bit4: Ignition failure due to missing power supply, failure (1) or pass (0)
+   bit3: Ignition failure due to ematch discontinuity, failure (1) or pass (0)
    bit2: Nozzle wire continuity, 1 indicates continuity between screw terminals
    bit1: Solid propellant wire continuity, 1 indicates continuity between screw 
          terminals
@@ -41,14 +45,17 @@ typedef uint8_t IGN_STAT;
 ------------------------------------------------------------------------------*/
 
 /* Ignition subcommand codes */
-#define IGN_FIRE_CODE 0x01
-#define IGN_CONT_CODE 0x02
+#define IGN_FIRE_CODE	    0x01
+#define IGN_CONT_CODE	    0x02
 
 /* Ignition response code bitmasks */
-#define IGN_E_CONT_MASK   0b00000001
-#define IGN_SP_CONT_MASK  0b00000010
-#define IGN_NOZ_CONT_MASK 0b00000100
-#define IGN_SUCCESS       0b00001000
+#define IGN_E_CONT_MASK   	0b00000001
+#define IGN_SP_CONT_MASK  	0b00000010
+#define IGN_NOZ_CONT_MASK 	0b00000100
+#define IGN_FAIL_E_MASK   	0b00001000
+#define IGN_FAIL_PWR_MASK 	0b00010000
+#define IGN_FAIL_MASK       0b00100000
+#define IGN_SUCCESS         0b01000000
 
 
 /*------------------------------------------------------------------------------

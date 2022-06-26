@@ -18,32 +18,35 @@ extern "C" {
 #endif
 
 /*------------------------------------------------------------------------------
- Includes                                                                     
+ Includes                                                                    
 ------------------------------------------------------------------------------*/
 #include "stm32h7xx_hal.h"
 
 /*------------------------------------------------------------------------------
- MCU Pin Assignments                                                                     
+ MCU Pin Assignments                                                          
 ------------------------------------------------------------------------------*/
 
 /* Pins */
-#define STATUS_B     GPIO_PIN_12  /* Status LED                    */  
-#define STATUS_G     GPIO_PIN_11  
-#define STATUS_R     GPIO_PIN_10  
-#define FIRE_PIN     GPIO_PIN_6   /* Ignition MOSFET               */
-#define E_CONT_PIN   GPIO_PIN_7   /* E-match and switch continuity */
-#define NOZ_CONT_PIN GPIO_PIN_8   /* Engine nozzle continuity      */ 
-#define SP_CONT_PIN  GPIO_PIN_9   /* Solid propellant continuity   */
+#define STATUS_B_PIN      GPIO_PIN_12  /* Status LED                    */  
+#define STATUS_G_PIN      GPIO_PIN_11  
+#define STATUS_R_PIN      GPIO_PIN_10  
+#define FIRE_PIN          GPIO_PIN_6   /* Ignition MOSFET               */
+#define E_CONT_PIN        GPIO_PIN_7   /* E-match and switch continuity */
+#define NOZ_CONT_PIN      GPIO_PIN_8   /* Engine nozzle continuity      */ 
+#define SP_CONT_PIN  	  GPIO_PIN_9   /* Solid propellant continuity   */
+#define PWR_SOURCE_PIN    GPIO_PIN_0   /* Source of 5V supply           */
 
 /* Ports */
-#define STATUS_GPIO        GPIOE  /* Status LED                    */
-#define FIRE_GPIO_PORT     GPIOE  /* Ignition MOSFET               */
-#define E_CONT_GPIO_PORT   GPIOE  /* E-match and switch continuity */
-#define NOZ_CONT_GPIO_PORT GPIOE  /* Engine Nozzle continuity      */
-#define SP_CONT_GPIO_PORT  GPIOE  /* Solid Propellant continuity   */
+#define STATUS_GPIO_PORT        GPIOE  /* Status LED                    */
+#define FIRE_GPIO_PORT          GPIOE  /* Ignition MOSFET               */
+#define E_CONT_GPIO_PORT        GPIOE  /* E-match and switch continuity */
+#define NOZ_CONT_GPIO_PORT      GPIOE  /* Engine Nozzle continuity      */
+#define SP_CONT_GPIO_PORT       GPIOE  /* Solid Propellant continuity   */
+#define PWR_SOURCE_GPIO_PORT    GPIOE  /* Source of 5V supply           */
 	
+
 /*------------------------------------------------------------------------------
- Exported functions prototypes                                                                     
+ Exported functions prototypes                                             
 ------------------------------------------------------------------------------*/
 void Error_Handler(void);
 

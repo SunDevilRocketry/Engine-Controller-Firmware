@@ -40,6 +40,11 @@ void led_error_assert
 	void
 	)
 {
+/* Reset RGB LED */
+led_reset();
+
+/* Set the RGB LED to red */
+HAL_GPIO_WritePin(STATUS_GPIO_PORT, STATUS_R_PIN, GPIO_PIN_RESET);
 
 } /* led_error_assert */
 
@@ -59,6 +64,15 @@ void led_reset
 	)
 {
 
+/* Set all MCU RGB led pins to high */
+HAL_GPIO_WritePin(
+                 STATUS_GPIO_PORT, 
+                 STATUS_R_PIN |
+                 STATUS_G_PIN |
+                 STATUS_B_PIN,
+                 GPIO_PIN_SET
+                 );
+
 } /* led_reset */
 
 
@@ -77,6 +91,12 @@ void led_error_flash
 	void
 	)
 {
+
+/* Flash led red */
+led_reset();
+HAL_GPIO_WritePin(STATUS_GPIO_PORT, STATUS_R_PIN, GPIO_PIN_RESET); 
+HAL_Delay(100);
+HAL_GPIO_WritePin(STATUS_GPIO_PORT, STATUS_R_PIN, GPIO_PIN_SET); 
 
 } /* led_error_flash */
 

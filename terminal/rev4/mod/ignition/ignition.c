@@ -98,8 +98,10 @@ IGN_STAT ignite
 if (!ematch_cont())
 	{
     /* No continuity across ematch and/or switch */
-    return 0; 
+    return IGN_FAIL_E_MASK; 
     }
+
+/* Check that power supply is not USB */
 
 /* Assert ignition signal for 10 ms */
 HAL_GPIO_WritePin(FIRE_GPIO_PORT, FIRE_PIN, GPIO_PIN_SET);
@@ -113,7 +115,7 @@ if (!ematch_cont())
     }
 else /* Ignition unsuccessful */
 	{
-    return 0;
+    return IGN_FAIL_MASK;
     }
 
 } /* ignite */
@@ -138,6 +140,7 @@ IGN_STAT ign_get_cont_info
  Local Variables 
 ------------------------------------------------------------------------------*/
 IGN_STAT ign_status = 0; /* Status code to be returned */
+
 
 /*------------------------------------------------------------------------------
  Call API functions 
