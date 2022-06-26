@@ -26,8 +26,8 @@ extern "C" {
    5V from USB or from the buck converter */
 enum pwr_source
 	{
-    USB_5V_SRC = 0U,
-    BUCK_5V_SRC
+    BUCK_5V_SRC = 0U,
+    USB_5V_SRC
     };
 typedef enum pwr_source PWR_SRC;
 

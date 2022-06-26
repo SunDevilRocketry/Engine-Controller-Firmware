@@ -55,7 +55,7 @@ uint8_t pwr_source; /* USB or buck converter power supply */
 pwr_source = HAL_GPIO_ReadPin(PWR_SRC_GPIO_PORT, PWR_SRC_PIN);
 
 /* Return the corresponding code */
-if (pwr_source == GPIO_PIN_SET)
+if (pwr_source == GPIO_PIN_RESET)
 	{
 	/* Buck converter 5V source */
 	return BUCK_5V_SRC; 
