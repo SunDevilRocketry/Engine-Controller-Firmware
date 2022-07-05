@@ -24,6 +24,7 @@
 #include "ignition.h"
 #include "led.h"
 #include "power.h"
+#include "flash.h"
 
 
 /*------------------------------------------------------------------------------
@@ -61,10 +62,11 @@ int main
 /*------------------------------------------------------------------------------
  Local Variables                                                                  
 ------------------------------------------------------------------------------*/
-uint8_t data;           /* USB Incoming Data Buffer */
-uint8_t ign_subcommand; /* Ignition subcommand code */
-uint8_t ign_status;     /* Ignition status code     */
-uint8_t pwr_source;     /* Power source code        */
+uint8_t      data;           /* USB Incoming Data Buffer               */
+uint8_t      ign_subcommand; /* Ignition subcommand code               */
+uint8_t      ign_status;     /* Ignition status code                   */
+uint8_t      pwr_source;     /* Power source code                      */
+FLASH_BUFFER flash_buffer;   /* Buffer for flash read/write operations */
 
 
 /*------------------------------------------------------------------------------
@@ -136,7 +138,7 @@ while (1)
 			case FLASH_OP:
 			
 				/* Get operation code */
-				led_flash();
+				flash_cmd_execute(0, &flash_buffer);
 				break;
 
 			/*-------------------- Unrecognized Command ----------------------*/
