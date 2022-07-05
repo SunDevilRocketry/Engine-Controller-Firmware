@@ -132,7 +132,14 @@ while (1)
 				HAL_UART_Transmit(&huart1, &pwr_source, 1, 1);
 				break;
 
+			/*------------------------ Power Command -------------------------*/
+			case FLASH_OP:
+			
+				/* Get operation code */
+				led_flash();
+				break;
 
+			/*-------------------- Unrecognized Command ----------------------*/
 			default:
 				/* Unsupported command code flash the red LED */
 				led_error_flash();

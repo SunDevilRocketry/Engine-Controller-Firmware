@@ -100,6 +100,33 @@ HAL_GPIO_WritePin(STATUS_GPIO_PORT, STATUS_R_PIN, GPIO_PIN_SET);
 
 } /* led_error_flash */
 
+/*******************************************************************************
+*                                                                              *
+* PROCEDURE:                                                                   * 
+* 		led_flash                                                              *
+*                                                                              *
+* DESCRIPTION:                                                                 * 
+* 		Flashes the RGB led                                                    *
+*                                                                              *
+*******************************************************************************/
+void led_flash
+	(
+	void
+	)
+{
+
+/* Flash led */
+led_reset();
+HAL_GPIO_WritePin(STATUS_GPIO_PORT, 
+                  STATUS_R_PIN | STATUS_G_PIN | STATUS_B_PIN, 
+                  GPIO_PIN_RESET); 
+HAL_Delay(100);
+HAL_GPIO_WritePin(STATUS_GPIO_PORT, 
+                  STATUS_R_PIN | STATUS_G_PIN | STATUS_B_PIN, 
+                  GPIO_PIN_SET); 
+
+} /* led_flash */
+
 
 /*******************************************************************************
 * END OF FILE                                                                  * 

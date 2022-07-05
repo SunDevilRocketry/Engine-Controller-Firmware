@@ -24,6 +24,7 @@ extern "C" {
 #define CONNECT_OP	0x02 /* connect command opcode */
 #define IGNITE_OP	0x20 /* connect command opcode */
 #define POWER_OP    0x21 /* power command opcode   */
+#define FLASH_OP    0x22 /* flash command opcode   */
 
 /*------------------------------------------------------------------------------
  Function Prototypes 

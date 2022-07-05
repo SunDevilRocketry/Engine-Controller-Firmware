@@ -50,5 +50,11 @@ void led_error_flash
     void
     );
 
+/* Flash the RGB led */
+void led_flash
+	(
+    void
+    );
+
 
 #endif /* LED_H */
