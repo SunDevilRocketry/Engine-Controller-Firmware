@@ -50,7 +50,7 @@ SPI_HandleTypeDef  hspi2;  /* Flash SPI handle */
 static void	SystemClock_Config(void); /* clock configuration */
 static void GPIO_Init(void); /* GPIO configurations  */
 static void USB_UART_Init(void); /* USB UART configuration  */
-static void MX_SPI2_Init(void);  /* Flash SPI configuration */
+static void FLASH_SPI2_Init(void);  /* Flash SPI configuration */
 
 
 /*------------------------------------------------------------------------------
@@ -79,7 +79,7 @@ HAL_Init();           /* Reset peripherals, initialize flash interface and
 SystemClock_Config(); /* System clock                                         */
 GPIO_Init();          /* GPIO                                                 */
 USB_UART_Init();      /* USB UART                                             */
-MX_SPI2_Init();
+FLASH_SPI2_Init();
 
 /*------------------------------------------------------------------------------
  Event Loop                                                                  
@@ -233,7 +233,7 @@ else /* RCC Configuration okay */
 
 } /* SystemClock_Config */
 
-static void MX_SPI2_Init(void)
+static void FLASH_SPI2_Init(void)
 {
 
 /* SPI2 parameter configuration*/
