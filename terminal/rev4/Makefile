@@ -38,6 +38,8 @@ mod/flash/flash.c \
 lib/Core/Src/stm32h7xx_it.c \
 lib/Core/Src/stm32h7xx_hal_msp.c \
 lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.c \
+lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi.c \
+lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi_ex.c \
 lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc.c \
 lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc_ex.c \
 lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash.c \
