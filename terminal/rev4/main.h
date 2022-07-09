@@ -36,6 +36,9 @@ extern "C" {
 #define SP_CONT_PIN     GPIO_PIN_9   /* Solid propellant continuity   */
 #define PWR_SRC_PIN     GPIO_PIN_0   /* Source of 5V supply           */
 #define FLASH_SS_PIN    GPIO_PIN_12  /* Flash SPI pins                */
+#define FLASH_SCK_PIN   GPIO_PIN_10 
+#define FLASH_MISO_PIN  GPIO_PIN_14
+#define FLASH_MOSI_PIN  GPIO_PIN_15
 
 /* Ports */
 #define STATUS_GPIO_PORT      GPIOE  /* Status LED                    */
@@ -45,6 +48,10 @@ extern "C" {
 #define SP_CONT_GPIO_PORT     GPIOE  /* Solid Propellant continuity   */
 #define PWR_SRC_GPIO_PORT     GPIOE  /* Source of 5V supply           */
 #define FLASH_SS_GPIO_PORT    GPIOB  /* Flash SPI port                */
+#define FLASH_SCK_GPIO_PORT   GPIOB  
+#define FLASH_MISO_GPIO_PORT  GPIOB  
+#define FLASH_MOSI_GPIO_PORT  GPIOB  
+
 	
 
 /*------------------------------------------------------------------------------
