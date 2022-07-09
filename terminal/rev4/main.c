@@ -137,7 +137,7 @@ while (1)
 				HAL_UART_Transmit(&huart1, &pwr_source, 1, 1);
 				break;
 
-			/*------------------------ Power Command -------------------------*/
+			/*------------------------ Flash Command -------------------------*/
 			case FLASH_OP:
 			
 				/* Get operation code */
