@@ -35,6 +35,7 @@ extern "C" {
 #define NOZ_CONT_PIN    GPIO_PIN_8   /* Engine nozzle continuity      */ 
 #define SP_CONT_PIN     GPIO_PIN_9   /* Solid propellant continuity   */
 #define PWR_SRC_PIN     GPIO_PIN_0   /* Source of 5V supply           */
+#define FLASH_SS_PIN    GPIO_PIN_12  /* Flash SPI pins                */
 
 /* Ports */
 #define STATUS_GPIO_PORT      GPIOE  /* Status LED                    */
@@ -43,6 +44,7 @@ extern "C" {
 #define NOZ_CONT_GPIO_PORT    GPIOE  /* Engine Nozzle continuity      */
 #define SP_CONT_GPIO_PORT     GPIOE  /* Solid Propellant continuity   */
 #define PWR_SRC_GPIO_PORT     GPIOE  /* Source of 5V supply           */
+#define FLASH_SS_GPIO_PORT    GPIOB  /* Flash SPI port                */
 	
 
 /*------------------------------------------------------------------------------

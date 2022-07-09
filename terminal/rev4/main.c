@@ -50,7 +50,7 @@ SPI_HandleTypeDef  hspi2;  /* Flash SPI handle */
 static void	SystemClock_Config(void); /* clock configuration */
 static void GPIO_Init(void); /* GPIO configurations  */
 static void USB_UART_Init(void); /* USB UART configuration  */
-static void FLASH_SPI2_Init(void);  /* Flash SPI configuration */
+static void FLASH_SPI_Init(void);  /* Flash SPI configuration */
 
 
 /*------------------------------------------------------------------------------
@@ -79,7 +79,7 @@ HAL_Init();           /* Reset peripherals, initialize flash interface and
 SystemClock_Config(); /* System clock                                         */
 GPIO_Init();          /* GPIO                                                 */
 USB_UART_Init();      /* USB UART                                             */
-FLASH_SPI2_Init();
+FLASH_SPI_Init();
 
 /*------------------------------------------------------------------------------
  Event Loop                                                                  
@@ -233,7 +233,7 @@ else /* RCC Configuration okay */
 
 } /* SystemClock_Config */
 
-static void FLASH_SPI2_Init(void)
+static void FLASH_SPI_Init(void)
 {
 
 /* SPI2 parameter configuration*/
@@ -402,14 +402,14 @@ HAL_GPIO_Init(PWR_SRC_GPIO_PORT, &GPIO_InitStruct); /* Write to registers  */
 /*--------------------------- FLASH CHIP PINS ---------------------------------*/
 
 /*Configure GPIO pin Output Level */
-HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
+HAL_GPIO_WritePin(FLASH_SS_GPIO_PORT, FLASH_SS_PIN, GPIO_PIN_RESET);
 
 /*Configure GPIO pin : PB12 */
-GPIO_InitStruct.Pin = GPIO_PIN_12;
-GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-GPIO_InitStruct.Pull = GPIO_NOPULL;
+GPIO_InitStruct.Pin   = FLASH_SS_PIN;
+GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+GPIO_InitStruct.Pull  = GPIO_NOPULL;
 GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+HAL_GPIO_Init(FLASH_SS_GPIO_PORT, &GPIO_InitStruct);
 
 } /* GPIO_Init */
 
