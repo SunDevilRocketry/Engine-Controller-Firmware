@@ -3,3 +3,9 @@ blink/rev3/build/*
 blink/rev4/build/*
 terminal/rev3/build/*
 terminal/rev4/build/*
+
+# Visual Studio Code Artifacts
+blink/rev3/.vscode/*
+blink/rev4/.vscode/*
+terminal/rev3/.vscode/*
+terminal/rev4/.vscode/*

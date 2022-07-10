@@ -233,6 +233,16 @@ else /* RCC Configuration okay */
 
 } /* SystemClock_Config */
 
+/*******************************************************************************
+*                                                                              *
+* PROCEDURE:                                                                   * 
+* 		FLASH_SPI_Init                                                         *	
+*                                                                              *
+* DESCRIPTION:                                                                 * 
+* 		Initializes the SPI peripheral used for communication with the         *
+*       external flash chip                                                    *
+*                                                                              *
+*******************************************************************************/
 static void FLASH_SPI_Init(void)
 {
 
@@ -402,7 +412,7 @@ HAL_GPIO_Init(PWR_SRC_GPIO_PORT, &GPIO_InitStruct); /* Write to registers  */
 /*--------------------------- FLASH CHIP PINS ---------------------------------*/
 
 /*Configure GPIO pin Output Level */
-HAL_GPIO_WritePin(FLASH_SS_GPIO_PORT, FLASH_SS_PIN, GPIO_PIN_RESET);
+HAL_GPIO_WritePin(FLASH_SS_GPIO_PORT, FLASH_SS_PIN, GPIO_PIN_SET);
 
 /*Configure GPIO pin : PB12 */
 GPIO_InitStruct.Pin   = FLASH_SS_PIN;
