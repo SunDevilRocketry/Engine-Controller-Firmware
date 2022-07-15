@@ -67,13 +67,21 @@ typedef struct _FLASH_BUFFER_TAG {
 typedef FLASH_BUFFER* PFLASH_BUFFER;
 
 /* Flash subcommand codes */
-enum FLASH_SUBCMD_CODES {
+typedef enum FLASH_SUBCMD_CODES {
     FLASH_SUBCMD_READ = 0,
     FLASH_SUBCMD_ENABLE  ,
     FLASH_SUBCMD_DISABLE ,
     FLASH_SUBCMD_WRITE   ,
     FLASH_SUBCMD_ERASE   
-};
+} FLASH_SUBCMD_CODE;
+
+/* Flash return value codes */
+typedef enum FLASH_CMD_STATUS {
+	FLASH_OK = 0         ,
+    FLASH_FAIL           ,
+    FLASH_UNSUPPORTED_OP ,
+	FLASH_UNRECOGNIZED_OP,
+} FLASH_CMD_STATUS;
 
 
 /*------------------------------------------------------------------------------
@@ -81,7 +89,7 @@ enum FLASH_SUBCMD_CODES {
 ------------------------------------------------------------------------------*/
 
 /* Executes a flash subcommand based on user input from the sdec terminal */
-void flash_cmd_execute
+FLASH_CMD_STATUS flash_cmd_execute
 	(
     uint8_t       flash_subcommand,
     PFLASH_BUFFER pflash_buffer

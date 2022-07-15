@@ -37,7 +37,7 @@
 * 		Executes a flash subcommand based on input from the sdec terminal      *
 *                                                                              *
 *******************************************************************************/
-void flash_cmd_execute
+FLASH_CMD_STATUS flash_cmd_execute
 	(
     uint8_t       subcommand,
 	PFLASH_BUFFER pflash_buffer
@@ -46,8 +46,8 @@ void flash_cmd_execute
 /*------------------------------------------------------------------------------
  Local Variables 
 ------------------------------------------------------------------------------*/
-uint8_t opcode;     /* Subcommand opcode                   */
-uint8_t num_bytes;  /* Number of bytes on which to operate */
+uint8_t          opcode;     /* Subcommand opcode                   */
+uint8_t          num_bytes;  /* Number of bytes on which to operate */
 
 /*------------------------------------------------------------------------------
  Command Input processing 
@@ -63,47 +63,41 @@ switch(opcode)
     /* READ Subcommand */
     case FLASH_SUBCMD_READ:
         {
-		Error_Handler();
-        break;
+		return FLASH_UNSUPPORTED_OP;	
         }
 
     /* ENABLE Subcommand */
     case FLASH_SUBCMD_ENABLE:
         {
-		Error_Handler();
-        break;
+		flash_write_enable(pflash_buffer);
+		return FLASH_OK;
         }
 
     /* DISABLE Subcommand */
     case FLASH_SUBCMD_DISABLE:
         {
-		Error_Handler();
-        break;
+		flash_write_disable(pflash_buffer);
+		return FLASH_OK;
         }
 
     /* WRITE Subcommand */
     case FLASH_SUBCMD_WRITE:
         {
-		Error_Handler();
-        break;
+	    return FLASH_UNSUPPORTED_OP;	
         }
 
     /* ERASE Subcommand */
     case FLASH_SUBCMD_ERASE:
         {
-		Error_Handler();
-        break;
+	    return FLASH_UNSUPPORTED_OP;	
         }
 
     /* Unrecognized subcommand code: invoke error handler */
 	default:
         {
-		Error_Handler();
-        break;
+	    return FLASH_UNRECOGNIZED_OP;	
         }
-
     }
-
 } /* flash_cmd_execute */
 
 
@@ -121,7 +115,8 @@ void flash_write_enable
     PFLASH_BUFFER pflash_buffer
     )
 {
-// TODO: API function implementation
+/* Set WP MCU pin to HIGH */
+HAL_GPIO_WritePin(FLASH_WP_GPIO_PORT, FLASH_WP_PIN, GPIO_PIN_SET);
 } /* flash_write_enable */
 
 
@@ -139,7 +134,8 @@ void flash_write_disable
     PFLASH_BUFFER pflash_buffer
     )
 {
-// TODO: API function implementation
+/* Set WP MCU pin to LOW */
+HAL_GPIO_WritePin(FLASH_WP_GPIO_PORT, FLASH_WP_PIN, GPIO_PIN_RESET);
 } /* flash_write_disable */
 
 
