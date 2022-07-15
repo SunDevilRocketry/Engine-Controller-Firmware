@@ -64,11 +64,12 @@ int main
 /*------------------------------------------------------------------------------
  Local Variables                                                                  
 ------------------------------------------------------------------------------*/
-uint8_t      data;           /* USB Incoming Data Buffer               */
-uint8_t      ign_subcommand; /* Ignition subcommand code               */
-uint8_t      ign_status;     /* Ignition status code                   */
-uint8_t      pwr_source;     /* Power source code                      */
-FLASH_BUFFER flash_buffer;   /* Buffer for flash read/write operations */
+uint8_t      data;             /* USB Incoming Data Buffer               */
+uint8_t      ign_subcommand;   /* Ignition subcommand code               */
+uint8_t      flash_subcommand; /* flash subcommand code                  */
+uint8_t      ign_status;       /* Ignition status code                   */
+uint8_t      pwr_source;       /* Power source code                      */
+FLASH_BUFFER flash_buffer;     /* Buffer for flash read/write operations */
 
 
 /*------------------------------------------------------------------------------
@@ -79,7 +80,18 @@ HAL_Init();           /* Reset peripherals, initialize flash interface and
 SystemClock_Config(); /* System clock                                         */
 GPIO_Init();          /* GPIO                                                 */
 USB_UART_Init();      /* USB UART                                             */
-FLASH_SPI_Init();
+FLASH_SPI_Init();     /* Flash SPI Bus                                        */
+
+/*------------------------------------------------------------------------------
+ Variable Initializations 
+------------------------------------------------------------------------------*/
+
+/* Flash Buffer */
+flash_buffer.hspi          = hspi2;
+flash_buffer.write_protect = FLASH_WP_READ_ONLY;
+flash_buffer.address       = 0;
+flash_buffer.num_bytes     = 0;
+flash_buffer.pbuffer       = NULL;
 
 /*------------------------------------------------------------------------------
  Event Loop                                                                  
@@ -139,9 +151,20 @@ while (1)
 
 			/*------------------------ Flash Command -------------------------*/
 			case FLASH_OP:
+
+                /* Recieve flash subcommand over USB */
+                command_status = HAL_UART_Receive(&huart1, &flash_subcommand, 1, 1);
 			
-				/* Get operation code */
-				flash_cmd_execute(0, &flash_buffer);
+				/* Execute subcommand */
+				if (command_status != HAL_TIMEOUT)
+					{
+				    flash_cmd_execute(flash_subcommand, &flash_buffer);
+					}
+				else
+					{
+					/* Subcommand code not recieved */
+					Error_Handler();
+					}
 				break;
 
 			/*-------------------- Unrecognized Command ----------------------*/
@@ -347,9 +370,10 @@ static void GPIO_Init
 GPIO_InitTypeDef GPIO_InitStruct = {0};
 
 /* GPIO Ports Clock Enable */
-__HAL_RCC_GPIOE_CLK_ENABLE();
 __HAL_RCC_GPIOA_CLK_ENABLE();
 __HAL_RCC_GPIOB_CLK_ENABLE();
+__HAL_RCC_GPIOD_CLK_ENABLE();
+__HAL_RCC_GPIOE_CLK_ENABLE();
 __HAL_RCC_GPIOH_CLK_ENABLE();
 
 
@@ -411,6 +435,8 @@ HAL_GPIO_Init(PWR_SRC_GPIO_PORT, &GPIO_InitStruct); /* Write to registers  */
 
 /*--------------------------- FLASH CHIP PINS ---------------------------------*/
 
+/* SPI Chip Select Pin */
+
 /*Configure GPIO pin Output Level */
 HAL_GPIO_WritePin(FLASH_SS_GPIO_PORT, FLASH_SS_PIN, GPIO_PIN_SET);
 
@@ -420,6 +446,18 @@ GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
 GPIO_InitStruct.Pull  = GPIO_NOPULL;
 GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 HAL_GPIO_Init(FLASH_SS_GPIO_PORT, &GPIO_InitStruct);
+
+/* Flash write protect Pin */
+
+/*Configure GPIO pin Output Level */
+HAL_GPIO_WritePin(FLASH_WP_GPIO_PORT, FLASH_WP_PIN, GPIO_PIN_RESET);
+
+/*Configure GPIO pin : PB12 */
+GPIO_InitStruct.Pin   = FLASH_WP_PIN;
+GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+GPIO_InitStruct.Pull  = GPIO_NOPULL;
+GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+HAL_GPIO_Init(FLASH_WP_GPIO_PORT, &GPIO_InitStruct);
 
 } /* GPIO_Init */
 

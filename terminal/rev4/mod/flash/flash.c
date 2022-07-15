@@ -34,33 +34,113 @@
 * 		flash_cmd_execute                                                      *
 *                                                                              *
 * DESCRIPTION:                                                                 * 
-* 		Executes a flash subcommand based on user input from the sdec terminal *
+* 		Executes a flash subcommand based on input from the sdec terminal      *
 *                                                                              *
 *******************************************************************************/
 void flash_cmd_execute
 	(
-    uint8_t flash_subcommand,
+    uint8_t       subcommand,
 	PFLASH_BUFFER pflash_buffer
     )
 {
 /*------------------------------------------------------------------------------
  Local Variables 
 ------------------------------------------------------------------------------*/
+uint8_t opcode;     /* Subcommand opcode                   */
+uint8_t num_bytes;  /* Number of bytes on which to operate */
+
+/*------------------------------------------------------------------------------
+ Command Input processing 
+------------------------------------------------------------------------------*/
+opcode    = ( subcommand & FLASH_SUBCMD_OP_BITMASK ) >>  5;
+num_bytes = ( subcommand & FLASH_NBYTES_BITMASK    ); 
 
 /*------------------------------------------------------------------------------
  Call API function 
 ------------------------------------------------------------------------------*/
-switch(flash_subcommand)
+switch(opcode)
 	{
+    /* READ Subcommand */
+    case FLASH_SUBCMD_READ:
+        {
+		Error_Handler();
+        break;
+        }
 
-    /* Unrecognized subcommand code: call error handler */
+    /* ENABLE Subcommand */
+    case FLASH_SUBCMD_ENABLE:
+        {
+		Error_Handler();
+        break;
+        }
+
+    /* DISABLE Subcommand */
+    case FLASH_SUBCMD_DISABLE:
+        {
+		Error_Handler();
+        break;
+        }
+
+    /* WRITE Subcommand */
+    case FLASH_SUBCMD_WRITE:
+        {
+		Error_Handler();
+        break;
+        }
+
+    /* ERASE Subcommand */
+    case FLASH_SUBCMD_ERASE:
+        {
+		Error_Handler();
+        break;
+        }
+
+    /* Unrecognized subcommand code: invoke error handler */
 	default:
-		led_flash();
-		//Error_Handler();
+        {
+		Error_Handler();
+        break;
+        }
 
     }
 
 } /* flash_cmd_execute */
+
+
+/*******************************************************************************
+*                                                                              *
+* PROCEDURE:                                                                   * 
+* 		flash_write_enable                                                     *
+*                                                                              *
+* DESCRIPTION:                                                                 * 
+*       Enable writing to the external flash chip                              *
+*                                                                              *
+*******************************************************************************/
+void flash_write_enable
+    (
+    PFLASH_BUFFER pflash_buffer
+    )
+{
+// TODO: API function implementation
+} /* flash_write_enable */
+
+
+/*******************************************************************************
+*                                                                              *
+* PROCEDURE:                                                                   * 
+* 		flash_write_disable                                                    *
+*                                                                              *
+* DESCRIPTION:                                                                 * 
+*       Disable writing to the external flash chip                             *
+*                                                                              *
+*******************************************************************************/
+void flash_write_disable
+    (
+    PFLASH_BUFFER pflash_buffer
+    )
+{
+// TODO: API function implementation
+} /* flash_write_disable */
 
 
 /*******************************************************************************
