@@ -69,6 +69,7 @@ uint8_t      ign_subcommand;   /* Ignition subcommand code               */
 uint8_t      flash_subcommand; /* flash subcommand code                  */
 uint8_t      ign_status;       /* Ignition status code                   */
 uint8_t      pwr_source;       /* Power source code                      */
+uint8_t      status_code;      /* Status code for reporting errors       */
 FLASH_BUFFER flash_buffer;     /* Buffer for flash read/write operations */
 
 
@@ -99,10 +100,10 @@ flash_buffer.pbuffer       = NULL;
 while (1)
 	{
 	/* Read data from UART reciever */
-	uint8_t command_status = HAL_UART_Receive(&huart1, &data, 1, 1);
+    status_code = HAL_UART_Receive(&huart1, &data, 1, 1);
 
 	/* Parse command input if HAL_UART_Receive doesn't timeout */
-	if (command_status != HAL_TIMEOUT )
+	if (status_code != HAL_TIMEOUT )
 		{
 		switch(data)
 			{
@@ -120,10 +121,10 @@ while (1)
 			case IGNITE_OP:
 
                 /* Recieve ignition subcommand over USB */
-                command_status = HAL_UART_Receive(&huart1, &ign_subcommand, 1, 1);
+                status_code = HAL_UART_Receive(&huart1, &ign_subcommand, 1, 1);
 
                 /* Execute subcommand */
-                if (command_status != HAL_TIMEOUT)
+                if (status_code != HAL_TIMEOUT)
 					{
 					/* Execute subcommand*/
                     ign_status = ign_cmd_execute(ign_subcommand);
@@ -153,18 +154,21 @@ while (1)
 			case FLASH_OP:
 
                 /* Recieve flash subcommand over USB */
-                command_status = HAL_UART_Receive(&huart1, &flash_subcommand, 1, 1);
+                status_code = HAL_UART_Receive(&huart1, &flash_subcommand, 1, 1);
 			
 				/* Execute subcommand */
-				if (command_status != HAL_TIMEOUT)
+				if (status_code != HAL_TIMEOUT)
 					{
-				    flash_cmd_execute(flash_subcommand, &flash_buffer);
+				    status_code = flash_cmd_execute(flash_subcommand, &flash_buffer);
 					}
 				else
 					{
 					/* Subcommand code not recieved */
 					Error_Handler();
 					}
+
+				/* Transmit status code to PC */
+				HAL_UART_Transmit(&huart1, &status_code, 1, 1);
 				break;
 
 			/*-------------------- Unrecognized Command ----------------------*/
