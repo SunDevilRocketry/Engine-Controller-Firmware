@@ -30,12 +30,31 @@ Includes
 ------------------------------------------------------------------------------*/
 
 /* Flash subcommand bitmasks */
-#define FLASH_SUBCMD_OP_BITMASK 0b11100000 
-#define FLASH_NBYTES_BITMASK    0b00011111
+#define FLASH_SUBCMD_OP_BITMASK     0b11100000 
+#define FLASH_NBYTES_BITMASK        0b00011111
 
 /* Write protection ON/OFF States */
-#define FLASH_WP_READ_ONLY      false
-#define FLASH_WP_WRITE_ENABLED  true
+#define FLASH_WP_READ_ONLY          false
+#define FLASH_WP_WRITE_ENABLED      true
+
+/* Flash Chip operation codes from datasheet */
+#define FLASH_OP_HW_READ	        0x03
+#define FLASH_OP_HW_READ_HS         0x0B
+#define FLASH_OP_HW_4K_ERASE        0x20
+#define FLASH_OP_HW_32K_ERASE       0x52
+#define FLASH_OP_HW_64K_ERASE       0xD8
+#define FLASH_OP_HW_FULL_ERASE      0x60
+#define FLASH_OP_HW_BYTE_PROGRAM    0x02
+#define FLASH_OP_HW_AAI_PROGRAM     0xAD
+#define FLASH_OP_HW_RDSR            0x05
+#define FLASH_OP_HW_EWSR            0x50
+#define FLASH_OP_HW_WRSR            0x01
+#define FLASH_OP_HW_WREN            0x06
+#define FLASH_OP_HW_WRDI            0x04
+#define FLASH_OP_HW_RDID            0x90
+#define FLASH_OP_HW_JEDEC_ID        0x9F
+#define FLASH_OP_HW_EBSY            0x70
+#define FLASH_OP_HW_DBSY            0x80
 
 /*------------------------------------------------------------------------------
  Typdefs 
@@ -50,7 +69,7 @@ typedef struct _FLASH_BUFFER_TAG {
 	uint8_t num_bytes;
 
 	/* Base flash address for read/write operations */
-	uint32_t address;
+	uint8_t address[3];
 
 	/* Buffer reference */
 	uint8_t* pbuffer;
@@ -59,12 +78,12 @@ typedef struct _FLASH_BUFFER_TAG {
     SPI_HandleTypeDef hspi;
 
     /* Write protection state */
-    bool write_protect;
+    bool write_enabled;
 
-} FLASH_BUFFER; 
+	/* Contents of status register */
+	uint8_t status_register;
 
-/* Buffer handle */
-typedef FLASH_BUFFER* PFLASH_BUFFER;
+} HFLASH_BUFFER; 
 
 /* Flash subcommand codes */
 typedef enum FLASH_SUBCMD_CODES {
@@ -72,7 +91,8 @@ typedef enum FLASH_SUBCMD_CODES {
     FLASH_SUBCMD_ENABLE  ,
     FLASH_SUBCMD_DISABLE ,
     FLASH_SUBCMD_WRITE   ,
-    FLASH_SUBCMD_ERASE   
+    FLASH_SUBCMD_ERASE   , 
+	FLASH_SUBCMD_STATUS 
 } FLASH_SUBCMD_CODE;
 
 /* Flash return value codes */
@@ -81,6 +101,7 @@ typedef enum FLASH_CMD_STATUS {
     FLASH_FAIL           ,
     FLASH_UNSUPPORTED_OP ,
 	FLASH_UNRECOGNIZED_OP,
+    FLASH_TIMEOUT 
 } FLASH_CMD_STATUS;
 
 
@@ -91,39 +112,46 @@ typedef enum FLASH_CMD_STATUS {
 /* Executes a flash subcommand based on user input from the sdec terminal */
 FLASH_CMD_STATUS flash_cmd_execute
 	(
-    uint8_t       flash_subcommand,
-    PFLASH_BUFFER pflash_buffer
+    uint8_t        flash_subcommand,
+    HFLASH_BUFFER* pflash_handle   ,
+	UART_HandleTypeDef* huart
+    );
+
+/* Read the status register of the flash chip */
+FLASH_CMD_STATUS flash_status
+	(
+	HFLASH_BUFFER* pflash_handle
     );
 
 /* Enable writing to the external flash chip */
-void flash_write_enable 
+FLASH_CMD_STATUS flash_write_enable 
     (
-    PFLASH_BUFFER pflash_buffer 
+    HFLASH_BUFFER* pflash_handle
     );
 
 /* Disable writing to the external flash chip */
-void flash_write_disable
+FLASH_CMD_STATUS flash_write_disable
     (
-    PFLASH_BUFFER pflash_buffer
+    HFLASH_BUFFER* pflash_handle
     );
 
 /* Write bytes from a flash buffer to the external flash */
 void flash_write 
     (
-	PFLASH_BUFFER pflash_buffer
+	HFLASH_BUFFER* pflash_handle
     );
 
 /* Read a specified number of bytes using a flash buffer */
 void flash_read
     (
-	PFLASH_BUFFER pflash_buffer,
-    uint8_t       num_bytes
+	HFLASH_BUFFER* pflash_handle,
+    uint8_t        num_bytes
     );
 
 /* Erase the entire flash chip */
 void flash_erase
     (
-	void
+    HFLASH_BUFFER* pflash_handle	
     );
 
 #endif /* FLASH_H */

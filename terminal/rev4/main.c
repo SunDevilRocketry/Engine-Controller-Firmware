@@ -47,10 +47,10 @@ SPI_HandleTypeDef  hspi2;  /* Flash SPI handle */
 /*------------------------------------------------------------------------------
  Function prototypes                                                          
 ------------------------------------------------------------------------------*/
-static void	SystemClock_Config(void); /* clock configuration */
-static void GPIO_Init(void); /* GPIO configurations  */
-static void USB_UART_Init(void); /* USB UART configuration  */
-static void FLASH_SPI_Init(void);  /* Flash SPI configuration */
+static void	SystemClock_Config( void ); /* clock configuration                */
+static void GPIO_Init         ( void ); /* GPIO configurations                */
+static void USB_UART_Init     ( void ); /* USB UART configuration             */
+static void FLASH_SPI_Init    ( void ); /* Flash SPI configuration            */
 
 
 /*------------------------------------------------------------------------------
@@ -64,13 +64,15 @@ int main
 /*------------------------------------------------------------------------------
  Local Variables                                                                  
 ------------------------------------------------------------------------------*/
-uint8_t      data;             /* USB Incoming Data Buffer               */
-uint8_t      ign_subcommand;   /* Ignition subcommand code               */
-uint8_t      flash_subcommand; /* flash subcommand code                  */
-uint8_t      ign_status;       /* Ignition status code                   */
-uint8_t      pwr_source;       /* Power source code                      */
-uint8_t      status_code;      /* Status code for reporting errors       */
-FLASH_BUFFER flash_buffer;     /* Buffer for flash read/write operations */
+uint8_t       data;             /* USB Incoming Data Buffer                   */
+uint8_t       ign_subcommand;   /* Ignition subcommand code                   */
+uint8_t       flash_subcommand; /* flash subcommand code                      */
+uint8_t       ign_status;       /* Ignition status code                       */
+uint8_t       pwr_source;       /* Power source code                          */
+uint8_t       status_code;      /* Status code for reporting errors           */
+HFLASH_BUFFER flash_handle;                    /* Flash API buffer handle     */
+uint8_t       flash_buffer[ DEF_BUFFER_SIZE ]; /* Flash data buffer */
+
 
 
 /*------------------------------------------------------------------------------
@@ -88,11 +90,14 @@ FLASH_SPI_Init();     /* Flash SPI Bus                                        */
 ------------------------------------------------------------------------------*/
 
 /* Flash Buffer */
-flash_buffer.hspi          = hspi2;
-flash_buffer.write_protect = FLASH_WP_READ_ONLY;
-flash_buffer.address       = 0;
-flash_buffer.num_bytes     = 0;
-flash_buffer.pbuffer       = NULL;
+flash_handle.hspi             = hspi2;
+flash_handle.write_enabled    = FLASH_WP_READ_ONLY;
+flash_handle.address[0]       = 0;
+flash_handle.address[1]       = 0;
+flash_handle.address[2]       = 0;
+flash_handle.num_bytes        = 0;
+flash_handle.pbuffer          = &flash_buffer[0];
+flash_handle.status_register  = 0;
 
 /*------------------------------------------------------------------------------
  Event Loop                                                                  
@@ -154,12 +159,21 @@ while (1)
 			case FLASH_OP:
 
                 /* Recieve flash subcommand over USB */
-                status_code = HAL_UART_Receive(&huart1, &flash_subcommand, 1, 1);
+                status_code = HAL_UART_Receive(
+                                              &huart1                 , 
+                                              &flash_subcommand       , 
+                                              sizeof(flash_subcommand), 
+                                              HAL_DEFAULT_TIMEOUT 
+                                              );
 			
 				/* Execute subcommand */
 				if (status_code != HAL_TIMEOUT)
 					{
-				    status_code = flash_cmd_execute(flash_subcommand, &flash_buffer);
+				    status_code = flash_cmd_execute(
+                                                   flash_subcommand, 
+                                                   &flash_handle   ,
+                                                   &huart1
+                                                   );
 					}
 				else
 					{
@@ -168,7 +182,12 @@ while (1)
 					}
 
 				/* Transmit status code to PC */
-				HAL_UART_Transmit(&huart1, &status_code, 1, 1);
+				HAL_UART_Transmit(
+                                 &huart1            , 
+                                 &status_code       , 
+                                 sizeof(status_code), 
+                                 HAL_DEFAULT_TIMEOUT
+                                 );
 				break;
 
 			/*-------------------- Unrecognized Command ----------------------*/
@@ -456,12 +475,24 @@ HAL_GPIO_Init(FLASH_SS_GPIO_PORT, &GPIO_InitStruct);
 /*Configure GPIO pin Output Level */
 HAL_GPIO_WritePin(FLASH_WP_GPIO_PORT, FLASH_WP_PIN, GPIO_PIN_RESET);
 
-/*Configure GPIO pin : PB12 */
+/*Configure GPIO pin : PD12 */
 GPIO_InitStruct.Pin   = FLASH_WP_PIN;
 GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
 GPIO_InitStruct.Pull  = GPIO_NOPULL;
 GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 HAL_GPIO_Init(FLASH_WP_GPIO_PORT, &GPIO_InitStruct);
+
+/* Flash hold pin */
+
+/*Configure GPIO pin Output Level */
+HAL_GPIO_WritePin(FLASH_HOLD_GPIO_PORT, FLASH_HOLD_PIN, GPIO_PIN_SET);
+
+/*Configure GPIO pin : PD13 */
+GPIO_InitStruct.Pin   = FLASH_HOLD_PIN;
+GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+GPIO_InitStruct.Pull  = GPIO_NOPULL;
+GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+HAL_GPIO_Init(FLASH_HOLD_GPIO_PORT, &GPIO_InitStruct);
 
 } /* GPIO_Init */
 
