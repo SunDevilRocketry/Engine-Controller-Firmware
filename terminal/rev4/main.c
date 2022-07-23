@@ -25,6 +25,7 @@
 #include "led.h"
 #include "power.h"
 #include "flash.h"
+#include "pressure.h"
 
 
 /*------------------------------------------------------------------------------
@@ -188,6 +189,11 @@ while (1)
                                  sizeof(status_code), 
                                  HAL_DEFAULT_TIMEOUT
                                  );
+				break;
+
+			/*----------------------- Sensor Command -------------------------*/
+			case SENSOR_OP:
+
 				break;
 
 			/*-------------------- Unrecognized Command ----------------------*/
