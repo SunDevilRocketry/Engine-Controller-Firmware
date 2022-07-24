@@ -84,6 +84,10 @@ void pressure_set_gain
     uint8_t         gain
     )
 {
+
+/* Update gain within global pt_gains array */
+pt_gains[ pt_num ] = gain;
+
 } /* pressure_set_gain */
 
 
@@ -101,6 +105,14 @@ void pressure_set_all_gains
     uint8_t gains[] 
     )
 {
+
+/* iterate over pressure transducers */
+for ( int i = 0; i < NUM_PTS; ++i )
+	{
+	/* Update gain within global pt_gains array */
+    pt_gains[i] = gains[i];
+    }
+
 } /* pressure_set_gains */
 
 
@@ -118,7 +130,9 @@ uint8_t pressure_get_gain
     PRESSURE_PT_NUM pt_num
     )
 {
-return 0;
+
+return pt_gains[ pt_num ];
+
 } /* pressure_get_gain */
 
 
@@ -136,6 +150,14 @@ void pressure_get_all_gains
     uint8_t* pgains 
     )
 {
+
+/* Loop over all pressure transducer gains */
+for ( int i = 0; i < NUM_PTS; ++i )
+	{
+    /* Read gain from global gains array */
+    *( pgains + i ) = pt_gains[i];
+    }
+
 } /* pressure_get_all_gains */
 
 
