@@ -22,44 +22,79 @@ extern "C" {
 /*------------------------------------------------------------------------------
 Includes 
 ------------------------------------------------------------------------------*/
-#include <stdbool.h>
 
 
 /*------------------------------------------------------------------------------
  Macros 
 ------------------------------------------------------------------------------*/
+#define NUM_PTS    ( 8 )  /* Number of pressure transducers */
+
 
 /*------------------------------------------------------------------------------
  Typdefs 
 ------------------------------------------------------------------------------*/
 
 /* Pressure transducer subcommand codes */
-typedef enum PRESSURE_SUBCMD_CODES {
-    PRESSURE_SUBCMD_DUMP = 0,
-    PRESSURE_SUBCMD_POLL    
-} PRESSURE_SUBCMD_CODE;
-
-/* Pressure transducer subcommand codes */
-typedef enum PRESSURE_CMD_STATUS {
+typedef enum PRESSURE_STATUS 
+    {
 	PRESSURE_OK = 0,
     PRESSURE_FAIL        
-} PRESSURE_CMD_STATUS;
+    } PRESSURE_STATUS;
 
+/* Pressure transducer numbers */
+// TODO: Change the enumeration tags to be descriptive of what
+//       each pressure transducer measures 
+typedef enum PRESSURE_PT_NUMS
+	{
+    PT_NUM0 = 0,
+    PT_NUM1    ,
+    PT_NUM2    ,
+    PT_NUM3    ,
+    PT_NUM4    ,
+    PT_NUM5    ,
+    PT_NUM6    ,
+    PT_NUM7
+    } PRESSURE_PT_NUM;
 
 /*------------------------------------------------------------------------------
  Function Prototypes 
 ------------------------------------------------------------------------------*/
 
-/* Executes a pressure subcommand based on input from the sdec terminal */
-int pressure_cmd_execute
+/* Get a single pressure transducer reading */
+uint16_t pressure_get_pt_reading 
 	(
-    uint8_t subcommand
+    PRESSURE_PT_NUM pt_num
     );
 
-/* template for module functions */
-void procedure_template 
+/* Get readings from all pressure transducers */
+PRESSURE_STATUS pressure_poll_pts
 	(
-    void
+    uint16_t* pPT_readings 
+    );
+
+/* Set the amplifier gain for a single pressure transducer */
+void pressure_set_gain
+	(
+    PRESSURE_PT_NUM pt_num,
+    uint8_t         gain
+    );
+
+/* Set the amplifier gain for all pressure transducers */
+void pressure_set_all_gains
+	(
+    uint8_t gains[] 
+    );
+
+/* Get the gain for a single pressure transducer */
+uint8_t pressure_get_gain
+	(
+    PRESSURE_PT_NUM pt_num
+    );
+
+/* Get the gain for all pressure transducers */
+void pressure_get_all_gains
+	(
+    uint8_t* pgains 
     );
 
 
