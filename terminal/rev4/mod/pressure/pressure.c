@@ -22,6 +22,11 @@
 #include "pressure.h"
 #include "led.h"
 
+/*------------------------------------------------------------------------------
+ Global Variables 
+------------------------------------------------------------------------------*/
+uint8_t pt_gains[ NUM_PTS ];
+
 
 /*------------------------------------------------------------------------------
  Procedures 
@@ -31,80 +36,107 @@
 /*******************************************************************************
 *                                                                              *
 * PROCEDURE:                                                                   * 
-* 		pressure_cmd_execute                                                   *
+* 		pressure_get_pt_reading                                                *
 *                                                                              *
 * DESCRIPTION:                                                                 * 
-* 		Executes a pressure subcommand based on input from the sdec terminal   *
+*       Get a single pressure transducer reading                               *
 *                                                                              *
 *******************************************************************************/
-int pressure_cmd_execute
+uint16_t pressure_get_pt_reading 
 	(
-    uint8_t             subcommand
+    PRESSURE_PT_NUM pt_num
     )
 {
-/*------------------------------------------------------------------------------
- Local Variables 
-------------------------------------------------------------------------------*/
-uint8_t          opcode;                    /* Subcommand opcode              */
-uint8_t          num_bytes;                 /* Number of bytes on which to 
-                                               operate                        */
-uint8_t          status;                    /* Return value of UART API calls */
-
-/*------------------------------------------------------------------------------
- Command Input processing 
-------------------------------------------------------------------------------*/
-
-/*------------------------------------------------------------------------------
- Call API function 
-------------------------------------------------------------------------------*/
-switch( opcode )
-	{
-    /* READ Subcommand */
-    case PRESSURE_SUBCMD_DUMP:
-        {
-        }
-
-    /* ENABLE Subcommand */
-    case PRESSURE_SUBCMD_POLL:
-        {
-        }
-
-    /* Unrecognized subcommand code: invoke error handler */
-	default:
-        {
-        }
-    }
-} /* pressure_cmd_execute */
+return 0;
+} /* pressure_get_pt_reading */
 
 
 /*******************************************************************************
 *                                                                              *
 * PROCEDURE:                                                                   * 
-* 		procedure_template                                                     *
+* 		pressure_poll_pts                                                      *
 *                                                                              *
 * DESCRIPTION:                                                                 * 
-*       template for module functions                                          *
+*       Get readings from all pressure transducers                             *
 *                                                                              *
 *******************************************************************************/
-void procedure_template 
+PRESSURE_STATUS pressure_poll_pts
 	(
-    void
+    uint16_t* pPT_readings 
     )
 {
-/*------------------------------------------------------------------------------
- Local variables 
-------------------------------------------------------------------------------*/
-
-/*------------------------------------------------------------------------------
- Initialiazations 
-------------------------------------------------------------------------------*/
-
-/*------------------------------------------------------------------------------
- API function implementation 
-------------------------------------------------------------------------------*/
+return 0;
+} /* pressure_poll_pts */
 
 
-} /* procedure_template */
+/*******************************************************************************
+*                                                                              *
+* PROCEDURE:                                                                   * 
+* 		pressure_set_gain                                                      *
+*                                                                              *
+* DESCRIPTION:                                                                 * 
+*       Set the amplifier gain for a single pressure transducer                *
+*                                                                              *
+*******************************************************************************/
+void pressure_set_gain
+	(
+    PRESSURE_PT_NUM pt_num,
+    uint8_t         gain
+    )
+{
+} /* pressure_set_gain */
+
+
+/*******************************************************************************
+*                                                                              *
+* PROCEDURE:                                                                   * 
+* 		pressure_set_all_gains                                                 *
+*                                                                              *
+* DESCRIPTION:                                                                 * 
+*       Set the amplifier gain for all pressure transducers                    *
+*                                                                              *
+*******************************************************************************/
+void pressure_set_all_gains
+	(
+    uint8_t gains[] 
+    )
+{
+} /* pressure_set_gains */
+
+
+/*******************************************************************************
+*                                                                              *
+* PROCEDURE:                                                                   * 
+* 		pressure_get_gain                                                      *
+*                                                                              *
+* DESCRIPTION:                                                                 * 
+*       Get the gain for a single pressure transducer                          *
+*                                                                              *
+*******************************************************************************/
+uint8_t pressure_get_gain
+	(
+    PRESSURE_PT_NUM pt_num
+    )
+{
+return 0;
+} /* pressure_get_gain */
+
+
+/*******************************************************************************
+*                                                                              *
+* PROCEDURE:                                                                   * 
+* 		pressure_get_all_gains                                                 *
+*                                                                              *
+* DESCRIPTION:                                                                 * 
+*       Get the gain for all pressure transducers                              *
+*                                                                              *
+*******************************************************************************/
+void pressure_get_all_gains
+	(
+    uint8_t* pgains 
+    )
+{
+} /* pressure_get_all_gains */
 
 
 /*******************************************************************************
