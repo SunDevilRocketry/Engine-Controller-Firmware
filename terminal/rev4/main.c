@@ -161,9 +161,9 @@ while (1)
 
                 /* Recieve flash subcommand over USB */
                 status_code = HAL_UART_Receive(
-                                              &huart1                 , 
-                                              &flash_subcommand       , 
-                                              sizeof(flash_subcommand), 
+                                              &huart1                   , 
+                                              &flash_subcommand         , 
+                                              sizeof( flash_subcommand ), 
                                               HAL_DEFAULT_TIMEOUT 
                                               );
 			
@@ -184,9 +184,9 @@ while (1)
 
 				/* Transmit status code to PC */
 				HAL_UART_Transmit(
-                                 &huart1            , 
-                                 &status_code       , 
-                                 sizeof(status_code), 
+                                 &huart1              , 
+                                 &status_code         , 
+                                 sizeof( status_code ), 
                                  HAL_DEFAULT_TIMEOUT
                                  );
 				break;
@@ -378,6 +378,7 @@ if (HAL_UARTEx_DisableFifoMode(&huart1) != HAL_OK)
 	{
 	Error_Handler();
 	}
+
 } /* USB_UART_Init */
 
 
@@ -499,6 +500,41 @@ GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
 GPIO_InitStruct.Pull  = GPIO_NOPULL;
 GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 HAL_GPIO_Init(FLASH_HOLD_GPIO_PORT, &GPIO_InitStruct);
+
+
+/*--------------------------- PRESSURE TRANSDUCER PINS ------------------------*/
+
+/* Pressure transducer gain and multiplexor pins */
+HAL_GPIO_WritePin      (
+                        PRESSURE_GPIO_PORT  , 
+                        PRESSURE_GAIN0_PIN | 
+                        PRESSURE_GAIN1_PIN | 
+                        PRESSURE_GAIN2_PIN | 
+                        PRESSURE_GAIN3_PIN | 
+                        PRESSURE_GAIN4_PIN | 
+                        PRESSURE_GAIN5_PIN | 
+                        PRESSURE_GAIN6_PIN | 
+                        PRESSURE_GAIN7_PIN | 
+                        PRESSURE_MUXA_PIN  |
+                        PRESSURE_MUXB_PIN  |
+                        PRESSURE_MUXC_PIN   , 
+                        GPIO_PIN_RESET 
+                        );
+GPIO_InitStruct.Pin   = PRESSURE_GAIN0_PIN | 
+                        PRESSURE_GAIN1_PIN | 
+                        PRESSURE_GAIN2_PIN | 
+                        PRESSURE_GAIN3_PIN | 
+                        PRESSURE_GAIN4_PIN | 
+                        PRESSURE_GAIN5_PIN | 
+                        PRESSURE_GAIN6_PIN | 
+                        PRESSURE_GAIN7_PIN | 
+                        PRESSURE_MUXA_PIN  |
+                        PRESSURE_MUXB_PIN  |
+                        PRESSURE_MUXC_PIN;
+GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+GPIO_InitStruct.Pull  = GPIO_NOPULL;
+GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+HAL_GPIO_Init( PRESSURE_GPIO_PORT, &GPIO_InitStruct );
 
 } /* GPIO_Init */
 
