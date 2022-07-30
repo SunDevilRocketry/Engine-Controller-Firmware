@@ -1,67 +1,70 @@
-# ------------------------------------------------
+# --------------------------------------------------------------
 # Terminal Makefile (based on gcc)
 #
-# ------------------------------------------------
+# --------------------------------------------------------------
 
-######################################
+################################################################
 # target
-######################################
+################################################################
 TARGET = L0002-Firmware
 
 
-######################################
+################################################################
 # building variables
-######################################
+################################################################
+
 # debug build?
 DEBUG = 1
 # optimization
 OPT = -Og
 
 
-#######################################
+################################################################
 # paths
-#######################################
+################################################################
+
 # Build path
 BUILD_DIR = build
 
-######################################
+################################################################
 # source
-######################################
+################################################################
+
 # C sources
-C_SOURCES =  \
-main.c \
-mod/commands/commands.c \
-mod/ignition/ignition.c \
-mod/led/led.c \
-mod/power/power.c \
-mod/flash/flash.c \
-mod/pressure/pressure.c \
-config/Src/stm32h7xx_it.c \
-config/Src/stm32h7xx_hal_msp.c \
-config/Src/system_stm32h7xx.c \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc.c \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.c \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi.c \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi_ex.c \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc.c \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc_ex.c \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash.c \
+C_SOURCES =                                                   \
+main.c                                                        \
+mod/commands/commands.c                                       \
+mod/ignition/ignition.c                                       \
+mod/led/led.c                                                 \
+mod/power/power.c                                             \
+mod/flash/flash.c                                             \
+mod/pressure/pressure.c                                       \
+config/Src/stm32h7xx_it.c                                     \
+config/Src/stm32h7xx_hal_msp.c                                \
+config/Src/system_stm32h7xx.c                                 \
+lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc.c      \
+lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c   \
+lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.c   \
+lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi.c      \
+lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi_ex.c   \
+lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc.c      \
+lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc_ex.c   \
+lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash.c    \
 lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash_ex.c \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_gpio.c \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hsem.c \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma.c \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma_ex.c \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mdma.c \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr.c \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr_ex.c \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal.c \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c.c \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c_ex.c \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.c \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim.c \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim_ex.c \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c \
+lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_gpio.c     \
+lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hsem.c     \
+lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma.c      \
+lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma_ex.c   \
+lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mdma.c     \
+lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr.c      \
+lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr_ex.c   \
+lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal.c          \
+lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c.c      \
+lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c_ex.c   \
+lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.c     \
+lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim.c      \
+lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim_ex.c   \
+lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c     \
 lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart_ex.c
 
 # ASM sources
@@ -69,9 +72,10 @@ ASM_SOURCES =  \
 startup_stm32h750xx.s
 
 
-#######################################
+################################################################
 # binaries
-#######################################
+################################################################
+
 PREFIX = arm-none-eabi-
 # The gcc compiler bin path can be either defined in make command via GCC_PATH variable (> make GCC_PATH=xxx)
 # either it can be added to the PATH environment variable.
@@ -89,9 +93,10 @@ endif
 HEX = $(CP) -O ihex
 BIN = $(CP) -O binary -S
  
-#######################################
+################################################################
 # CFLAGS
-#######################################
+################################################################
+
 # cpu
 CPU = -mcpu=cortex-m7
 
@@ -109,7 +114,7 @@ MCU = $(CPU) -mthumb $(FPU) $(FLOAT-ABI)
 AS_DEFS = 
 
 # C defines
-C_DEFS =  \
+C_DEFS =         \
 -DUSE_HAL_DRIVER \
 -DSTM32H750xx
 
@@ -118,18 +123,18 @@ C_DEFS =  \
 AS_INCLUDES = 
 
 # C includes
-C_INCLUDES =  \
--I. \
--Iconfig/Inc \
--Ilib/Drivers/STM32H7xx_HAL_Driver/Inc \
--Ilib/Drivers/STM32H7xx_HAL_Driver/Inc/Legacy \
+C_INCLUDES =                                    \
+-I.                                             \
+-Iconfig/Inc                                    \
+-Ilib/Drivers/STM32H7xx_HAL_Driver/Inc          \
+-Ilib/Drivers/STM32H7xx_HAL_Driver/Inc/Legacy   \
 -Ilib/Drivers/CMSIS/Device/ST/STM32H7xx/Include \
--Ilib/Drivers/CMSIS/Include \
--Imod/commands \
--Imod/ignition \
--Imod/led \
--Imod/power \
--Imod/flash \
+-Ilib/Drivers/CMSIS/Include                     \
+-Imod/commands                                  \
+-Imod/ignition                                  \
+-Imod/led                                       \
+-Imod/power                                     \
+-Imod/flash                                     \
 -Imod/pressure
 
 # compile gcc flags
@@ -146,9 +151,10 @@ endif
 CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 
 
-#######################################
+################################################################
 # LDFLAGS
-#######################################
+################################################################
+
 # link script
 LDSCRIPT = STM32H750VBTx_FLASH.ld
 
@@ -161,9 +167,10 @@ LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BU
 all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET).bin
 
 
-#######################################
+################################################################
 # build the application
-#######################################
+################################################################
+
 # list of objects
 OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(C_SOURCES:.c=.o)))
 vpath %.c $(sort $(dir $(C_SOURCES)))
@@ -190,27 +197,31 @@ $(BUILD_DIR)/%.bin: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
 $(BUILD_DIR):
 	mkdir $@		
 
-#######################################
+################################################################
 # flash to device
-#######################################
+################################################################
+
 flash:
 	st-flash write $(BUILD_DIR)/$(TARGET).bin 0x08000000
 
-#######################################
+################################################################
 # erase device flash
-#######################################
+################################################################
+
 erase:
 	st-flash erase
 
-#######################################
+################################################################
 # clean up
-#######################################
+################################################################
+
 clean:
 	-rm -fR $(BUILD_DIR)
   
-#######################################
+################################################################
 # dependencies
-#######################################
+################################################################
+
 -include $(wildcard $(BUILD_DIR)/*.d)
 
 # *** EOF ***
