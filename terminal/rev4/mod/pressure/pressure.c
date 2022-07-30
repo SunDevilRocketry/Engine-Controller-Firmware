@@ -25,7 +25,7 @@
 /*------------------------------------------------------------------------------
  Global Variables 
 ------------------------------------------------------------------------------*/
-uint8_t pt_gains[ NUM_PTS ];
+static uint8_t pt_gains[ NUM_PTS ];
 
 
 /*------------------------------------------------------------------------------
@@ -85,6 +85,8 @@ void pressure_set_gain
     )
 {
 
+// TODO: Throw an assert if pt_num is out of range
+
 /* Update gain within global pt_gains array */
 pt_gains[ pt_num ] = gain;
 
@@ -130,6 +132,8 @@ uint8_t pressure_get_gain
     PRESSURE_PT_NUM pt_num
     )
 {
+
+// TODO: Throw an assert if pt_num is out of range
 
 return pt_gains[ pt_num ];
 
