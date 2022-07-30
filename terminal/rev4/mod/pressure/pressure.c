@@ -25,11 +25,23 @@
 /*------------------------------------------------------------------------------
  Global Variables 
 ------------------------------------------------------------------------------*/
-static uint8_t pt_gains[ NUM_PTS ];
+static uint8_t           pt_gains[ NUM_PTS ]; /* Amplifier gain settings      */
+extern ADC_HandleTypeDef hadc1;               /* ADC handle                   */
 
 
 /*------------------------------------------------------------------------------
- Procedures 
+ Internal function prototypes 
+------------------------------------------------------------------------------*/
+
+/* PT number to GPIO pin butmask mapping */
+static inline uint16_t multiplexor_map
+	(
+    PRESSURE_PT_NUM    pt_num    
+    );
+
+
+/*------------------------------------------------------------------------------
+ API Functions 
 ------------------------------------------------------------------------------*/
 
 
@@ -163,6 +175,33 @@ for ( int i = 0; i < NUM_PTS; ++i )
     }
 
 } /* pressure_get_all_gains */
+
+
+/*------------------------------------------------------------------------------
+ Internal procedures 
+------------------------------------------------------------------------------*/
+
+
+/*******************************************************************************
+*                                                                              *
+* PROCEDURE:                                                                   * 
+* 		multiplexor_map                                                        *
+*                                                                              *
+* DESCRIPTION:                                                                 * 
+*       Mapping from pressure transducer number to mutliplexor GPIO pin        *
+*       bitmask. ex. PTNUM5 -> 101 -> GPIO_PIN_C | GPIO_PIN_A                  * 
+*                                                                              *
+*******************************************************************************/
+static inline uint16_t multiplexor_map
+	(
+    PRESSURE_PT_NUM    pt_num    
+    )
+{
+/* Mux pins are adjacent and from the same port. Just shift the ptnum bits up
+   to create the bitmask */
+return ( (uint16_t) pt_num) << PT_MUX_BITMASK_SHIFT; 
+
+} /* multiplexor_map */
 
 
 /*******************************************************************************
