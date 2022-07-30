@@ -39,6 +39,8 @@ mod/pressure/pressure.c \
 config/Src/stm32h7xx_it.c \
 config/Src/stm32h7xx_hal_msp.c \
 config/Src/system_stm32h7xx.c \
+lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc.c \
+lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c \
 lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.c \
 lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi.c \
 lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi_ex.c \
