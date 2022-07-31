@@ -22,9 +22,12 @@ extern "C" {
 /*------------------------------------------------------------------------------
  Macros 
 ------------------------------------------------------------------------------*/
-#define NUM_PTS              ( 8 )  /* Number of pressure transducers         */
-#define PT_MUX_BITMASK_SHIFT ( 9 )  /* Bit shift to convert from pt number to 
-                                       GPIO pin bitmask                       */
+
+#define NUM_PTS              ( 8   )  /* Number of pressure transducers       */
+#define PT_MUX_BITMASK_SHIFT ( 9   )  /* Bit shift to convert from pt number
+                                         to GPIO pin bitmask                  */
+#define ADC_TIMEOUT          ( 100 )  /* ADC timeout for a single conversion  
+                                         in milliseconds                      */
 
 
 /*------------------------------------------------------------------------------
@@ -34,7 +37,9 @@ extern "C" {
 /* Pressure transducer subcommand codes */
 typedef enum PRESSURE_STATUS 
     {
-	PRESSURE_OK = 0,
+	PRESSURE_OK         = 0,
+    PRESSURE_ADC_TIMEOUT   ,
+	PRESSURE_ADC_POLL_ERROR,
     PRESSURE_FAIL        
     } PRESSURE_STATUS;
 
