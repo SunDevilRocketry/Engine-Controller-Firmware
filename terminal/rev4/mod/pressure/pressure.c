@@ -143,10 +143,74 @@ return pt_reading;
 *******************************************************************************/
 PRESSURE_STATUS pressure_poll_pts
 	(
-    uint32_t* pPT_readings 
+    uint32_t* pPT_readings /* array of size NUM_PTS */ 
     )
 {
-return 0;
+/*------------------------------------------------------------------------------
+ Local Variables  
+------------------------------------------------------------------------------*/
+uint16_t        gain_GPIO_pins_bitmask; /* GPIO pins for amplifier gain       */
+uint16_t        mux_GPIO_pins_bitmask;  /* GPIO pins for multiplexor          */
+PRESSURE_STATUS pt_status_code;         /* Status code from adc conversion    */
+
+/*------------------------------------------------------------------------------
+ Initializations  
+------------------------------------------------------------------------------*/
+
+/* Reset all GPIO */
+HAL_GPIO_WritePin( PRESSURE_GPIO_PORT    , 
+				   PRESSURE_MUX_ALL_PINS |
+				   PRESSURE_GAIN_ALL_PINS,
+				   GPIO_PIN_RESET );
+
+/*------------------------------------------------------------------------------
+ Get a reading from each PT 
+------------------------------------------------------------------------------*/
+
+for ( uint8_t i = 0; i < NUM_PTS; ++i )
+	{
+	/*--------------------------------------------------------------------------
+	 Setup mux and gain circuits  
+	--------------------------------------------------------------------------*/
+
+	/* GPIO pin mapping */
+	gain_GPIO_pins_bitmask = amplifier_gain_map( pt_gains[ i ] );
+	mux_GPIO_pins_bitmask  = mux_map( i );
+
+	/* Set MUX */
+	HAL_GPIO_WritePin( PRESSURE_GPIO_PORT   , 
+					   mux_GPIO_pins_bitmask,
+					   GPIO_PIN_SET );
+
+	/* Set gain */
+	HAL_GPIO_WritePin( PRESSURE_GPIO_PORT    ,
+					   gain_GPIO_pins_bitmask,
+					   GPIO_PIN_SET );
+
+	/*--------------------------------------------------------------------------
+	 Poll ADC once 
+	--------------------------------------------------------------------------*/
+	pt_status_code = sample_adc_poll( 1, (pPT_readings + i) );
+	if ( pt_status_code != PRESSURE_OK )
+		{
+		Error_Handler();
+		}
+
+	/*--------------------------------------------------------------------------
+	 Reset gain cicuitry 
+	--------------------------------------------------------------------------*/
+
+	/* Reset all GPIO */
+	HAL_GPIO_WritePin( PRESSURE_GPIO_PORT    , 
+					   PRESSURE_MUX_ALL_PINS |
+					   PRESSURE_GAIN_ALL_PINS,
+					   GPIO_PIN_RESET );
+
+    }
+
+/* Conversions successful */
+return PRESSURE_OK;
+
 } /* pressure_poll_pts */
 
 
