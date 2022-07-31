@@ -34,7 +34,7 @@ extern ADC_HandleTypeDef hadc1;               /* ADC handle                   */
 ------------------------------------------------------------------------------*/
 
 /* PT number to GPIO pin butmask mapping */
-static inline uint16_t multiplexor_map
+static inline uint16_t mux_map
 	(
     PRESSURE_PT_NUM    pt_num    
     );
@@ -67,12 +67,68 @@ static uint16_t amplifier_gain_map
 *       Get a single pressure transducer reading                               *
 *                                                                              *
 *******************************************************************************/
-uint16_t pressure_get_pt_reading 
+uint32_t pressure_get_pt_reading 
 	(
     PRESSURE_PT_NUM pt_num
     )
 {
-return 0;
+/*------------------------------------------------------------------------------
+ Local Variables  
+------------------------------------------------------------------------------*/
+uint16_t        gain_GPIO_pins_bitmask; /* GPIO pins for amplifier gain       */
+uint16_t        mux_GPIO_pins_bitmask;  /* GPIO pins for multiplexor          */
+uint32_t        pt_reading;             /* PT reading, return value           */
+PRESSURE_STATUS pt_status_code;         /* Status code from adc conversion    */
+
+/*------------------------------------------------------------------------------
+ Initializations 
+------------------------------------------------------------------------------*/
+gain_GPIO_pins_bitmask = amplifier_gain_map( pt_gains[ pt_num ] );
+mux_GPIO_pins_bitmask  = mux_map( pt_num );
+pt_reading             = 0;
+
+/*------------------------------------------------------------------------------
+ Setup mux and gain circuits  
+------------------------------------------------------------------------------*/
+
+/* Reset all GPIO */
+HAL_GPIO_WritePin( PRESSURE_GPIO_PORT    , 
+                   PRESSURE_MUX_ALL_PINS |
+                   PRESSURE_GAIN_ALL_PINS,
+                   GPIO_PIN_RESET );
+
+/* Set MUX */
+HAL_GPIO_WritePin( PRESSURE_GPIO_PORT   , 
+                   mux_GPIO_pins_bitmask,
+                   GPIO_PIN_SET );
+
+/* Set gain */
+HAL_GPIO_WritePin( PRESSURE_GPIO_PORT    ,
+                   gain_GPIO_pins_bitmask,
+                   GPIO_PIN_SET );
+
+/*------------------------------------------------------------------------------
+ Poll ADC once 
+------------------------------------------------------------------------------*/
+pt_status_code = sample_adc_poll( 1, &pt_reading );
+if ( pt_status_code != PRESSURE_OK )
+	{
+    Error_Handler();
+    }
+
+/*------------------------------------------------------------------------------
+ Reset gain cicuitry and return  
+------------------------------------------------------------------------------*/
+
+/* Reset all GPIO */
+HAL_GPIO_WritePin( PRESSURE_GPIO_PORT    , 
+                   PRESSURE_MUX_ALL_PINS |
+                   PRESSURE_GAIN_ALL_PINS,
+                   GPIO_PIN_RESET );
+
+/* Return pt reading */
+return pt_reading;
+
 } /* pressure_get_pt_reading */
 
 
@@ -87,7 +143,7 @@ return 0;
 *******************************************************************************/
 PRESSURE_STATUS pressure_poll_pts
 	(
-    uint16_t* pPT_readings 
+    uint32_t* pPT_readings 
     )
 {
 return 0;
@@ -226,14 +282,14 @@ return ( gain_setting_high_bits | gain_setting_low_bits );
 /*******************************************************************************
 *                                                                              *
 * PROCEDURE:                                                                   * 
-* 		multiplexor_map                                                        *
+* 		mux_map                                                                *
 *                                                                              *
 * DESCRIPTION:                                                                 * 
 *       Mapping from pressure transducer number to mutliplexor GPIO pin        *
 *       bitmask. ex. PTNUM5 -> 101 -> GPIO_PIN_C | GPIO_PIN_A                  * 
 *                                                                              *
 *******************************************************************************/
-static inline uint16_t multiplexor_map
+static inline uint16_t mux_map
 	(
     PRESSURE_PT_NUM    pt_num    
     )
@@ -242,7 +298,7 @@ static inline uint16_t multiplexor_map
    to create the bitmask */
 return ( (uint16_t) pt_num) << PT_MUX_BITMASK_SHIFT; 
 
-} /* multiplexor_map */
+} /* mux_map */
 
 
 /*******************************************************************************

@@ -63,7 +63,7 @@ typedef enum PRESSURE_PT_NUMS
 ------------------------------------------------------------------------------*/
 
 /* Get a single pressure transducer reading */
-uint16_t pressure_get_pt_reading 
+uint32_t pressure_get_pt_reading 
 	(
     PRESSURE_PT_NUM pt_num
     );
@@ -71,7 +71,7 @@ uint16_t pressure_get_pt_reading
 /* Get readings from all pressure transducers */
 PRESSURE_STATUS pressure_poll_pts
 	(
-    uint16_t* pPT_readings 
+    uint32_t* pPT_readings 
     );
 
 /* Set the amplifier gain for a single pressure transducer */
