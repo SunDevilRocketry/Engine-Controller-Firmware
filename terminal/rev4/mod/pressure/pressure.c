@@ -39,6 +39,19 @@ static inline uint16_t multiplexor_map
     PRESSURE_PT_NUM    pt_num    
     );
 
+/* Sample ADC in polling mode */
+static PRESSURE_STATUS sample_adc_poll
+	(
+    uint16_t     num_samples,
+    uint32_t*    psample_buffer
+    );
+
+/* Mapping from PT number to amplifer gain GPIO pin bitmask */
+static uint16_t amplifier_gain_map
+	(
+    uint8_t gain_setting 
+    );
+
 
 /*------------------------------------------------------------------------------
  API Functions 
@@ -185,6 +198,34 @@ for ( int i = 0; i < NUM_PTS; ++i )
 /*******************************************************************************
 *                                                                              *
 * PROCEDURE:                                                                   * 
+* 		amplifer_gain_map                                                      *
+*                                                                              *
+* DESCRIPTION:                                                                 * 
+*       Mapping from pressure transducer number to amplifer gain GPIO pin      *
+*       bitmask. ex. gain setting 128 -> PRESSURE_GAIN7_PIN                    * 
+*                                                                              *
+*******************************************************************************/
+static uint16_t amplifier_gain_map
+	(
+    uint8_t gain_setting 
+    )
+{
+/* PT gain GPIO pins are consecutively numbered, except GPIO_pin 2. Shift bits
+   2-7 up one */
+uint16_t gain_setting_16b       = (uint16_t) gain_setting;
+uint16_t gain_setting_low_bits  = gain_setting_16b &   0x0003;
+uint16_t gain_setting_high_bits = gain_setting_16b & (~0x0003);
+
+/* Shift and recombine bits */
+gain_setting_high_bits = gain_setting_high_bits << 1; 
+return ( gain_setting_high_bits | gain_setting_low_bits );
+
+} /* amplifier_gain_map */
+
+
+/*******************************************************************************
+*                                                                              *
+* PROCEDURE:                                                                   * 
 * 		multiplexor_map                                                        *
 *                                                                              *
 * DESCRIPTION:                                                                 * 
@@ -202,6 +243,57 @@ static inline uint16_t multiplexor_map
 return ( (uint16_t) pt_num) << PT_MUX_BITMASK_SHIFT; 
 
 } /* multiplexor_map */
+
+
+/*******************************************************************************
+*                                                                              *
+* PROCEDURE:                                                                   * 
+* 		sample_adc_poll                                                        *
+*                                                                              *
+* DESCRIPTION:                                                                 * 
+*       Sample the pressure transducer ADC a specified number of times in      *
+*       polling mode                                                           *
+*                                                                              *
+*******************************************************************************/
+static PRESSURE_STATUS sample_adc_poll
+	(
+    uint16_t    num_samples,
+    uint32_t*   psample_buffer
+    )
+{
+/* Conversion status indicator */
+HAL_StatusTypeDef adc_status;
+
+/* Start the ADC */
+HAL_ADC_Start( &hadc1 );
+
+/* Poll ADC */
+for ( int i = 0; i < num_samples; ++i )
+	{
+	/* Wait for end of conversion */
+    adc_status = HAL_ADC_PollForConversion( &hadc1, ADC_TIMEOUT );
+    if      ( adc_status == HAL_TIMEOUT )
+		{
+        return PRESSURE_ADC_TIMEOUT;
+        }
+	else if ( adc_status != HAL_OK      )
+		{
+        return PRESSURE_ADC_POLL_ERROR;
+        }
+	else /* No error */
+		{
+		/* Read the ADC value */
+		*(psample_buffer + i) = HAL_ADC_GetValue( &hadc1 ); 
+        }
+    }
+
+/* Stop the ADC */
+HAL_ADC_Stop( &hadc1 );
+
+/* Conversion successful */
+return PRESSURE_OK;
+
+} /* sample_adc_poll */
 
 
 /*******************************************************************************
