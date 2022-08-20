@@ -37,6 +37,12 @@ void led_error_assert
     void
     );
 
+/* Sets the RGB LED to blue to be triggered during debugging */
+void led_debug_assert
+	(
+    void
+    );
+
 /* Reset the led */
 void led_reset
 	(

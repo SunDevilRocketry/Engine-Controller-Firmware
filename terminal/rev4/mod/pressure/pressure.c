@@ -25,7 +25,9 @@
 /*------------------------------------------------------------------------------
  Global Variables 
 ------------------------------------------------------------------------------*/
-static uint8_t           pt_gains[ NUM_PTS ]; /* Amplifier gain settings      */
+
+/* Amplifier gain settings */
+static uint8_t           pt_gains[] = { 0, 0, 0, 0, 0, 0, 0, 0 } ; 
 extern ADC_HandleTypeDef hadc1;               /* ADC handle                   */
 
 

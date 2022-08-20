@@ -52,6 +52,29 @@ HAL_GPIO_WritePin(STATUS_GPIO_PORT, STATUS_R_PIN, GPIO_PIN_RESET);
 /*******************************************************************************
 *                                                                              *
 * PROCEDURE:                                                                   * 
+* 		led_debug_assert                                                       *
+*                                                                              *
+* DESCRIPTION:                                                                 * 
+* 		Sets the RGB LED to blue to be triggered during debugging              *
+*                                                                              *
+*******************************************************************************/
+void led_debug_assert
+	(
+	void
+	)
+{
+/* Reset RGB LED */
+led_reset();
+
+/* Set the RGB LED to red */
+HAL_GPIO_WritePin(STATUS_GPIO_PORT, STATUS_B_PIN, GPIO_PIN_RESET);
+
+} /* led_debug_assert */
+
+
+/*******************************************************************************
+*                                                                              *
+* PROCEDURE:                                                                   * 
 * 		led_reset                                                              *
 *                                                                              *
 * DESCRIPTION:                                                                 * 
