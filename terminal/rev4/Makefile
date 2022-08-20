@@ -39,6 +39,7 @@ mod/led/led.c                                                 \
 mod/power/power.c                                             \
 mod/flash/flash.c                                             \
 mod/pressure/pressure.c                                       \
+mod/sensor/sensor.c                                           \
 config/Src/stm32h7xx_it.c                                     \
 config/Src/stm32h7xx_hal_msp.c                                \
 config/Src/system_stm32h7xx.c                                 \
@@ -135,7 +136,8 @@ C_INCLUDES =                                    \
 -Imod/led                                       \
 -Imod/power                                     \
 -Imod/flash                                     \
--Imod/pressure
+-Imod/pressure                                  \
+-Imod/sensor
 
 # compile gcc flags
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections

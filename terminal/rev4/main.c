@@ -26,6 +26,7 @@
 #include "power.h"
 #include "flash.h"
 #include "pressure.h"
+#include "sensor.h"
 
 
 /*------------------------------------------------------------------------------
@@ -68,14 +69,12 @@ int main
  Local Variables                                                                  
 ------------------------------------------------------------------------------*/
 uint8_t       data;             /* USB Incoming Data Buffer                   */
-uint8_t       ign_subcommand;   /* Ignition subcommand code                   */
-uint8_t       flash_subcommand; /* flash subcommand code                      */
+uint8_t       subcommand;       /* subcommand code                            */
 uint8_t       ign_status;       /* Ignition status code                       */
 uint8_t       pwr_source;       /* Power source code                          */
 uint8_t       status_code;      /* Status code for reporting errors           */
 HFLASH_BUFFER flash_handle;                    /* Flash API buffer handle     */
 uint8_t       flash_buffer[ DEF_BUFFER_SIZE ]; /* Flash data buffer */
-
 
 
 /*------------------------------------------------------------------------------
@@ -88,6 +87,7 @@ GPIO_Init();          /* GPIO                                                 */
 USB_UART_Init();      /* USB UART                                             */
 FLASH_SPI_Init();     /* Flash SPI Bus                                        */
 PRESSURE_ADC_Init();  /* Pressure transducers ADC                             */
+
 
 /*------------------------------------------------------------------------------
  Variable Initializations 
@@ -103,40 +103,49 @@ flash_handle.num_bytes        = 0;
 flash_handle.pbuffer          = &flash_buffer[0];
 flash_handle.status_register  = 0;
 
+
 /*------------------------------------------------------------------------------
  Event Loop                                                                  
 ------------------------------------------------------------------------------*/
 while (1)
 	{
 	/* Read data from UART reciever */
-    status_code = HAL_UART_Receive(&huart1, &data, 1, 1);
+    status_code = HAL_UART_Receive( &huart1, &data, 1, 1 );
 
 	/* Parse command input if HAL_UART_Receive doesn't timeout */
-	if (status_code != HAL_TIMEOUT )
+	if ( status_code != HAL_TIMEOUT )
 		{
-		switch(data)
+		switch( data )
 			{
+
 			/*------------------------- Ping Command -------------------------*/
 			case PING_OP:
+				{
 				ping(&huart1);
 				break;
+				} /* PING_OP */
 
 			/*------------------------ Connect Command ------------------------*/
 			case CONNECT_OP:
+				{
 				ping(&huart1);
 				break;
+				} /* CONNECT_OP */
 
 			/*------------------------ Ignite Command -------------------------*/
 			case IGNITE_OP:
-
+				{
                 /* Recieve ignition subcommand over USB */
-                status_code = HAL_UART_Receive(&huart1, &ign_subcommand, 1, 1);
+                status_code = HAL_UART_Receive( &huart1             , 
+                                                &subcommand         , 
+                                                sizeof( subcommand ), 
+                                                HAL_DEFAULT_TIMEOUT );
 
                 /* Execute subcommand */
-                if (status_code != HAL_TIMEOUT)
+                if ( status_code != HAL_TIMEOUT )
 					{
 					/* Execute subcommand*/
-                    ign_status = ign_cmd_execute(ign_subcommand);
+                    ign_status = ign_cmd_execute( subcommand );
                     }
 				else
 					{
@@ -145,28 +154,30 @@ while (1)
                     }
 
                 /* Return response code to terminal */
-                HAL_UART_Transmit(&huart1, &ign_status, 1, 1);
+                HAL_UART_Transmit( &huart1, &ign_status, 1, 1 );
 				break;
+				} /* IGNITE_OP */
 
 			/*------------------------ Power Command -------------------------*/
 			case POWER_OP:
-
+				{
                 /* Determine power source */
 				pwr_source = pwr_get_source();
 
 				/* Convert to response code and transmit to PC */
                 pwr_source += 1;
-				HAL_UART_Transmit(&huart1, &pwr_source, 1, 1);
+				HAL_UART_Transmit( &huart1, &pwr_source, 1, 1 );
 				break;
+				} /* POWER_OP */
 
 			/*------------------------ Flash Command -------------------------*/
 			case FLASH_OP:
-
+				{
                 /* Recieve flash subcommand over USB */
                 status_code = HAL_UART_Receive(
-                                              &huart1                   , 
-                                              &flash_subcommand         , 
-                                              sizeof( flash_subcommand ), 
+                                              &huart1             , 
+                                              &subcommand         , 
+                                              sizeof( subcommand ), 
                                               HAL_DEFAULT_TIMEOUT 
                                               );
 			
@@ -174,8 +185,8 @@ while (1)
 				if (status_code != HAL_TIMEOUT)
 					{
 				    status_code = flash_cmd_execute(
-                                                   flash_subcommand, 
-                                                   &flash_handle   ,
+                                                   subcommand   , 
+                                                   &flash_handle,
                                                    &huart1
                                                    );
 					}
@@ -193,16 +204,39 @@ while (1)
                                  HAL_DEFAULT_TIMEOUT
                                  );
 				break;
+				} /* FLASH_OP */
 
 			/*----------------------- Sensor Command -------------------------*/
 			case SENSOR_OP:
+				{
+				/* Recieve subcommand from USB */
+                status_code = HAL_UART_Receive(
+                                              &huart1             ,
+                                              &subcommand         ,
+                                              sizeof( subcommand ),
+                                              HAL_DEFAULT_TIMEOUT
+                                              );
+
+				/* Execute subcommand */
+				if ( status_code != HAL_TIMEOUT )
+					{
+                    status_code = sensor_cmd_execute( subcommand ); 
+                    }
+				else
+					{
+                    /* Subcommand not recieved */
+                    Error_Handler();
+                    }
 
 				break;
+				} /* SENSOR_OP */
 
 			/*-------------------- Unrecognized Command ----------------------*/
 			default:
+				{
 				/* Unsupported command code flash the red LED */
 				led_error_flash();
+				} /* default */
 			} 
 		} 
 	else /* USB connection times out */
@@ -211,6 +245,7 @@ while (1)
 		}
 	}
 } /* main */
+
 
 /*******************************************************************************
 *                                                                              *
@@ -305,8 +340,8 @@ static void PRESSURE_ADC_Init
 {
 
 /* Initialize config structs */
-ADC_MultiModeTypeDef multimode = {0};
-ADC_ChannelConfTypeDef sConfig = {0};
+ADC_MultiModeTypeDef   multimode = {0};
+ADC_ChannelConfTypeDef sConfig   = {0};
 
 /* Configuration settings */
 hadc1.Instance                      = ADC1;
