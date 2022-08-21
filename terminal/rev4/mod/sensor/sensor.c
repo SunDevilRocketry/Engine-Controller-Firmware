@@ -69,9 +69,8 @@ SENSOR_STATUS sensor_subcmd_status;           /* Status indicating if
 uint32_t      sensor_readings[ NUM_SENSORS ]; /* Readings obtained from each 
                                                  sensor                       */
 uint8_t       sensor_readings_bytes[ 4*NUM_SENSORS ];
-const uint8_t       num_sensor_bytes = 4*NUM_SENSORS; /* Number of bytes to be 
+const uint8_t num_sensor_bytes = 4*NUM_SENSORS; /* Number of bytes to be 
                                                    transmitted back to PC     */
-
 
 /*------------------------------------------------------------------------------
  Initializations  
@@ -86,7 +85,6 @@ for ( uint8_t i =0; i < num_sensor_bytes; ++i )
 	{
     sensor_readings_bytes[i] = 0;
     }
-
 
 /*------------------------------------------------------------------------------
  Execute Sensor Subcommand 
@@ -111,8 +109,7 @@ switch ( subcommand )
                            HAL_DEFAULT_TIMEOUT );
 
 		/* Get the sensor readings */
-	    //sensor_subcmd_status = sensor_dump( &sensor_readings[0] );	
-		sensor_subcmd_status = SENSOR_OK;
+	    sensor_subcmd_status = sensor_dump( &sensor_readings[0] );	
 
 		/* Transmit sensor readings to PC */
 		if ( sensor_subcmd_status == SENSOR_OK )
@@ -122,7 +119,7 @@ switch ( subcommand )
 			HAL_UART_Transmit( &huart1                        , 
                                &sensor_readings_bytes[0]      , 
                                sizeof( sensor_readings_bytes ), 
-                               HAL_DEFAULT_TIMEOUT );
+                               HAL_SENSOR_TIMEOUT );
 			return ( sensor_subcmd_status );
             }
 		else
@@ -236,7 +233,7 @@ for ( uint8_t i = 0; i < NUM_SENSORS; ++i )
 		reading_bytes[j] = (uint8_t) ( *(pSrc_buffer + i) >> 8*(3-j) );
 
 		/* Export bytes to destination buffer */
-		*( pDst_buffer + i*j ) = reading_bytes[j];
+		*( pDst_buffer + 4*i + j ) = reading_bytes[j];
         }
     }
 }
