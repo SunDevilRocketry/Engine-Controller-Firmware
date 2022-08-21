@@ -3,6 +3,7 @@ blink/rev3/build/*
 blink/rev4/build/*
 terminal/rev3/build/*
 terminal/rev4/build/*
+unit_tests/terminal/rev4/mod/sensor/build/*
 
 # Visual Studio Code Artifacts
 blink/rev3/.vscode/*
