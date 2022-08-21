@@ -23,6 +23,15 @@ extern "C" {
  Macros 
 ------------------------------------------------------------------------------*/
 
+/* GCC requires stdint.h for uint_t types*/
+#ifdef UNIT_TEST
+	#include <stdint.h>
+#endif
+
+/*------------------------------------------------------------------------------
+ Macros 
+------------------------------------------------------------------------------*/
+
 #define NUM_PTS              ( 8   )  /* Number of pressure transducers       */
 #define PT_MUX_BITMASK_SHIFT ( 9   )  /* Bit shift to convert from pt number
                                          to GPIO pin bitmask                  */
