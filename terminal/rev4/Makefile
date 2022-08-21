@@ -23,47 +23,50 @@ OPT   = -Og # optimization
 # Build path
 BUILD_DIR = build
 
+# Library path
+LIB_DIR = ../../lib
+
 ################################################################
 # source
 ################################################################
 
 # C sources
-C_SOURCES =                                                   \
-main.c                                                        \
-mod/commands/commands.c                                       \
-mod/ignition/ignition.c                                       \
-mod/led/led.c                                                 \
-mod/power/power.c                                             \
-mod/flash/flash.c                                             \
-mod/pressure/pressure.c                                       \
-mod/sensor/sensor.c                                           \
-config/Src/stm32h7xx_it.c                                     \
-config/Src/stm32h7xx_hal_msp.c                                \
-config/Src/system_stm32h7xx.c                                 \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc.c      \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c   \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.c   \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi.c      \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi_ex.c   \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc.c      \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc_ex.c   \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash.c    \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash_ex.c \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_gpio.c     \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hsem.c     \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma.c      \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma_ex.c   \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mdma.c     \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr.c      \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr_ex.c   \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal.c          \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c.c      \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c_ex.c   \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.c     \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim.c      \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim_ex.c   \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c     \
-lib/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart_ex.c
+C_SOURCES =                                                          \
+main.c                                                               \
+mod/commands/commands.c                                              \
+mod/ignition/ignition.c                                              \
+mod/led/led.c                                                        \
+mod/power/power.c                                                    \
+mod/flash/flash.c                                                    \
+mod/pressure/pressure.c                                              \
+mod/sensor/sensor.c                                                  \
+config/Src/stm32h7xx_it.c                                            \
+config/Src/stm32h7xx_hal_msp.c                                       \
+config/Src/system_stm32h7xx.c                                        \
+$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc.c      \
+$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c   \
+$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.c   \
+$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi.c      \
+$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi_ex.c   \
+$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc.c      \
+$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc_ex.c   \
+$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash.c    \
+$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash_ex.c \
+$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_gpio.c     \
+$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hsem.c     \
+$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma.c      \
+$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma_ex.c   \
+$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mdma.c     \
+$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr.c      \
+$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr_ex.c   \
+$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal.c          \
+$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c.c      \
+$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c_ex.c   \
+$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.c     \
+$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim.c      \
+$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim_ex.c   \
+$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c     \
+$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart_ex.c
 
 # ASM sources
 ASM_SOURCES =  \
@@ -121,19 +124,19 @@ C_DEFS =         \
 AS_INCLUDES = 
 
 # C includes
-C_INCLUDES =                                    \
--I.                                             \
--Iconfig/Inc                                    \
--Ilib/Drivers/STM32H7xx_HAL_Driver/Inc          \
--Ilib/Drivers/STM32H7xx_HAL_Driver/Inc/Legacy   \
--Ilib/Drivers/CMSIS/Device/ST/STM32H7xx/Include \
--Ilib/Drivers/CMSIS/Include                     \
--Imod/commands                                  \
--Imod/ignition                                  \
--Imod/led                                       \
--Imod/power                                     \
--Imod/flash                                     \
--Imod/pressure                                  \
+C_INCLUDES =                                           \
+-I.                                                    \
+-Iconfig/Inc                                           \
+-I$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Inc          \
+-I$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Inc/Legacy   \
+-I$(LIB_DIR)/Drivers/CMSIS/Device/ST/STM32H7xx/Include \
+-I$(LIB_DIR)/Drivers/CMSIS/Include                     \
+-Imod/commands                                         \
+-Imod/ignition                                         \
+-Imod/led                                              \
+-Imod/power                                            \
+-Imod/flash                                            \
+-Imod/pressure                                         \
 -Imod/sensor
 
 # compile gcc flags
