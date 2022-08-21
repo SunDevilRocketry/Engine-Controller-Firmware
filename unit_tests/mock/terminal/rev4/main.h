@@ -18,18 +18,12 @@ extern "C" {
 #endif
 
 /*------------------------------------------------------------------------------
- Includes                                                                    
-------------------------------------------------------------------------------*/
-#include "stm32h7xx_hal.h"
-
-/*------------------------------------------------------------------------------
  Macros  
 ------------------------------------------------------------------------------*/
 
 /* General MCU HAL related macros */
-#define HAL_DEFAULT_TIMEOUT    ( 1  )   /* Default timeout for polling 
-                                           operations                          */
-#define HAL_SENSOR_TIMEOUT     ( 40 )  /* Larger timeout for sensor polling */
+#define HAL_DEFAULT_TIMEOUT    ( 1 )   /* Default timeout for polling 
+                                          operations                          */
 #define DEF_BUFFER_SIZE        ( 16 )  /* Default size of buffer arrays       */
 
 /*------------------------------------------------------------------------------
