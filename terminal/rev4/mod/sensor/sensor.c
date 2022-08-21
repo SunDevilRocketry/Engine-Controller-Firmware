@@ -69,7 +69,7 @@ SENSOR_STATUS sensor_subcmd_status;           /* Status indicating if
 uint32_t      sensor_readings[ NUM_SENSORS ]; /* Readings obtained from each 
                                                  sensor                       */
 uint8_t       sensor_readings_bytes[ 4*NUM_SENSORS ];
-uint8_t       num_sensor_bytes = 4*NUM_SENSORS; /* Number of bytes to be 
+const uint8_t       num_sensor_bytes = 4*NUM_SENSORS; /* Number of bytes to be 
                                                    transmitted back to PC     */
 
 
