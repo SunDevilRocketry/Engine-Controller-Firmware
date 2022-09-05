@@ -19,6 +19,7 @@ Standard Includes
 Project Includes                                                                     
 ------------------------------------------------------------------------------*/
 #include "unity.h"
+#include "main.h"
 
 /* CMSIS/HAL */
 #include "stm32h7xx_hal.h"

@@ -66,6 +66,7 @@ CC = gcc
 # C Includes
 C_INCLUDES =                                           \
 -I.                                                    \
+-I$(TERMINAL_DIR)                                      \
 -I$(TERMINAL_DIR)/config/Inc                           \
 -I$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Inc          \
 -I$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Inc/Legacy   \
