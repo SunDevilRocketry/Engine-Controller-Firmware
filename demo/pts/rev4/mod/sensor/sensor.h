@@ -69,6 +69,12 @@ SENSOR_STATUS sensor_dump
     uint32_t* pSensor_buffer 
     );
 
+void readings_to_bytes
+	(
+    uint8_t*  pDst_buffer, 
+	uint32_t* pSrc_buffer
+    );
+
 
 #endif /* SENSOR_H */
 

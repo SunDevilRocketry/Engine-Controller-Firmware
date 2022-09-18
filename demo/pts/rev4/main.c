@@ -110,16 +110,20 @@ flash_handle.status_register  = 0;
 while (1)
 	{
 
-	/* Get PT Reading*/
-	uint8_t  pt_reading_bytes[4];
-	uint32_t pt_reading = pressure_get_pt_reading( 0 );
-	readings_to_bytes( &pt_reading_bytes[0], &pt_reading );
+	status_code = HAL_UART_Receive( &huart1, &data, sizeof( data ), HAL_SENSOR_TIMEOUT );	
+	if ( status_code == HAL_OK )
+		{
+		/* Get PT Reading*/
+		uint8_t  pt_reading_bytes[4];
+		uint32_t pt_reading = pressure_get_pt_reading( 1 );
+		readings_to_bytes( &pt_reading_bytes[0], &pt_reading );
 
-	/* Transmit to PC */
-	HAL_UART_Transmit( &huart1                   , 
-                       &pt_reading_bytes[0]      , 
-                       sizeof( pt_reading_bytes ),
-                       HAL_SENSOR_TIMEOUT );
+		/* Transmit to PC */
+		HAL_UART_Transmit( &huart1                   , 
+						   &pt_reading_bytes[0]      , 
+						   sizeof( pt_reading_bytes ),
+						   HAL_SENSOR_TIMEOUT );
+		}
 	}
 } /* main */
 
