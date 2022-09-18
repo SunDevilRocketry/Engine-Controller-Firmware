@@ -50,11 +50,12 @@ ADC_HandleTypeDef  hadc1;  /* Pressure transducer ADC handle */
 /*------------------------------------------------------------------------------
  Function prototypes                                                          
 ------------------------------------------------------------------------------*/
-static void	SystemClock_Config( void ); /* clock configuration                */
-static void GPIO_Init         ( void ); /* GPIO configurations                */
-static void USB_UART_Init     ( void ); /* USB UART configuration             */
-static void FLASH_SPI_Init    ( void ); /* Flash SPI configuration            */
-static void PRESSURE_ADC_Init ( void ); /* Pressure transducers ADC config    */
+void	    SystemClock_Config       ( void ); /* clock configuration         */
+void        PeriphCommonClock_Config ( void ); /* Common clock config         */
+static void GPIO_Init                ( void ); /* GPIO configurations         */
+static void USB_UART_Init            ( void ); /* USB UART configuration      */
+static void FLASH_SPI_Init           ( void ); /* Flash SPI configuration     */
+static void PRESSURE_ADC_Init        ( void ); /* Pressure transducers ADC    */
 
 
 /*------------------------------------------------------------------------------
@@ -80,13 +81,14 @@ uint8_t       flash_buffer[ DEF_BUFFER_SIZE ]; /* Flash data buffer */
 /*------------------------------------------------------------------------------
  MCU Initialization                                                                  
 ------------------------------------------------------------------------------*/
-HAL_Init();           /* Reset peripherals, initialize flash interface and 
-                         Systick.                                             */
-SystemClock_Config(); /* System clock                                         */
-GPIO_Init();          /* GPIO                                                 */
-USB_UART_Init();      /* USB UART                                             */
-FLASH_SPI_Init();     /* Flash SPI Bus                                        */
-PRESSURE_ADC_Init();  /* Pressure transducers ADC                             */
+HAL_Init();                 /* Reset peripherals, initialize flash interface and 
+                               Systick.                                       */
+SystemClock_Config();       /* System clock                                   */
+PeriphCommonClock_Config(); /* Configure the peripherals common clocks        */
+GPIO_Init();                /* GPIO                                           */
+USB_UART_Init();            /* USB UART                                       */
+FLASH_SPI_Init();           /* Flash SPI Bus                                  */
+PRESSURE_ADC_Init();        /* Pressure transducers ADC                       */
 
 
 /*------------------------------------------------------------------------------
@@ -257,7 +259,7 @@ while (1)
 *       sets prescalers                                                        *
 *                                                                              *
 *******************************************************************************/
-static void SystemClock_Config
+void SystemClock_Config
 	(
 	void
 	)
@@ -270,7 +272,7 @@ RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 HAL_PWREx_ConfigSupply( PWR_LDO_SUPPLY );
 
 /* Configure the main internal regulator output voltage */
-__HAL_PWR_VOLTAGESCALING_CONFIG( PWR_REGULATOR_VOLTAGE_SCALE1 );
+__HAL_PWR_VOLTAGESCALING_CONFIG( PWR_REGULATOR_VOLTAGE_SCALE0 );
 
 while( !__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY) ) 
 	{
@@ -290,7 +292,7 @@ RCC_OscInitStruct.PLL.PLLQ       = 2;
 RCC_OscInitStruct.PLL.PLLR       = 2;
 RCC_OscInitStruct.PLL.PLLRGE     = RCC_PLL1VCIRANGE_2;
 RCC_OscInitStruct.PLL.PLLVCOSEL  = RCC_PLL1VCOWIDE;
-RCC_OscInitStruct.PLL.PLLFRACN   = 3072;
+RCC_OscInitStruct.PLL.PLLFRACN   = 0;
 if ( HAL_RCC_OscConfig( &RCC_OscInitStruct ) != HAL_OK )
 	{
     Error_Handler();
@@ -322,6 +324,46 @@ else /* RCC Configuration okay */
 	}
 
 } /* SystemClock_Config */
+
+
+/*******************************************************************************
+*                                                                              *
+* PROCEDURE:                                                                   * 
+* 		PeriphCommonClock_Config                                               *
+*                                                                              *
+* DESCRIPTION:                                                                 * 
+* 		Initializes common microcontroller clock setting such as PLL factors   *
+*       and peripheral prescalers.                                             *
+*                                                                              *
+*******************************************************************************/
+void PeriphCommonClock_Config
+	(
+	void
+	)
+{
+
+/* Init struct */
+RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+
+/* Initializes the peripherals clock */
+PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_ADC|RCC_PERIPHCLK_SPI2;
+PeriphClkInitStruct.PLL2.PLL2M           = 2;
+PeriphClkInitStruct.PLL2.PLL2N           = 16;
+PeriphClkInitStruct.PLL2.PLL2P           = 4;
+PeriphClkInitStruct.PLL2.PLL2Q           = 2;
+PeriphClkInitStruct.PLL2.PLL2R           = 2;
+PeriphClkInitStruct.PLL2.PLL2RGE         = RCC_PLL2VCIRANGE_3;
+PeriphClkInitStruct.PLL2.PLL2VCOSEL      = RCC_PLL2VCOWIDE;
+PeriphClkInitStruct.PLL2.PLL2FRACN       = 0;
+PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL2;
+PeriphClkInitStruct.AdcClockSelection    = RCC_ADCCLKSOURCE_PLL2;
+
+/* Initialize clock and call error handler if initialization fails */
+if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+	{
+	Error_Handler();
+	}
+}
 
 
 /*******************************************************************************
@@ -410,6 +452,8 @@ else
 * 		Initializes the SPI peripheral used for communication with the         *
 *       external flash chip                                                    *
 *                                                                              *
+*       Uses MCU SPI2 peripheral                                               *
+*                                                                              *
 *******************************************************************************/
 static void FLASH_SPI_Init(void)
 {
@@ -452,7 +496,9 @@ if ( HAL_SPI_Init( &hspi2 ) != HAL_OK )
 *                                                                              *
 * DESCRIPTION:                                                                 * 
 * 		Initializes the UART interface used for USB communication with a host  *
-*        PC                                                                    *
+*       PC                                                                     *
+*                                                                              *
+*       Uses MCU USART1 peripheral                                             *
 *                                                                              *
 *******************************************************************************/
 static void USB_UART_Init
@@ -464,15 +510,15 @@ static void USB_UART_Init
 huart1.Instance = USART1;
 
 /* Initialization settings */
-huart1.Init.BaudRate = 9600;
-huart1.Init.WordLength = UART_WORDLENGTH_8B;
-huart1.Init.StopBits = UART_STOPBITS_1;
-huart1.Init.Parity = UART_PARITY_NONE;
-huart1.Init.Mode = UART_MODE_TX_RX;
-huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-huart1.Init.OverSampling = UART_OVERSAMPLING_16;
-huart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-huart1.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+huart1.Init.BaudRate               = 9600;
+huart1.Init.WordLength             = UART_WORDLENGTH_8B;
+huart1.Init.StopBits               = UART_STOPBITS_1;
+huart1.Init.Parity                 = UART_PARITY_NONE;
+huart1.Init.Mode                   = UART_MODE_TX_RX;
+huart1.Init.HwFlowCtl              = UART_HWCONTROL_NONE;
+huart1.Init.OverSampling           = UART_OVERSAMPLING_16;
+huart1.Init.OneBitSampling         = UART_ONE_BIT_SAMPLE_DISABLE;
+huart1.Init.ClockPrescaler         = UART_PRESCALER_DIV1;
 huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
 
 /* Write to registers and call error handler if initialization fails */
@@ -516,6 +562,7 @@ GPIO_InitTypeDef GPIO_InitStruct = {0};
 /* GPIO Ports Clock Enable */
 __HAL_RCC_GPIOA_CLK_ENABLE();
 __HAL_RCC_GPIOB_CLK_ENABLE();
+__HAL_RCC_GPIOC_CLK_ENABLE();
 __HAL_RCC_GPIOD_CLK_ENABLE();
 __HAL_RCC_GPIOE_CLK_ENABLE();
 __HAL_RCC_GPIOH_CLK_ENABLE();
