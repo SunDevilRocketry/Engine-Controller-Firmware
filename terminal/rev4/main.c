@@ -19,7 +19,12 @@
 /*------------------------------------------------------------------------------
  Project Includes                                                                     
 ------------------------------------------------------------------------------*/
+
+/* Pin definitions and main prototypes */
 #include "main.h"
+#include "sdr_pin_defines.h"
+
+/* SDR Modules */
 #include "commands.h"
 #include "ignition.h"
 #include "led.h"
@@ -45,6 +50,7 @@
 UART_HandleTypeDef huart1; /* USB UART handler struct        */
 SPI_HandleTypeDef  hspi2;  /* Flash SPI handle               */
 ADC_HandleTypeDef  hadc1;  /* Pressure transducer ADC handle */
+SD_HandleTypeDef   hsd1;   /* SD card handle                 */
 
 
 /*------------------------------------------------------------------------------
@@ -56,6 +62,8 @@ static void GPIO_Init                ( void ); /* GPIO configurations         */
 static void USB_UART_Init            ( void ); /* USB UART configuration      */
 static void FLASH_SPI_Init           ( void ); /* Flash SPI configuration     */
 static void PRESSURE_ADC_Init        ( void ); /* Pressure transducers ADC    */
+static void SD_SDMMC_Init            ( void ); /* SD card                     */
+
 
 
 /*------------------------------------------------------------------------------
@@ -89,6 +97,7 @@ GPIO_Init();                /* GPIO                                           */
 USB_UART_Init();            /* USB UART                                       */
 FLASH_SPI_Init();           /* Flash SPI Bus                                  */
 PRESSURE_ADC_Init();        /* Pressure transducers ADC                       */
+SD_SDMMC_Init();            /* SD Card SDMMC Interface                        */
 
 
 /*------------------------------------------------------------------------------
@@ -346,7 +355,9 @@ void PeriphCommonClock_Config
 RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
 
 /* Initializes the peripherals clock */
-PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_ADC|RCC_PERIPHCLK_SPI2;
+PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_ADC   |
+                                           RCC_PERIPHCLK_SDMMC |
+                                           RCC_PERIPHCLK_SPI2;
 PeriphClkInitStruct.PLL2.PLL2M           = 2;
 PeriphClkInitStruct.PLL2.PLL2N           = 16;
 PeriphClkInitStruct.PLL2.PLL2P           = 4;
@@ -355,6 +366,7 @@ PeriphClkInitStruct.PLL2.PLL2R           = 2;
 PeriphClkInitStruct.PLL2.PLL2RGE         = RCC_PLL2VCIRANGE_3;
 PeriphClkInitStruct.PLL2.PLL2VCOSEL      = RCC_PLL2VCOWIDE;
 PeriphClkInitStruct.PLL2.PLL2FRACN       = 0;
+PeriphClkInitStruct.SdmmcClockSelection  = RCC_SDMMCCLKSOURCE_PLL2; 
 PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL2;
 PeriphClkInitStruct.AdcClockSelection    = RCC_ADCCLKSOURCE_PLL2;
 
@@ -440,7 +452,38 @@ else
     /* ADC channel configuration okay, do nothing */
     }
 
-}
+} /* PRESSURE_ADC_Init */
+
+
+/*******************************************************************************
+*                                                                              *
+* PROCEDURE:                                                                   * 
+* 		SD_SDMMC_Init                                                          *
+*                                                                              *
+* DESCRIPTION:                                                                 * 
+* 		Initializes the MCU SDMMC interface for use with the engine            *
+*       controller's SD card                                                   *
+*                                                                              *
+*******************************************************************************/
+static void SD_SDMMC_Init
+	(
+	void
+	)
+{
+/* Fill the configuration struct */
+hsd1.Instance                 = SDMMC1;
+hsd1.Init.ClockEdge           = SDMMC_CLOCK_EDGE_RISING;
+hsd1.Init.ClockPowerSave      = SDMMC_CLOCK_POWER_SAVE_DISABLE;
+hsd1.Init.BusWide             = SDMMC_BUS_WIDE_4B;
+hsd1.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_DISABLE;
+hsd1.Init.ClockDiv            = 0;
+
+/* Initialize the SDMMC interface */
+if (HAL_SD_Init(&hsd1) != HAL_OK)
+	{
+	Error_Handler();
+	}
+} /* SD_SDMMC_Init */
 
 
 /*******************************************************************************
@@ -696,6 +739,15 @@ GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
 GPIO_InitStruct.Pull  = GPIO_NOPULL;
 GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 HAL_GPIO_Init( PRESSURE_GPIO_PORT, &GPIO_InitStruct );
+
+
+/*---------------------------------- SD CARD ---------------------------------*/
+
+/* SD detect pin */
+GPIO_InitStruct.Pin = SD_DETECT_PIN;
+GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+GPIO_InitStruct.Pull = GPIO_NOPULL;
+HAL_GPIO_Init( SD_DETECT_GPIO_PORT, &GPIO_InitStruct );
 
 } /* GPIO_Init */
 

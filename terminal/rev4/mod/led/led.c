@@ -18,6 +18,7 @@
  Project Includes                                                                     
 ------------------------------------------------------------------------------*/
 #include "main.h"
+#include "sdr_pin_defines.h"
 #include "led.h"
 
 

@@ -20,6 +20,7 @@
  Project Includes                                                                     
 ------------------------------------------------------------------------------*/
 #include "main.h"
+#include "sdr_pin_defines.h"
 #include "ignition.h"
 
 
