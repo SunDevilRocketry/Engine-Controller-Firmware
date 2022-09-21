@@ -70,7 +70,16 @@ $(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart_ex.c   \
 $(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_sdmmc.c      \
 $(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_delayblock.c \
 $(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sd.c        \
-$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sd_ex.c 
+$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sd_ex.c     \
+$(LIB_DIR)/FATFS/App/fatfs.c                                          \
+$(LIB_DIR)/FATFS/Target/bsp_driver_sd.c                               \
+$(LIB_DIR)/FATFS/Target/sd_diskio.c                                   \
+$(LIB_DIR)/FATFS/Target/fatfs_platform.c                              \
+$(LIB_DIR)/Middlewares/Third_Party/FatFs/src/diskio.c                 \
+$(LIB_DIR)/Middlewares/Third_Party/FatFs/src/ff.c                     \
+$(LIB_DIR)/Middlewares/Third_Party/FatFs/src/ff_gen_drv.c             \
+$(LIB_DIR)/Middlewares/Third_Party/FatFs/src/option/syscall.c
+
 
 
 # ASM sources
@@ -136,6 +145,9 @@ C_INCLUDES =                                           \
 -I$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Inc/Legacy   \
 -I$(LIB_DIR)/Drivers/CMSIS/Device/ST/STM32H7xx/Include \
 -I$(LIB_DIR)/Drivers/CMSIS/Include                     \
+-I$(LIB_DIR)/FATFS/Target                              \
+-I$(LIB_DIR)/FATFS/App                                 \
+-I$(LIB_DIR)/Middlewares/Third_Party/FatFs/src         \
 -Imod/commands                                         \
 -Imod/ignition                                         \
 -Imod/led                                              \

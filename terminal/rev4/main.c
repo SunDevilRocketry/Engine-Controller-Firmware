@@ -22,6 +22,7 @@
 
 /* Pin definitions and main prototypes */
 #include "main.h"
+#include "fatfs.h"
 #include "sdr_pin_defines.h"
 
 /* SDR Modules */
@@ -98,6 +99,7 @@ USB_UART_Init();            /* USB UART                                       */
 FLASH_SPI_Init();           /* Flash SPI Bus                                  */
 PRESSURE_ADC_Init();        /* Pressure transducers ADC                       */
 SD_SDMMC_Init();            /* SD Card SDMMC Interface                        */
+MX_FATFS_Init();            /* SD Card filesystem                             */
 
 
 /*------------------------------------------------------------------------------
@@ -478,11 +480,6 @@ hsd1.Init.BusWide             = SDMMC_BUS_WIDE_4B;
 hsd1.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_DISABLE;
 hsd1.Init.ClockDiv            = 0;
 
-/* Initialize the SDMMC interface */
-if (HAL_SD_Init(&hsd1) != HAL_OK)
-	{
-	Error_Handler();
-	}
 } /* SD_SDMMC_Init */
 
 
