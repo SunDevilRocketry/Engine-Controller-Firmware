@@ -14,11 +14,19 @@ of the controller. </p>
 
 <p><b>Source Directories:</b></p>
 <p>
+blink: firmware which blinks the onboard LED to verify functional programming setup
+
 hotfire: firmware to be run during hotfire testing
 
 cta: firmware to be run on the component test apparatus
 
 terminal: firmware to allow terminal access to all PCB hardware 
+
+demo: special purpose code written to demonstration purposes only
+
+lib: libraries for device drivers, third-party code, middleware, and external functions
+
+unit_tests: Unit tests for firmware functions, directory structure is the same as that of the source code
 </p>
 
 <p><b>Working Directory Structure</b></p>
@@ -28,5 +36,9 @@ doc: documentation
 
 src: source code files and build files
 
-lib: libraries for device drivers and external functions
+config: microcontroller system configuration code
+
+auto: STM32CubeMX auto-generated code and program files
+
+mod: low-level SDR device drivers/modules
 </p>
