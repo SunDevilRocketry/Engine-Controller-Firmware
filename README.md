@@ -41,4 +41,6 @@ config: microcontroller system configuration code
 auto: STM32CubeMX auto-generated code and program files
 
 mod: low-level SDR device drivers/modules
+
+app: application level software modules
 </p>
