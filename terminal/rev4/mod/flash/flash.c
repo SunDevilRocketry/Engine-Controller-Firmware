@@ -395,19 +395,43 @@ void flash_write
  Local variables 
 ------------------------------------------------------------------------------*/
 /* Return data from SPI bus */
+uint8_t hal_status;    /* Status code return by hal spi functions             */
+uint8_t transmit_data = FLASH_OP_HW_BYTE_PROGRAM; /* Data to be transmitted over SPI                     */
 
 /*------------------------------------------------------------------------------
  API function implementation
 ------------------------------------------------------------------------------*/
 
+/* Check if write_enabled */
+if(pflash_handle -> write_enabled == false)
+    return;
+
 /* Drive chip enable line low */
 HAL_GPIO_WritePin(FLASH_SS_GPIO_PORT, FLASH_SS_PIN, GPIO_PIN_RESET);
 
 /* Send command code  */
+hal_status = HAL_SPI_Transmit(
+							 &( pflash_handle -> hspi ),
+                             &transmit_data            ,
+                             sizeof( transmit_data )   ,
+                             HAL_DEFAULT_TIMEOUT 
+                             );
 
 /* Send address bytes */
+hal_status = HAL_SPI_Transmit(
+                             &( pflash_handle -> hspi )        ,
+                             &( pflash_handle -> address[0] )  ,
+                             sizeof( pflash_handle -> address ),
+                             HAL_DEFAULT_TIMEOUT 
+                             );
 
 /* Write bytes*/
+hal_status = HAL_SPI_Transmit(
+                             &( pflash_handle -> hspi )     ,
+                             &( pflash_handle -> pbuffer )  ,
+                             pflash_handle -> num_bytes     ,
+                             HAL_DEFAULT_TIMEOUT 
+                             );
 
 /* Drive chip enable line high */
 HAL_GPIO_WritePin(FLASH_SS_GPIO_PORT, FLASH_SS_PIN, GPIO_PIN_SET);
@@ -430,10 +454,45 @@ void flash_read
     uint8_t        num_bytes
     )
 {
+
+uint8_t hal_status;    /* Status code return by hal spi functions             */
+uint8_t transmit_data = FLASH_OP_HW_READ; /* Data to be transmitted over SPI                     */
+
 /*------------------------------------------------------------------------------
  API function implementation
 ------------------------------------------------------------------------------*/
+/* Drive chip enable line low */
+HAL_GPIO_WritePin(FLASH_SS_GPIO_PORT, FLASH_SS_PIN, GPIO_PIN_RESET);
 
+/* Send command code*/
+hal_status = HAL_SPI_Transmit(
+							 &( pflash_handle -> hspi ),
+                             &transmit_data            ,
+                             sizeof( transmit_data )   ,
+                             HAL_DEFAULT_TIMEOUT 
+                             );
+
+/* Send Address*/
+hal_status = HAL_SPI_Transmit(
+							 &( pflash_handle -> hspi )        ,
+                             &( pflash_handle -> adress[0] )   ,
+                             sizeof( pflash_handle -> adress ) ,
+                             HAL_DEFAULT_TIMEOUT 
+                             );
+
+/* Recieve output into buffer*/
+for(int i = 0; i < num_bytes; ++i){
+	uint8_t* pbuffer = ( pflash_handle -> pbuffer ) + i;
+    hal_status = HAL_SPI_Receive(
+                                &( pflash_handle -> hspi ),
+                                pbuffer                   ,
+                                sizeof( uint8_t )         ,
+							    HAL_DEFAULT_TIMEOUT
+                                );
+}
+
+/* Drive chip enable line high */
+HAL_GPIO_WritePin(FLASH_SS_GPIO_PORT, FLASH_SS_PIN, GPIO_PIN_SET);
 
 } /* flash_read */
 
@@ -452,13 +511,34 @@ void flash_erase
     HFLASH_BUFFER* pflash_handle	
     )
 {
+
+uint8_t hal_status;    /* Status code return by hal spi functions             */
+uint8_t transmit_data = FLASH_OP_HW_FULL_ERASE; /* Data to be transmitted over SPI                     */
+
 /*------------------------------------------------------------------------------
  API function implementation
 ------------------------------------------------------------------------------*/
 
+/*Check if write_enabled*/
+if(write_enabled == false)
+    return;
 
-} /* flash_read */
+/* Drive chip enable line low */
+HAL_GPIO_WritePin(FLASH_SS_GPIO_PORT, FLASH_SS_PIN, GPIO_PIN_RESET);
 
+/*Full chip erase*/
+hal_status = HAL_SPI_Transmit(
+							 &( pflash_handle -> hspi ),
+                             &transmit_data            ,
+                             sizeof( transmit_data )   ,
+                             HAL_DEFAULT_TIMEOUT 
+                             );
+
+/* Drive chip enable line high */
+HAL_GPIO_WritePin(FLASH_SS_GPIO_PORT, FLASH_SS_PIN, GPIO_PIN_SET);
+
+
+} /* flash_erase */
 
 /*******************************************************************************
 * END OF FILE                                                                  * 
