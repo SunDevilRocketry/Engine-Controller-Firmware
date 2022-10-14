@@ -22,6 +22,12 @@
 #include "flash.h"
 #include "led.h"
 
+/*------------------------------------------------------------------------------
+ Global Variables 
+------------------------------------------------------------------------------*/
+
+extern SPI_HandleTypeDef hspi;               /* SPI handle                   */
+
 
 /*------------------------------------------------------------------------------
  Procedures 
@@ -66,7 +72,52 @@ switch(opcode)
     /* READ Subcommand */
     case FLASH_SUBCMD_READ:
         {
-		return FLASH_UNSUPPORTED_OP;	
+        /* Get Addres bits */
+		status = HAL_UART_Receive(
+                                 huart                             , 
+                                 &( pflash_handle -> address[0] )  , 
+                                 sizeof( pflash_handle -> address ), 
+                                 HAL_DEFAULT_TIMEOUT
+                                 );	
+        if (status != HAL_TIMEOUT )
+			{
+			    /* Call API Function */
+				status = flash_read( pflash_handle );
+				if (status == FLASH_TIMEOUT)
+					{
+                    /* Bytes not read */
+				    return FLASH_TIMEOUT;
+                    }
+
+                /* Bytes read successfully into pbuffer */
+                for (int i = 0; i < num_bytes; ++i)
+				    {
+                    uint8_t* pbuffer = ( pflash_handle -> pbuffer ) + i;
+				    status = HAL_UART_Transmit(
+                                            huart               , 
+                                            pbuffer             , 
+                                            sizeof( uint8_t )   , 
+                                            HAL_DEFAULT_TIMEOUT
+                                            );
+                    if (status == HAL_TIMEOUT)
+                        {
+                        /* Bytes not transimitted */
+                        return FLASH_TIMEOUT;	
+                        }
+				    else
+                        {
+                        /* Do nothing, UART working fine */
+                        }
+                    }
+			}
+		else    	
+			{
+			/* Address not recieved */
+			return FLASH_TIMEOUT;
+            }
+        
+        /* Bytes read and transimitted back sucessfully*/
+	    return FLASH_OK;	
         }
 
     /* ENABLE Subcommand */
@@ -123,7 +174,15 @@ switch(opcode)
             }
 
 		/* Call API function */
-		flash_write( pflash_handle );
+		status = flash_write( pflash_handle );
+        if( status == FLASH_TIMEOUT )
+            {
+            return FLASH_TIMEOUT;
+            }
+        else if( status == FLASH_WRITE_PROTECTED)
+            {
+            return FLASH_WRITE_PROTECTED;
+            }
 
 	    return FLASH_OK;	
         }
@@ -131,7 +190,19 @@ switch(opcode)
     /* ERASE Subcommand */
     case FLASH_SUBCMD_ERASE:
         {
-	    return FLASH_UNSUPPORTED_OP;	
+        /* No Prerequiste data from/to UART*/
+        /* Call API Function*/
+	    status = flash_erase( pflash_handle );
+        if( status == FLASH_TIMEOUT )
+            {
+            return FLASH_TIMEOUT;
+            }
+        else if( status == FLASH_WRITE_PROTECTED)
+            {
+            return FLASH_WRITE_PROTECTED;
+            }
+
+        return FLASH_OK;	
         }
 
     /* STATUS Subcommand */
@@ -232,7 +303,7 @@ HAL_GPIO_WritePin(
                  );
 
 /* Flash status register read successful */
-return hal_status;
+return FLASH_OK;
 
 } /* flash_status */
 
@@ -386,7 +457,7 @@ else
 *       writes bytes from a flash buffer to the external flash                 *
 *                                                                              *
 *******************************************************************************/
-void flash_write 
+FLASH_CMD_STATUS flash_write 
     (
 	HFLASH_BUFFER* pflash_handle
     )
@@ -404,7 +475,7 @@ uint8_t transmit_data = FLASH_OP_HW_BYTE_PROGRAM; /* Data to be transmitted over
 
 /* Check if write_enabled */
 if(pflash_handle -> write_enabled == false)
-    return;
+    return FLASH_WRITE_PROTECTED;
 
 /* Drive chip enable line low */
 HAL_GPIO_WritePin(FLASH_SS_GPIO_PORT, FLASH_SS_PIN, GPIO_PIN_RESET);
@@ -417,6 +488,11 @@ hal_status = HAL_SPI_Transmit(
                              HAL_DEFAULT_TIMEOUT 
                              );
 
+if ( hal_status == HAL_TIMEOUT )
+{
+	return FLASH_TIMEOUT;
+}
+
 /* Send address bytes */
 hal_status = HAL_SPI_Transmit(
                              &( pflash_handle -> hspi )        ,
@@ -425,16 +501,28 @@ hal_status = HAL_SPI_Transmit(
                              HAL_DEFAULT_TIMEOUT 
                              );
 
-/* Write bytes*/
+if ( hal_status == HAL_TIMEOUT )
+{
+	return FLASH_TIMEOUT;
+}
+
+/* Write bytes */
 hal_status = HAL_SPI_Transmit(
                              &( pflash_handle -> hspi )     ,
-                             &( pflash_handle -> pbuffer )  ,
+                             pflash_handle -> pbuffer       ,
                              pflash_handle -> num_bytes     ,
-                             HAL_DEFAULT_TIMEOUT 
+                             FLASH_WRITE_TIMEOUT 
                              );
+
+if ( hal_status == HAL_TIMEOUT )
+{
+	return FLASH_TIMEOUT;
+}
 
 /* Drive chip enable line high */
 HAL_GPIO_WritePin(FLASH_SS_GPIO_PORT, FLASH_SS_PIN, GPIO_PIN_SET);
+
+return FLASH_OK;
 
 } /* flash_write */
 
@@ -448,7 +536,7 @@ HAL_GPIO_WritePin(FLASH_SS_GPIO_PORT, FLASH_SS_PIN, GPIO_PIN_SET);
 *       reads a specified number of bytes using a flash buffer                 *
 *                                                                              *
 *******************************************************************************/
-void flash_read
+FLASH_CMD_STATUS flash_read
     (
 	HFLASH_BUFFER* pflash_handle,
     uint8_t        num_bytes
@@ -472,13 +560,23 @@ hal_status = HAL_SPI_Transmit(
                              HAL_DEFAULT_TIMEOUT 
                              );
 
+if ( hal_status == HAL_TIMEOUT )
+{
+	return FLASH_TIMEOUT;
+}
+
 /* Send Address*/
 hal_status = HAL_SPI_Transmit(
 							 &( pflash_handle -> hspi )        ,
-                             &( pflash_handle -> adress[0] )   ,
+                             &( pflash_handle -> address[0] )   ,
                              sizeof( pflash_handle -> adress ) ,
                              HAL_DEFAULT_TIMEOUT 
                              );
+
+if ( hal_status == HAL_TIMEOUT )
+{
+	return FLASH_TIMEOUT;
+}
 
 /* Recieve output into buffer*/
 for(int i = 0; i < num_bytes; ++i){
@@ -489,10 +587,17 @@ for(int i = 0; i < num_bytes; ++i){
                                 sizeof( uint8_t )         ,
 							    HAL_DEFAULT_TIMEOUT
                                 );
+
+    if ( hal_status == HAL_TIMEOUT )
+    {
+	return FLASH_TIMEOUT;
+    }
 }
 
 /* Drive chip enable line high */
 HAL_GPIO_WritePin(FLASH_SS_GPIO_PORT, FLASH_SS_PIN, GPIO_PIN_SET);
+
+return FLASH_OK;
 
 } /* flash_read */
 
@@ -506,7 +611,7 @@ HAL_GPIO_WritePin(FLASH_SS_GPIO_PORT, FLASH_SS_PIN, GPIO_PIN_SET);
 *       erases the entire flash chip                                           *
 *                                                                              *
 *******************************************************************************/
-void flash_erase
+FLASH_CMD_STATUS flash_erase
     (
     HFLASH_BUFFER* pflash_handle	
     )
@@ -519,14 +624,14 @@ uint8_t transmit_data = FLASH_OP_HW_FULL_ERASE; /* Data to be transmitted over S
  API function implementation
 ------------------------------------------------------------------------------*/
 
-/*Check if write_enabled*/
-if(write_enabled == false)
-    return;
+/* Check if write_enabled */
+if(pflash_handle -> write_enabled == false)
+    return FLASH_WRITE_PROTECTED;
 
 /* Drive chip enable line low */
 HAL_GPIO_WritePin(FLASH_SS_GPIO_PORT, FLASH_SS_PIN, GPIO_PIN_RESET);
 
-/*Full chip erase*/
+/* Full chip erase */
 hal_status = HAL_SPI_Transmit(
 							 &( pflash_handle -> hspi ),
                              &transmit_data            ,
@@ -534,9 +639,15 @@ hal_status = HAL_SPI_Transmit(
                              HAL_DEFAULT_TIMEOUT 
                              );
 
+if ( hal_status == HAL_TIMEOUT )
+{
+	return FLASH_TIMEOUT;
+}
+
 /* Drive chip enable line high */
 HAL_GPIO_WritePin(FLASH_SS_GPIO_PORT, FLASH_SS_PIN, GPIO_PIN_SET);
 
+return FLASH_OK;
 
 } /* flash_erase */
 
