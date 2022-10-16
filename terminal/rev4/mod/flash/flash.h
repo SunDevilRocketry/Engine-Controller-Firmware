@@ -97,12 +97,13 @@ typedef enum FLASH_SUBCMD_CODES {
 
 /* Flash return value codes */
 typedef enum FLASH_CMD_STATUS {
-	FLASH_OK = 0         ,
-    FLASH_FAIL           ,
-    FLASH_UNSUPPORTED_OP ,
-	FLASH_UNRECOGNIZED_OP,
-    FLASH_TIMEOUT,
-	FLASH_WRITE_PROTECTED
+	FLASH_OK = 0            ,
+    FLASH_FAIL              ,
+    FLASH_UNSUPPORTED_OP    ,
+	FLASH_UNRECOGNIZED_OP   ,
+    FLASH_TIMEOUT           ,
+	FLASH_WRITE_PROTECTED   ,
+    FLASH_WRITE_TIMEOUT     ,
 } FLASH_CMD_STATUS;
 
 
