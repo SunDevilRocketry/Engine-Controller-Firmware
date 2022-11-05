@@ -58,6 +58,7 @@ uint8_t          opcode;                    /* Subcommand opcode              */
 uint8_t          num_bytes;                 /* Number of bytes on which to 
                                                operate                        */
 uint8_t          status;                    /* Return value of UART API calls */
+uint8_t          erase_size = 0;
 
 /*------------------------------------------------------------------------------
  Command Input processing 
@@ -258,8 +259,15 @@ switch(opcode)
         }
 
     /* 4K ERASE Subcommand*/
+    case FLASH_SUBCMD_64K_ERASE:
+        erase_size = FLASH_OP_HW_64K_ERASE;
+    case FLASH_SUBCMD_32K_ERASE:
+        if(erase_size != 0)
+            erase_size = FLASH_OP_HW_32K_ERASE;
     case FLASH_SUBCMD_4K_ERASE:
         {
+            if(erase_size != 0)
+                erase_size = FLASH_OP_HW_4K_ERASE;
         
         /* Get address bits */
 		status = HAL_UART_Receive(
@@ -271,7 +279,7 @@ switch(opcode)
         if (status != HAL_TIMEOUT )
 			{
 			    /* Call API Function*/
-	            status = flash_4k_erase( pflash_handle );
+	            status = flash_block_erase( pflash_handle, num_bytes, erase_size );
                 if( status == FLASH_TIMEOUT )
                 {
                     return FLASH_TIMEOUT;
@@ -835,15 +843,16 @@ return FLASH_OK;
 *       block erase 4 bit of data from Flash chip                              *
 *                                                                              *
 *******************************************************************************/
-FLASH_CMD_STATUS flash_4k_erase
+FLASH_CMD_STATUS flash_block_erase
     (
     HFLASH_BUFFER* pflash_handle,
-    uint8_t        num_bytes
+    uint8_t        num_bytes    ,
+    unit8_t        erase_size
     )
 {
     
 uint8_t hal_status;    /* Status code return by hal spi functions             */
-uint8_t transmit_data = FLASH_OP_HW_4K_ERASE; /* Data to be transmitted over SPI                     */
+uint8_t transmit_data = erase_size; /* Data to be transmitted over SPI                     */
 
 /*------------------------------------------------------------------------------
  API function implementation
