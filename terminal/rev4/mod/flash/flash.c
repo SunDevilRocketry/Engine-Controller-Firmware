@@ -663,7 +663,7 @@ if ( hal_status == HAL_TIMEOUT )
 hal_status = HAL_SPI_Transmit(
 							 &hspi2                             ,
                              &( pflash_handle -> address[0] )   ,
-                             sizeof( pflash_handle -> adress )  ,
+                             sizeof( pflash_handle -> address )  ,
                              HAL_DEFAULT_TIMEOUT 
                              );
 
@@ -764,6 +764,7 @@ FLASH_CMD_STATUS flash_high_speed_read
 uint8_t hal_status;    /* Status code return by hal spi functions             */
 uint8_t transmit_data = FLASH_OP_HW_READ_HS; /* Data to be transmitted over SPI                     */
 uint8_t dummy_byte = 0;
+uint8_t *dummy_ptr = &dummy_byte;
 
 /*------------------------------------------------------------------------------
  API function implementation
@@ -788,7 +789,7 @@ if ( hal_status == HAL_TIMEOUT )
 hal_status = HAL_SPI_Transmit(
 							 &hspi2                             ,
                              &( pflash_handle -> address[0] )   ,
-                             sizeof( pflash_handle -> adress )  ,
+                             sizeof( pflash_handle -> address )  ,
                              HAL_DEFAULT_TIMEOUT 
                              );
 
@@ -800,7 +801,7 @@ if ( hal_status == HAL_TIMEOUT )
 /* Send Dummy Byte */
 hal_status = HAL_SPI_Transmit(
 							 &hspi2              ,
-                             dummy_byte          ,
+                             dummy_ptr           ,
                              sizeof( uint8_t )   ,
                              HAL_DEFAULT_TIMEOUT 
                              );
@@ -847,7 +848,7 @@ FLASH_CMD_STATUS flash_block_erase
     (
     HFLASH_BUFFER* pflash_handle,
     uint8_t        num_bytes    ,
-    unit8_t        erase_size
+    uint8_t        erase_size
     )
 {
     
@@ -882,7 +883,7 @@ if ( hal_status == HAL_TIMEOUT )
 hal_status = HAL_SPI_Transmit(
 							 &hspi2                             ,
                              &( pflash_handle -> address[0] )   ,
-                             sizeof( pflash_handle -> adress )  ,
+                             sizeof( pflash_handle -> address )  ,
                              HAL_DEFAULT_TIMEOUT 
                              );
 

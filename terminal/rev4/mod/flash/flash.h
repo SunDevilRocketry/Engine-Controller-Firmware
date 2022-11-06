@@ -142,22 +142,38 @@ FLASH_CMD_STATUS flash_write_disable
     );
 
 /* Write bytes from a flash buffer to the external flash */
-void flash_write 
+FLASH_CMD_STATUS flash_write 
     (
 	HFLASH_BUFFER* pflash_handle
     );
 
 /* Read a specified number of bytes using a flash buffer */
-void flash_read
+FLASH_CMD_STATUS flash_read
     (
 	HFLASH_BUFFER* pflash_handle,
     uint8_t        num_bytes
     );
 
+/* High speed read a specific number of bytes*/
+FLASH_CMD_STATUS flash_high_speed_read
+    (
+    HFLASH_BUFFER* pflash_handle,
+    uint8_t        num_bytes
+    );
+
+
 /* Erase the entire flash chip */
-void flash_erase
+FLASH_CMD_STATUS flash_erase
     (
     HFLASH_BUFFER* pflash_handle	
+    );
+
+/* Block erase 4k/32k/64k on the chip depending on input SUB_CMD*/
+FLASH_CMD_STATUS flash_block_erase
+    (
+    HFLASH_BUFFER* pflash_handle,
+    uint8_t        num_bytes,
+    uint8_t        erase_size
     );
 
 #endif /* FLASH_H */
