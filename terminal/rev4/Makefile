@@ -26,6 +26,9 @@ BUILD_DIR = build
 # Library path
 LIB_DIR = ../../lib
 
+# Module path
+MOD_DIR = ../../mod
+
 ################################################################
 # source
 ################################################################
@@ -33,13 +36,13 @@ LIB_DIR = ../../lib
 # C sources
 C_SOURCES =                                                          \
 main.c                                                               \
-mod/commands/commands.c                                              \
-mod/ignition/ignition.c                                              \
-mod/led/led.c                                                        \
-mod/power/power.c                                                    \
-mod/flash/flash.c                                                    \
-mod/pressure/pressure.c                                              \
-mod/sensor/sensor.c                                                  \
+$(MOD_DIR)/commands/commands.c                                       \
+$(MOD_DIR)/ignition/ignition.c                                       \
+$(MOD_DIR)/led/led.c                                                 \
+$(MOD_DIR)/power/power.c                                             \
+$(MOD_DIR)/flash/flash.c                                             \
+$(MOD_DIR)/pressure/pressure.c                                       \
+$(MOD_DIR)/sensor/sensor.c                                           \
 config/Src/stm32h7xx_it.c                                            \
 config/Src/stm32h7xx_hal_msp.c                                       \
 config/Src/system_stm32h7xx.c                                        \
@@ -134,13 +137,13 @@ C_INCLUDES =                                           \
 -I$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Inc/Legacy   \
 -I$(LIB_DIR)/Drivers/CMSIS/Device/ST/STM32H7xx/Include \
 -I$(LIB_DIR)/Drivers/CMSIS/Include                     \
--Imod/commands                                         \
--Imod/ignition                                         \
--Imod/led                                              \
--Imod/power                                            \
--Imod/flash                                            \
--Imod/pressure                                         \
--Imod/sensor
+-I$(MOD_DIR)/commands                                  \
+-I$(MOD_DIR)/ignition                                  \
+-I$(MOD_DIR)/led                                       \
+-I$(MOD_DIR)/power                                     \
+-I$(MOD_DIR)/flash                                     \
+-I$(MOD_DIR)/pressure                                  \
+-I$(MOD_DIR)/sensor
 
 # compile gcc flags
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
