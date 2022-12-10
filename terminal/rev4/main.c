@@ -20,6 +20,7 @@
  Project Includes                                                                     
 ------------------------------------------------------------------------------*/
 #include "main.h"
+#include "sdr_pin_defines_L0002.h"
 #include "commands.h"
 #include "ignition.h"
 #include "led.h"

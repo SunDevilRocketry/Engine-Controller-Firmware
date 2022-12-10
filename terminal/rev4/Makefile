@@ -117,7 +117,9 @@ AS_DEFS =
 # C defines
 C_DEFS =         \
 -DUSE_HAL_DRIVER \
--DSTM32H750xx
+-DSTM32H750xx    \
+-DTERMINAL       \
+-DL0002_REV4
 
 
 # AS includes
@@ -127,6 +129,7 @@ AS_INCLUDES =
 C_INCLUDES =                                           \
 -I.                                                    \
 -Iconfig/Inc                                           \
+-I$(LIB_DIR)                                           \
 -I$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Inc          \
 -I$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Inc/Legacy   \
 -I$(LIB_DIR)/Drivers/CMSIS/Device/ST/STM32H7xx/Include \

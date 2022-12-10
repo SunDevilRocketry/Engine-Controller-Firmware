@@ -19,6 +19,7 @@
  Project Includes                                                                     
 ------------------------------------------------------------------------------*/
 #include "main.h"
+#include "sdr_pin_defines_L0002.h"
 #include "sensor.h"
 #include "pressure.h"
 #include "led.h"
