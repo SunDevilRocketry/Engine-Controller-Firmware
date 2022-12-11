@@ -7,6 +7,7 @@ unit_tests/terminal/rev4/mod/sensor/build/*
 demo/pts/rev4/build/*
 
 # Visual Studio Code Artifacts
+.vscode/*
 blink/rev3/.vscode/*
 blink/rev4/.vscode/*
 terminal/rev3/.vscode/*
