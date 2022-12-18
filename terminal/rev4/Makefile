@@ -43,6 +43,7 @@ $(MOD_DIR)/power/power.c                                             \
 $(MOD_DIR)/flash/flash.c                                             \
 $(MOD_DIR)/pressure/pressure.c                                       \
 $(MOD_DIR)/sensor/sensor.c                                           \
+$(MOD_DIR)/usb/usb.c                                                 \
 config/Src/stm32h7xx_it.c                                            \
 config/Src/stm32h7xx_hal_msp.c                                       \
 config/Src/system_stm32h7xx.c                                        \
@@ -118,10 +119,11 @@ MCU = $(CPU) -mthumb $(FPU) $(FLOAT-ABI)
 AS_DEFS = 
 
 # C defines
-C_DEFS =         \
--DUSE_HAL_DRIVER \
--DSTM32H750xx    \
--DTERMINAL       \
+C_DEFS =            \
+-DUSE_HAL_DRIVER    \
+-DSTM32H750xx       \
+-DTERMINAL          \
+-DENGINE_CONTROLLER \
 -DL0002_REV4
 
 
@@ -143,6 +145,7 @@ C_INCLUDES =                                           \
 -I$(MOD_DIR)/power                                     \
 -I$(MOD_DIR)/flash                                     \
 -I$(MOD_DIR)/pressure                                  \
+-I$(MOD_DIR)/usb                                       \
 -I$(MOD_DIR)/sensor
 
 # compile gcc flags

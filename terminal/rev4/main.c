@@ -19,13 +19,18 @@
 /*------------------------------------------------------------------------------
  Project Includes                                                                     
 ------------------------------------------------------------------------------*/
+
+/* Application Layer */
 #include "main.h"
 #include "sdr_pin_defines_L0002.h"
+
+/* Low-level modules */
 #include "commands.h"
 #include "ignition.h"
 #include "led.h"
 #include "power.h"
 #include "flash.h"
+#include "usb.h"
 #include "pressure.h"
 #include "sensor.h"
 
@@ -97,11 +102,8 @@ PRESSURE_ADC_Init();        /* Pressure transducers ADC                       */
 ------------------------------------------------------------------------------*/
 
 /* Flash Buffer */
-flash_handle.hspi             = hspi2;
 flash_handle.write_enabled    = FLASH_WP_READ_ONLY;
-flash_handle.address[0]       = 0;
-flash_handle.address[1]       = 0;
-flash_handle.address[2]       = 0;
+flash_handle.address          = 0;
 flash_handle.num_bytes        = 0;
 flash_handle.pbuffer          = &flash_buffer[0];
 flash_handle.status_register  = 0;
@@ -124,14 +126,14 @@ while (1)
 			/*------------------------- Ping Command -------------------------*/
 			case PING_OP:
 				{
-				ping(&huart1);
+				ping();
 				break;
 				} /* PING_OP */
 
 			/*------------------------ Connect Command ------------------------*/
 			case CONNECT_OP:
 				{
-				ping(&huart1);
+				ping();
 				break;
 				} /* CONNECT_OP */
 
@@ -189,8 +191,7 @@ while (1)
 					{
 				    status_code = flash_cmd_execute(
                                                    subcommand   , 
-                                                   &flash_handle,
-                                                   &huart1
+                                                   &flash_handle
                                                    );
 					}
 				else
