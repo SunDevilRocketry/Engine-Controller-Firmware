@@ -80,6 +80,7 @@ uint8_t       subcommand;       /* subcommand code                            */
 uint8_t       ign_status;       /* Ignition status code                       */
 uint8_t       pwr_source;       /* Power source code                          */
 uint8_t       status_code;      /* Status code for reporting errors           */
+USB_STATUS    usb_status;       /* Status of USB operations                   */
 HFLASH_BUFFER flash_handle;                    /* Flash API buffer handle     */
 uint8_t       flash_buffer[ DEF_BUFFER_SIZE ]; /* Flash data buffer */
 
@@ -115,10 +116,10 @@ flash_handle.status_register  = 0;
 while (1)
 	{
 	/* Read data from UART reciever */
-    status_code = HAL_UART_Receive( &huart1, &data, 1, 1 );
+    usb_status = usb_receive( &data, sizeof( data ), HAL_DEFAULT_TIMEOUT );
 
 	/* Parse command input if HAL_UART_Receive doesn't timeout */
-	if ( status_code != HAL_TIMEOUT )
+	if ( usb_status != USB_TIMEOUT )
 		{
 		switch( data )
 			{
@@ -141,13 +142,12 @@ while (1)
 			case IGNITE_OP:
 				{
                 /* Recieve ignition subcommand over USB */
-                status_code = HAL_UART_Receive( &huart1             , 
-                                                &subcommand         , 
-                                                sizeof( subcommand ), 
-                                                HAL_DEFAULT_TIMEOUT );
+                usb_status = usb_receive( &subcommand         , 
+                                          sizeof( subcommand ), 
+                                          HAL_DEFAULT_TIMEOUT );
 
                 /* Execute subcommand */
-                if ( status_code != HAL_TIMEOUT )
+                if ( usb_status != USB_TIMEOUT )
 					{
 					/* Execute subcommand*/
                     ign_status = ign_cmd_execute( subcommand );
@@ -159,7 +159,9 @@ while (1)
                     }
 
                 /* Return response code to terminal */
-                HAL_UART_Transmit( &huart1, &ign_status, 1, 1 );
+                usb_transmit( &ign_status         , 
+				              sizeof( ign_status ), 
+							  HAL_DEFAULT_TIMEOUT );
 				break;
 				} /* IGNITE_OP */
 
@@ -171,7 +173,9 @@ while (1)
 
 				/* Convert to response code and transmit to PC */
                 pwr_source += 1;
-				HAL_UART_Transmit( &huart1, &pwr_source, 1, 1 );
+				usb_transmit( &pwr_source         , 
+				              sizeof( pwr_source ), 
+							  HAL_DEFAULT_TIMEOUT );
 				break;
 				} /* POWER_OP */
 
@@ -179,20 +183,15 @@ while (1)
 			case FLASH_OP:
 				{
                 /* Recieve flash subcommand over USB */
-                status_code = HAL_UART_Receive(
-                                              &huart1             , 
-                                              &subcommand         , 
-                                              sizeof( subcommand ), 
-                                              HAL_DEFAULT_TIMEOUT 
-                                              );
+                usb_status = usb_receive( &subcommand         , 
+                                          sizeof( subcommand ), 
+                                          HAL_DEFAULT_TIMEOUT );
 			
 				/* Execute subcommand */
 				if (status_code != HAL_TIMEOUT)
 					{
-				    status_code = flash_cmd_execute(
-                                                   subcommand   , 
-                                                   &flash_handle
-                                                   );
+				    status_code = flash_cmd_execute( subcommand   , 
+                                                     &flash_handle );
 					}
 				else
 					{
@@ -201,12 +200,9 @@ while (1)
 					}
 
 				/* Transmit status code to PC */
-				HAL_UART_Transmit(
-                                 &huart1              , 
-                                 &status_code         , 
-                                 sizeof( status_code ), 
-                                 HAL_DEFAULT_TIMEOUT
-                                 );
+				usb_transmit( &status_code         , 
+                              sizeof( status_code ), 
+                              HAL_DEFAULT_TIMEOUT );
 				break;
 				} /* FLASH_OP */
 
@@ -214,15 +210,12 @@ while (1)
 			case SENSOR_OP:
 				{
 				/* Recieve subcommand from USB */
-                status_code = HAL_UART_Receive(
-                                              &huart1             ,
-                                              &subcommand         ,
-                                              sizeof( subcommand ),
-                                              HAL_DEFAULT_TIMEOUT
-                                              );
+                usb_status = usb_receive( &subcommand         ,
+                                          sizeof( subcommand ),
+                                          HAL_DEFAULT_TIMEOUT );
 
 				/* Execute subcommand */
-				if ( status_code != HAL_TIMEOUT )
+				if ( usb_status != USB_TIMEOUT )
 					{
                     status_code = sensor_cmd_execute( subcommand ); 
                     }
