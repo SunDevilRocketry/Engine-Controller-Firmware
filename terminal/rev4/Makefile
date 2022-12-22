@@ -12,8 +12,10 @@ TARGET = L0002-Firmware
 ################################################################
 # building variables
 ################################################################
-DEBUG = 1   # debug build?
-OPT   = -Og # optimization
+# debug build?
+DEBUG = 1
+# optimization
+OPT   = -Og
 
 
 ################################################################
@@ -125,6 +127,7 @@ C_DEFS =            \
 -DSTM32H750xx       \
 -DTERMINAL          \
 -DENGINE_CONTROLLER \
+-DSDR_DEBUG         \
 -DL0002_REV4
 
 

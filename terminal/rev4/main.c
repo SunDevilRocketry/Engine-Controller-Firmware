@@ -64,8 +64,8 @@ uint8_t       data;             /* USB Incoming Data Buffer                   */
 uint8_t       subcommand;       /* subcommand code                            */
 uint8_t       ign_status;       /* Ignition status code                       */
 uint8_t       pwr_source;       /* Power source code                          */
-uint8_t       status_code;      /* Status code for reporting errors           */
 USB_STATUS    usb_status;       /* Status of USB operations                   */
+FLASH_STATUS  flash_status;     /* Status of flash operations                 */
 HFLASH_BUFFER flash_handle;                    /* Flash API buffer handle     */
 uint8_t       flash_buffer[ DEF_BUFFER_SIZE ]; /* Flash data buffer */
 
@@ -93,6 +93,22 @@ flash_handle.address          = 0;
 flash_handle.num_bytes        = 0;
 flash_handle.pbuffer          = &flash_buffer[0];
 flash_handle.status_register  = 0;
+
+/* Module return codes */
+usb_status                    = USB_OK;
+flash_status                  = FLASH_OK;
+
+
+/*------------------------------------------------------------------------------
+ External Hardware Initializations 
+------------------------------------------------------------------------------*/
+
+/* Flash Chip */
+flash_status = flash_init( &flash_handle, false, 0 );
+if ( flash_status != FLASH_OK )
+	{
+	Error_Handler();
+	}
 
 
 /*------------------------------------------------------------------------------
@@ -173,9 +189,9 @@ while (1)
                                           HAL_DEFAULT_TIMEOUT );
 			
 				/* Execute subcommand */
-				if (status_code != HAL_TIMEOUT)
+				if ( usb_status == USB_OK )
 					{
-				    status_code = flash_cmd_execute( subcommand   , 
+				    flash_status = flash_cmd_execute( subcommand   , 
                                                      &flash_handle );
 					}
 				else
@@ -185,8 +201,8 @@ while (1)
 					}
 
 				/* Transmit status code to PC */
-				usb_transmit( &status_code         , 
-                              sizeof( status_code ), 
+				usb_transmit( &flash_status, 
+                              sizeof( flash_status ), 
                               HAL_DEFAULT_TIMEOUT );
 				break;
 				} /* FLASH_OP */
@@ -200,9 +216,9 @@ while (1)
                                           HAL_DEFAULT_TIMEOUT );
 
 				/* Execute subcommand */
-				if ( usb_status != USB_TIMEOUT )
+				if ( usb_status == USB_TIMEOUT )
 					{
-                    status_code = sensor_cmd_execute( subcommand ); 
+                    sensor_cmd_execute( subcommand ); 
                     }
 				else
 					{

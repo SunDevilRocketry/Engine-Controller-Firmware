@@ -28,9 +28,18 @@ extern "C" {
 ------------------------------------------------------------------------------*/
 
 /* General MCU HAL related macros */
-#define HAL_DEFAULT_TIMEOUT    ( 1  )   /* Default timeout for polling ops    */
-#define HAL_SENSOR_TIMEOUT     ( 40 )   /* Larger timeout for sensor polling  */
 #define DEF_BUFFER_SIZE        ( 16 )   /* Default size of buffer arrays      */
+
+/* Timeouts */
+#ifndef SDR_DEBUG
+	#define HAL_DEFAULT_TIMEOUT    ( 10  ) /* Default timeout for polling 
+											   operations                     */
+	#define HAL_SENSOR_TIMEOUT     ( 40  ) /* Timeout for sensor polling      */
+#else
+	/* Disable timeouts when debugging */
+	#define HAL_DEFAULT_TIMEOUT    ( 0xFFFFFFFF )  
+	#define HAL_SENSOR_TIMEOUT     ( 0xFFFFFFFF ) 
+#endif /* SDR_DEBUG */
 
 
 /*------------------------------------------------------------------------------
