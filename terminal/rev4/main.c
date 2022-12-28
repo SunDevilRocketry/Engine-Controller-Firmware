@@ -112,6 +112,9 @@ if ( flash_status != FLASH_OK )
 	Error_Handler();
 	}
 
+/* Sensor module */
+sensor_init();
+
 
 /*------------------------------------------------------------------------------
  Event Loop                                                                  
