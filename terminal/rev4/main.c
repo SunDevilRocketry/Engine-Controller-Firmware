@@ -64,10 +64,12 @@ uint8_t       data;             /* USB Incoming Data Buffer                   */
 uint8_t       subcommand;       /* subcommand code                            */
 uint8_t       ign_status;       /* Ignition status code                       */
 uint8_t       pwr_source;       /* Power source code                          */
-USB_STATUS    usb_status;       /* Status of USB operations                   */
-FLASH_STATUS  flash_status;     /* Status of flash operations                 */
 HFLASH_BUFFER flash_handle;                    /* Flash API buffer handle     */
 uint8_t       flash_buffer[ DEF_BUFFER_SIZE ]; /* Flash data buffer */
+
+/* Module return codes */
+USB_STATUS    usb_status;       /* Status of USB operations                   */
+FLASH_STATUS  flash_status;     /* Status of flash operations                 */
 
 
 /*------------------------------------------------------------------------------
@@ -216,7 +218,7 @@ while (1)
                                           HAL_DEFAULT_TIMEOUT );
 
 				/* Execute subcommand */
-				if ( usb_status == USB_TIMEOUT )
+				if ( usb_status != USB_OK )
 					{
                     sensor_cmd_execute( subcommand ); 
                     }
