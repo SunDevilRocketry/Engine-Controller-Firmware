@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "main.h": "c",
+        "sdr_pin_defines_l0002.h": "c",
+        "ignition.h": "c"
+    }
+}

@@ -12,10 +12,8 @@ TARGET = L0002-Firmware
 ################################################################
 # building variables
 ################################################################
-# debug build?
-DEBUG = 1
-# optimization
-OPT   = -Og
+DEBUG = 1   # debug build?
+OPT   = -Og # optimization
 
 
 ################################################################
@@ -26,10 +24,7 @@ OPT   = -Og
 BUILD_DIR = build
 
 # Library path
-LIB_DIR = ../../lib
-
-# Module path
-MOD_DIR = ../../mod
+LIB_DIR = ../../../../lib
 
 ################################################################
 # source
@@ -38,15 +33,13 @@ MOD_DIR = ../../mod
 # C sources
 C_SOURCES =                                                          \
 main.c                                                               \
-init.c                                                               \
-$(MOD_DIR)/commands/commands.c                                       \
-$(MOD_DIR)/ignition/ignition.c                                       \
-$(MOD_DIR)/led/led.c                                                 \
-$(MOD_DIR)/power/power.c                                             \
-$(MOD_DIR)/flash/flash.c                                             \
-$(MOD_DIR)/pressure/pressure.c                                       \
-$(MOD_DIR)/sensor/sensor.c                                           \
-$(MOD_DIR)/usb/usb.c                                                 \
+mod/commands/commands.c                                              \
+mod/ignition/ignition.c                                              \
+mod/led/led.c                                                        \
+mod/power/power.c                                                    \
+mod/flash/flash.c                                                    \
+mod/pressure/pressure.c                                              \
+mod/sensor/sensor.c                                                  \
 config/Src/stm32h7xx_it.c                                            \
 config/Src/stm32h7xx_hal_msp.c                                       \
 config/Src/system_stm32h7xx.c                                        \
@@ -122,13 +115,9 @@ MCU = $(CPU) -mthumb $(FPU) $(FLOAT-ABI)
 AS_DEFS = 
 
 # C defines
-C_DEFS =            \
--DUSE_HAL_DRIVER    \
--DSTM32H750xx       \
--DTERMINAL          \
--DENGINE_CONTROLLER \
--DSDR_DEBUG         \
--DL0002_REV4
+C_DEFS =         \
+-DUSE_HAL_DRIVER \
+-DSTM32H750xx
 
 
 # AS includes
@@ -138,19 +127,17 @@ AS_INCLUDES =
 C_INCLUDES =                                           \
 -I.                                                    \
 -Iconfig/Inc                                           \
--I$(LIB_DIR)                                           \
 -I$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Inc          \
 -I$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Inc/Legacy   \
 -I$(LIB_DIR)/Drivers/CMSIS/Device/ST/STM32H7xx/Include \
 -I$(LIB_DIR)/Drivers/CMSIS/Include                     \
--I$(MOD_DIR)/commands                                  \
--I$(MOD_DIR)/ignition                                  \
--I$(MOD_DIR)/led                                       \
--I$(MOD_DIR)/power                                     \
--I$(MOD_DIR)/flash                                     \
--I$(MOD_DIR)/pressure                                  \
--I$(MOD_DIR)/usb                                       \
--I$(MOD_DIR)/sensor
+-Imod/commands                                         \
+-Imod/ignition                                         \
+-Imod/led                                              \
+-Imod/power                                            \
+-Imod/flash                                            \
+-Imod/pressure                                         \
+-Imod/sensor
 
 # compile gcc flags
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
