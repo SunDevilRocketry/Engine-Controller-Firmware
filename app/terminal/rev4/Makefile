@@ -31,6 +31,9 @@ LIB_DIR = ../../../lib
 # Module path
 MOD_DIR = ../../../mod
 
+# MCU initialization path
+INIT_DIR = ../../../init
+
 ################################################################
 # source
 ################################################################
@@ -38,7 +41,7 @@ MOD_DIR = ../../../mod
 # C sources
 C_SOURCES =                                                          \
 main.c                                                               \
-init.c                                                               \
+$(INIT_DIR)/init.c                                                   \
 $(MOD_DIR)/commands/commands.c                                       \
 $(MOD_DIR)/ignition/ignition.c                                       \
 $(MOD_DIR)/led/led.c                                                 \
@@ -47,9 +50,9 @@ $(MOD_DIR)/flash/flash.c                                             \
 $(MOD_DIR)/pressure/pressure.c                                       \
 $(MOD_DIR)/sensor/sensor.c                                           \
 $(MOD_DIR)/usb/usb.c                                                 \
-config/Src/stm32h7xx_it.c                                            \
-config/Src/stm32h7xx_hal_msp.c                                       \
-config/Src/system_stm32h7xx.c                                        \
+$(INIT_DIR)/config/Src/stm32h7xx_it.c                                \
+$(INIT_DIR)/config/Src/stm32h7xx_hal_msp.c                           \
+$(INIT_DIR)/config/Src/system_stm32h7xx.c                            \
 $(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc.c      \
 $(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c   \
 $(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.c   \
@@ -137,7 +140,8 @@ AS_INCLUDES =
 # C includes
 C_INCLUDES =                                           \
 -I.                                                    \
--Iconfig/Inc                                           \
+-I$(INIT_DIR)                                          \
+-I$(INIT_DIR)/config/Inc                               \
 -I$(LIB_DIR)                                           \
 -I$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Inc          \
 -I$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Inc/Legacy   \
