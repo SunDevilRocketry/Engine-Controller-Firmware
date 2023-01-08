@@ -12,21 +12,31 @@ header pins which are regulated down to 5V and 3.3V with a buck converter and li
 Additionally, the board includes a reset button and several LEDs for visual indication of the power and firmware status 
 of the controller. </p>
 
-<p><b>Source Directories:</b></p>
+<h2>Working Directory Structure</h2>
+
 <p>
-hotfire: firmware to be run during hotfire testing
+app: application code for the flight computer containing source directories
+
+auto: auto-generated code from STM32CubeMX (not compiled into application)
+
+init: Microcontroller initialization and configuration code
+
+lib: third-party libraries for device drivers and middleware, microcontroller pin and peripheral configurations 
+
+mod: Hardware modules containing hardware specific code for SDR boards
+
+test: Test code
+</p>
+
+<h2>Source Directories:</h2>
+<p>
+blink:blinks status LED to test programmer and board setup 
 
 cta: firmware to be run on the component test apparatus
 
+demo: firmware containing small demo code
+
+hotfire: firmware to be run during hotfire testing
+
 terminal: firmware to allow terminal access to all PCB hardware 
-</p>
-
-<p><b>Working Directory Structure</b></p>
-
-<p>
-doc: documentation
-
-src: source code files and build files
-
-lib: libraries for device drivers and external functions
 </p>
