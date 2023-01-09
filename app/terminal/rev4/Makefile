@@ -130,7 +130,6 @@ C_DEFS =            \
 -DSTM32H750xx       \
 -DTERMINAL          \
 -DENGINE_CONTROLLER \
--DSDR_DEBUG         \
 -DL0002_REV4
 
 
