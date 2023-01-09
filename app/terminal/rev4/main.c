@@ -117,6 +117,8 @@ if ( flash_status != FLASH_OK )
 /* Sensor module */
 sensor_init();
 
+/* Indicate Successful MCU and Peripheral Hardware Setup */
+led_set_color( LED_GREEN );
 
 /*------------------------------------------------------------------------------
  Event Loop                                                                  
