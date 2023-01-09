@@ -33,7 +33,6 @@ extern "C" {
  Function prototypes                                                          
 ------------------------------------------------------------------------------*/
 void SystemClock_Config       ( void ); /* clock configuration         */
-void PeriphCommonClock_Config ( void ); /* Common clock config         */
 void GPIO_Init                ( void ); /* GPIO configurations         */
 void USB_UART_Init            ( void ); /* USB UART configuration      */
 void FLASH_SPI_Init           ( void ); /* Flash SPI configuration     */
