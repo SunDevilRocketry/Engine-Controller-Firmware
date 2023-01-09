@@ -1,8 +1,8 @@
 # Build directories
-blink/rev3/build/*
-blink/rev4/build/*
-terminal/rev3/build/*
-terminal/rev4/build/*
+app/blink/rev3/build/*
+app/blink/rev4/build/*
+app/terminal/rev3/build/*
+app/terminal/rev4/build/*
 unit_tests/terminal/rev4/mod/sensor/build/*
 demo/pts/rev4/build/*
 
