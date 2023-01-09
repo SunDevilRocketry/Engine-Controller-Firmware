@@ -52,36 +52,19 @@ void HAL_ADC_MspInit
     ADC_HandleTypeDef* hadc
     )
 {
-/* Initialization Structs */
-GPIO_InitTypeDef         GPIO_InitStruct     = {0};
-RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
-
-/* Setup ADC */
+GPIO_InitTypeDef GPIO_InitStruct = {0};
 if(hadc->Instance==ADC1)
 	{
-	/* Peripheral clock configuration */
-	PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_ADC;
-    PeriphClkInitStruct.PLL2.PLL2M           = 2;
-    PeriphClkInitStruct.PLL2.PLL2N           = 16;
-    PeriphClkInitStruct.PLL2.PLL2P           = 4;
-    PeriphClkInitStruct.PLL2.PLL2Q           = 2;
-    PeriphClkInitStruct.PLL2.PLL2R           = 2;
-    PeriphClkInitStruct.PLL2.PLL2RGE         = RCC_PLL2VCIRANGE_3;
-    PeriphClkInitStruct.PLL2.PLL2VCOSEL      = RCC_PLL2VCOWIDE;
-    PeriphClkInitStruct.PLL2.PLL2FRACN       = 0;
-    PeriphClkInitStruct.AdcClockSelection    = RCC_ADCCLKSOURCE_PLL2;
-    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
-		{
-		Error_Handler();
-		}
 
 	/* Peripheral clock enable */
 	__HAL_RCC_ADC12_CLK_ENABLE();
+
 	__HAL_RCC_GPIOC_CLK_ENABLE();
 
-	/* ADC1 GPIO Configuration
-	PC0     ------> ADC1_INP10 */
-	GPIO_InitStruct.Pin  = GPIO_PIN_0;
+	/**ADC1 GPIO Configuration
+	PC0     ------> ADC1_INP10
+	*/
+	GPIO_InitStruct.Pin = GPIO_PIN_0;
 	GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
@@ -135,43 +118,25 @@ void HAL_SPI_MspInit
     SPI_HandleTypeDef* hspi
     )
 {
-/* Initialization structs */
-GPIO_InitTypeDef         GPIO_InitStruct     = {0};
-RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
-
-/* SPI2 Configuration */
+GPIO_InitTypeDef GPIO_InitStruct = {0};
 if( hspi->Instance == SPI2 )
 	{
-	/* Clock configuration */
-	PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_SPI2;
-    PeriphClkInitStruct.PLL3.PLL3M           = 2;
-    PeriphClkInitStruct.PLL3.PLL3N           = 16;
-    PeriphClkInitStruct.PLL3.PLL3P           = 2;
-    PeriphClkInitStruct.PLL3.PLL3Q           = 2;
-    PeriphClkInitStruct.PLL3.PLL3R           = 2;
-    PeriphClkInitStruct.PLL3.PLL3RGE         = RCC_PLL3VCIRANGE_3;
-    PeriphClkInitStruct.PLL3.PLL3VCOSEL      = RCC_PLL3VCOWIDE;
-    PeriphClkInitStruct.PLL3.PLL3FRACN       = 0;
-    PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL3;
-    if ( HAL_RCCEx_PeriphCLKConfig( &PeriphClkInitStruct ) != HAL_OK )
-		{
-		Error_Handler();
-		}
-
 	/* Peripheral clock enable */
 	__HAL_RCC_SPI2_CLK_ENABLE();
 	__HAL_RCC_GPIOB_CLK_ENABLE();
 
-	/* SPI2 GPIO Configuration
+	/**SPI2 GPIO Configuration
 	PB10     ------> SPI2_SCK
 	PB14     ------> SPI2_MISO
-	PB15     ------> SPI2_MOSI */
+	PB15     ------> SPI2_MOSI
+	*/
 	GPIO_InitStruct.Pin       = GPIO_PIN_10|GPIO_PIN_14|GPIO_PIN_15;
 	GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
 	GPIO_InitStruct.Pull      = GPIO_NOPULL;
 	GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_LOW;
 	GPIO_InitStruct.Alternate = GPIO_AF5_SPI2;
 	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
 	}
 
 } /* HAL_SPI_MspInit */

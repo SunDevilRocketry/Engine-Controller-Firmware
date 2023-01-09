@@ -78,6 +78,7 @@ FLASH_STATUS  flash_status;     /* Status of flash operations                 */
 HAL_Init();                 /* Reset peripherals, initialize flash interface and 
                                Systick.                                       */
 SystemClock_Config();       /* System clock                                   */
+PeriphCommonClock_Config(); /* Configure the peripherals common clocks        */
 GPIO_Init();                /* GPIO                                           */
 USB_UART_Init();            /* USB UART                                       */
 FLASH_SPI_Init();           /* Flash SPI Bus                                  */
