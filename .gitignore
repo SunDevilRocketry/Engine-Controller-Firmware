@@ -4,7 +4,7 @@ app/blink/rev4/build/*
 app/terminal/rev3/build/*
 app/terminal/rev4/build/*
 unit_tests/terminal/rev4/mod/sensor/build/*
-demo/pts/rev4/build/*
+app/demo/pts/rev4/build/*
 
 # Visual Studio Code Artifacts
 .vscode/*

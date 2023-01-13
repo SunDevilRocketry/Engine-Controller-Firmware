@@ -226,12 +226,12 @@ while (1)
 				/* Execute subcommand */
 				if ( usb_status != USB_OK )
 					{
-                    sensor_cmd_execute( subcommand ); 
+                    /* Subcommand not recieved */
+                    Error_Handler();
                     }
 				else
 					{
-                    /* Subcommand not recieved */
-                    Error_Handler();
+                    sensor_cmd_execute( subcommand ); 
                     }
 
 				break;
