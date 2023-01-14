@@ -28,6 +28,7 @@
 extern UART_HandleTypeDef huart1; /* USB UART handler struct        */
 extern SPI_HandleTypeDef  hspi2;  /* Flash SPI handle               */
 extern ADC_HandleTypeDef  hadc1;  /* Pressure transducer ADC handle */
+extern ADC_HandleTypeDef  hadc2;  /* Load cell ADC handle           */
 
 
 /*------------------------------------------------------------------------------
@@ -37,10 +38,10 @@ extern ADC_HandleTypeDef  hadc1;  /* Pressure transducer ADC handle */
 
 /*******************************************************************************
 *                                                                              *
-* PROCEDURE:                                                                   * 
+* PROCEDURE:                                                                   *
 * 		SystemClock_Config                                                     *
 *                                                                              *
-* DESCRIPTION:                                                                 * 
+* DESCRIPTION:                                                                 *
 * 		Initializes the microcontroller clock. Enables peripheral clocks and   *
 *       sets prescalers                                                        *
 *                                                                              *
@@ -114,10 +115,45 @@ else /* RCC Configuration okay */
 
 /*******************************************************************************
 *                                                                              *
-* PROCEDURE:                                                                   * 
+* PROCEDURE:                                                                   *
+* 		PeriphCommonClock_Config                                               *
+*                                                                              *
+* DESCRIPTION:                                                                 *
+* 		Initializes the shared peripheral clocks.                              *
+*                                                                              *
+*******************************************************************************/
+void PeriphCommonClock_Config
+	(
+	void
+	)
+{
+/* Init Structs */
+RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+
+/* Initializes the peripherals clock */
+PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_ADC;
+PeriphClkInitStruct.PLL2.PLL2M           = 2;
+PeriphClkInitStruct.PLL2.PLL2N           = 16;
+PeriphClkInitStruct.PLL2.PLL2P           = 4;
+PeriphClkInitStruct.PLL2.PLL2Q           = 2;
+PeriphClkInitStruct.PLL2.PLL2R           = 2;
+PeriphClkInitStruct.PLL2.PLL2RGE         = RCC_PLL2VCIRANGE_3;
+PeriphClkInitStruct.PLL2.PLL2VCOSEL      = RCC_PLL2VCOWIDE;
+PeriphClkInitStruct.PLL2.PLL2FRACN       = 0;
+PeriphClkInitStruct.AdcClockSelection    = RCC_ADCCLKSOURCE_PLL2;
+if ( HAL_RCCEx_PeriphCLKConfig( &PeriphClkInitStruct ) != HAL_OK )
+	{
+	Error_Handler();
+	}
+} /* PeriphCommonClock_Config */
+
+
+/*******************************************************************************
+*                                                                              *
+* PROCEDURE:                                                                   *
 * 		PRESSURE_ADC_Init                                                      *
 *                                                                              *
-* DESCRIPTION:                                                                 * 
+* DESCRIPTION:                                                                 *
 * 		Initializes the MCU ADC for use with pressure transducers              *
 *                                                                              *
 *******************************************************************************/
@@ -186,7 +222,62 @@ else
     /* ADC channel configuration okay, do nothing */
     }
 
-}
+} /* PRESSURE_ADC_Init */
+
+
+
+/*******************************************************************************
+*                                                                              *
+* PROCEDURE:                                                                   *
+* 		LOADCELL_ADC_Init                                                      *
+*                                                                              *
+* DESCRIPTION:                                                                 *
+* 		Initializes the MCU ADC for use with the load cell                     *
+*                                                                              *
+*******************************************************************************/
+void LOADCELL_ADC_Init 
+	(
+	void
+	)
+{
+/* Init Structs */
+ADC_ChannelConfTypeDef sConfig = {0};
+
+/* Common config */
+hadc2.Instance                      = ADC2;
+hadc2.Init.ClockPrescaler           = ADC_CLOCK_ASYNC_DIV1;
+hadc2.Init.Resolution               = ADC_RESOLUTION_16B;
+hadc2.Init.ScanConvMode             = ADC_SCAN_DISABLE;
+hadc2.Init.EOCSelection             = ADC_EOC_SINGLE_CONV;
+hadc2.Init.LowPowerAutoWait         = DISABLE;
+hadc2.Init.ContinuousConvMode       = DISABLE;
+hadc2.Init.NbrOfConversion          = 1;
+hadc2.Init.DiscontinuousConvMode    = DISABLE;
+hadc2.Init.ExternalTrigConv         = ADC_SOFTWARE_START;
+hadc2.Init.ExternalTrigConvEdge     = ADC_EXTERNALTRIGCONVEDGE_NONE;
+hadc2.Init.ConversionDataManagement = ADC_CONVERSIONDATA_DR;
+hadc2.Init.Overrun                  = ADC_OVR_DATA_PRESERVED;
+hadc2.Init.LeftBitShift             = ADC_LEFTBITSHIFT_NONE;
+hadc2.Init.OversamplingMode         = DISABLE;
+if ( HAL_ADC_Init( &hadc2 ) != HAL_OK )
+	{
+	Error_Handler();
+	}
+
+/* Configure Regular Channel */
+sConfig.Channel                     = ADC_CHANNEL_11;
+sConfig.Rank                        = ADC_REGULAR_RANK_1;
+sConfig.SamplingTime                = ADC_SAMPLETIME_1CYCLE_5;
+sConfig.SingleDiff                  = ADC_SINGLE_ENDED;
+sConfig.OffsetNumber                = ADC_OFFSET_NONE;
+sConfig.Offset                      = 0;
+sConfig.OffsetSignedSaturation      = DISABLE;
+if ( HAL_ADC_ConfigChannel( &hadc2, &sConfig ) != HAL_OK )
+	{
+	Error_Handler();
+	}
+
+} /* LOADCELL_ADC_Init */
 
 
 /*******************************************************************************

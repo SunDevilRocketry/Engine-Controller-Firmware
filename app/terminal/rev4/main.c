@@ -42,6 +42,7 @@
 UART_HandleTypeDef huart1; /* USB UART handler struct        */
 SPI_HandleTypeDef  hspi2;  /* Flash SPI handle               */
 ADC_HandleTypeDef  hadc1;  /* Pressure transducer ADC handle */
+ADC_HandleTypeDef  hadc2;  /* Load cell ADC handle           */
 
 
 /*------------------------------------------------------------------------------
@@ -78,10 +79,12 @@ FLASH_STATUS  flash_status;     /* Status of flash operations                 */
 HAL_Init();                 /* Reset peripherals, initialize flash interface and 
                                Systick.                                       */
 SystemClock_Config();       /* System clock                                   */
+PeriphCommonClock_Config(); /* Shared peripheral clocks                       */
 GPIO_Init();                /* GPIO                                           */
 USB_UART_Init();            /* USB UART                                       */
 FLASH_SPI_Init();           /* Flash SPI Bus                                  */
 PRESSURE_ADC_Init();        /* Pressure transducers ADC                       */
+LOADCELL_ADC_Init();        /* Load Cell ADC                                  */
 
 
 /*------------------------------------------------------------------------------
