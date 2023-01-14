@@ -47,6 +47,7 @@ $(MOD_DIR)/ignition/ignition.c                                       \
 $(MOD_DIR)/led/led.c                                                 \
 $(MOD_DIR)/power/power.c                                             \
 $(MOD_DIR)/flash/flash.c                                             \
+$(MOD_DIR)/loadcell/loadcell.c                                       \
 $(MOD_DIR)/pressure/pressure.c                                       \
 $(MOD_DIR)/sensor/sensor.c                                           \
 $(MOD_DIR)/usb/usb.c                                                 \
@@ -151,6 +152,7 @@ C_INCLUDES =                                           \
 -I$(MOD_DIR)/led                                       \
 -I$(MOD_DIR)/power                                     \
 -I$(MOD_DIR)/flash                                     \
+-I$(MOD_DIR)/loadcell                                  \
 -I$(MOD_DIR)/pressure                                  \
 -I$(MOD_DIR)/usb                                       \
 -I$(MOD_DIR)/sensor
