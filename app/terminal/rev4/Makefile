@@ -50,6 +50,7 @@ $(MOD_DIR)/flash/flash.c                                             \
 $(MOD_DIR)/loadcell/loadcell.c                                       \
 $(MOD_DIR)/pressure/pressure.c                                       \
 $(MOD_DIR)/sensor/sensor.c                                           \
+$(MOD_DIR)/temp/temp.c                                               \
 $(MOD_DIR)/usb/usb.c                                                 \
 $(INIT_DIR)/config/Src/stm32h7xx_it.c                                \
 $(INIT_DIR)/config/Src/stm32h7xx_hal_msp.c                           \
@@ -149,13 +150,14 @@ C_INCLUDES =                                           \
 -I$(LIB_DIR)/Drivers/CMSIS/Include                     \
 -I$(MOD_DIR)/commands                                  \
 -I$(MOD_DIR)/ignition                                  \
--I$(MOD_DIR)/led                                       \
--I$(MOD_DIR)/power                                     \
 -I$(MOD_DIR)/flash                                     \
+-I$(MOD_DIR)/led                                       \
 -I$(MOD_DIR)/loadcell                                  \
+-I$(MOD_DIR)/power                                     \
 -I$(MOD_DIR)/pressure                                  \
--I$(MOD_DIR)/usb                                       \
--I$(MOD_DIR)/sensor
+-I$(MOD_DIR)/sensor                                    \
+-I$(MOD_DIR)/temp                                      \
+-I$(MOD_DIR)/usb                                       
 
 # compile gcc flags
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
