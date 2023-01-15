@@ -579,6 +579,15 @@ GPIO_InitStruct.Pull  = GPIO_NOPULL;
 GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 HAL_GPIO_Init( PRESSURE_GPIO_PORT, &GPIO_InitStruct );
 
+
+/*----------------------------- THERMOCOUPLE PINS ----------------------------*/
+
+/* Thermocouple alert pins */
+GPIO_InitStruct.Pin  = THERMO_ALERT_PIN | THERMO_OC_PIN | THERMO_SC_PIN;
+GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+GPIO_InitStruct.Pull = GPIO_NOPULL;
+HAL_GPIO_Init( THERMO_ALERT_GPIO_PORT, &GPIO_InitStruct );
+
 } /* GPIO_Init */
 
 
