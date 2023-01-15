@@ -39,10 +39,11 @@
 /*------------------------------------------------------------------------------
  Global Variables                                                                  
 ------------------------------------------------------------------------------*/
-UART_HandleTypeDef huart1; /* USB UART handler struct        */
-SPI_HandleTypeDef  hspi2;  /* Flash SPI handle               */
 ADC_HandleTypeDef  hadc1;  /* Pressure transducer ADC handle */
 ADC_HandleTypeDef  hadc2;  /* Load cell ADC handle           */
+I2C_HandleTypeDef  hi2c1;  /* Thermocouple I2C handle        */
+SPI_HandleTypeDef  hspi2;  /* Flash SPI handle               */
+UART_HandleTypeDef huart1; /* USB UART handler struct        */
 
 
 /*------------------------------------------------------------------------------
@@ -85,6 +86,7 @@ USB_UART_Init();            /* USB UART                                       */
 FLASH_SPI_Init();           /* Flash SPI Bus                                  */
 PRESSURE_ADC_Init();        /* Pressure transducers ADC                       */
 LOADCELL_ADC_Init();        /* Load Cell ADC                                  */
+Thermocouple_I2C_Init();    /* Thermocouple I2C                               */
 
 
 /*------------------------------------------------------------------------------

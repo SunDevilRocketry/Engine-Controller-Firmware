@@ -39,6 +39,7 @@ void USB_UART_Init            ( void ); /* USB UART configuration      */
 void FLASH_SPI_Init           ( void ); /* Flash SPI configuration     */
 void PRESSURE_ADC_Init        ( void ); /* Pressure transducers ADC    */
 void LOADCELL_ADC_Init        ( void ); /* Loadcell ADC                */
+void Thermocouple_I2C_Init    ( void ); /* Thermocouple I2C            */
 
 
 #ifdef __cplusplus

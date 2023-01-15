@@ -25,10 +25,11 @@
 /*------------------------------------------------------------------------------
  Global Variables 
 ------------------------------------------------------------------------------*/
-extern UART_HandleTypeDef huart1; /* USB UART handler struct        */
-extern SPI_HandleTypeDef  hspi2;  /* Flash SPI handle               */
 extern ADC_HandleTypeDef  hadc1;  /* Pressure transducer ADC handle */
 extern ADC_HandleTypeDef  hadc2;  /* Load cell ADC handle           */
+extern I2C_HandleTypeDef  hi2c1;  /* Thermocouple I2C handle        */
+extern SPI_HandleTypeDef  hspi2;  /* Flash SPI handle               */
+extern UART_HandleTypeDef huart1; /* USB UART handler struct        */
 
 
 /*------------------------------------------------------------------------------
@@ -282,10 +283,54 @@ if ( HAL_ADC_ConfigChannel( &hadc2, &sConfig ) != HAL_OK )
 
 /*******************************************************************************
 *                                                                              *
-* PROCEDURE:                                                                   * 
-* 		FLASH_SPI_Init                                                         *	
+* PROCEDURE:                                                                   *
+* 		Thermocouple_I2C_Init                                                  *
 *                                                                              *
-* DESCRIPTION:                                                                 * 
+* DESCRIPTION:                                                                 *
+* 		Initializes the I2C peripheral used for communication with the         *
+*       thermocouple cold-junction compensation chip                           *
+*                                                                              *
+*******************************************************************************/
+void Thermocouple_I2C_Init
+	(
+	void
+	)
+{
+/* Fill init struct */
+hi2c1.Instance              = I2C1;
+hi2c1.Init.Timing           = 0x70303AEE;
+hi2c1.Init.OwnAddress1      = 0;
+hi2c1.Init.AddressingMode   = I2C_ADDRESSINGMODE_7BIT;
+hi2c1.Init.DualAddressMode  = I2C_DUALADDRESS_DISABLE;
+hi2c1.Init.OwnAddress2      = 0;
+hi2c1.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+hi2c1.Init.GeneralCallMode  = I2C_GENERALCALL_DISABLE;
+hi2c1.Init.NoStretchMode    = I2C_NOSTRETCH_DISABLE;
+if ( HAL_I2C_Init( &hi2c1 ) != HAL_OK )
+	{
+	Error_Handler();
+	}
+
+/* Configure Analogue filter */
+if ( HAL_I2CEx_ConfigAnalogFilter( &hi2c1, I2C_ANALOGFILTER_ENABLE ) != HAL_OK )
+	{
+	Error_Handler();
+	}
+
+/* Configure Digital filter */
+if ( HAL_I2CEx_ConfigDigitalFilter( &hi2c1, 0 ) != HAL_OK )
+	{
+	Error_Handler();
+	}
+} /* Thermocouple_I2C_Init */
+
+
+/*******************************************************************************
+*                                                                              *
+* PROCEDURE:                                                                   *
+* 		FLASH_SPI_Init                                                         *
+*                                                                              *
+* DESCRIPTION:                                                                 *
 * 		Initializes the SPI peripheral used for communication with the         *
 *       external flash chip                                                    *
 *                                                                              *
