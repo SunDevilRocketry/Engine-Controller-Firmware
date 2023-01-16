@@ -28,12 +28,13 @@
 /* Low-level modules */
 #include "commands.h"
 #include "ignition.h"
+#include "flash.h"
 #include "led.h"
 #include "power.h"
-#include "flash.h"
-#include "usb.h"
 #include "pressure.h"
 #include "sensor.h"
+#include "temp.h"
+#include "usb.h"
 
 
 /*------------------------------------------------------------------------------
