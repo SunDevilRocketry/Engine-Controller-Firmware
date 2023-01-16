@@ -65,14 +65,20 @@ int main
 ------------------------------------------------------------------------------*/
 uint8_t       data;             /* USB Incoming Data Buffer                   */
 uint8_t       subcommand;       /* subcommand code                            */
-uint8_t       ign_status;       /* Ignition status code                       */
 uint8_t       pwr_source;       /* Power source code                          */
+
+/* Flash */
 HFLASH_BUFFER flash_handle;                    /* Flash API buffer handle     */
 uint8_t       flash_buffer[ DEF_BUFFER_SIZE ]; /* Flash data buffer */
 
+/* Thermocouple */
+THERMO_CONFIG thermo_config;    /* Thermocouple configuration settings        */
+
 /* Module return codes */
-USB_STATUS    usb_status;       /* Status of USB operations                   */
 FLASH_STATUS  flash_status;     /* Status of flash operations                 */
+IGN_STATUS    ign_status;       /* Ignition status code                       */
+THERMO_STATUS thermo_status;    /* Thermocouple status code                   */
+USB_STATUS    usb_status;       /* Status of USB operations                   */
 
 
 /*------------------------------------------------------------------------------
@@ -95,17 +101,27 @@ Thermocouple_I2C_Init();    /* Thermocouple I2C                               */
 ------------------------------------------------------------------------------*/
 
 /* Flash Buffer */
-flash_handle.write_protected   = FLASH_WP_WRITE_ENABLED;
-flash_handle.num_bytes         = 0;
-flash_handle.address           = 0;
-flash_handle.pbuffer           = &flash_buffer[0];
-flash_handle.status_register   = 0xFF;
-flash_handle.bpl_bits          = FLASH_BPL_NONE;
-flash_handle.bpl_write_protect = FLASH_BPL_READ_WRITE;
+flash_handle.write_protected       = FLASH_WP_WRITE_ENABLED;
+flash_handle.num_bytes             = 0;
+flash_handle.address               = 0;
+flash_handle.pbuffer               = &flash_buffer[0];
+flash_handle.status_register       = 0xFF;
+flash_handle.bpl_bits              = FLASH_BPL_NONE;
+flash_handle.bpl_write_protect     = FLASH_BPL_READ_WRITE;
+
+/* Thermocouple configuration */
+thermo_config.type                 = THERMO_TYPE_T;
+thermo_config.filter_coeff         = THERMO_FILTER_OFF; 
+thermo_config.adc_resolution       = THERMO_18BIT_ADC;
+thermo_config.cold_junc_resolution = THERMO_COLD_JUNC_MIN_RES;
+thermo_config.burst_mode           = THERMO_BURST_MODE_1;
+thermo_config.shutdown_mode        = THERMO_NORMAL_MODE;
+thermo_config.status               = 0;
 
 /* Module return codes */
-usb_status                    = USB_OK;
-flash_status                  = FLASH_OK;
+flash_status                       = FLASH_OK;
+thermo_status                      = THERMO_OK;
+usb_status                         = USB_OK;
 
 
 /*------------------------------------------------------------------------------
@@ -121,6 +137,13 @@ if ( flash_status != FLASH_OK )
 
 /* Sensor module */
 sensor_init();
+
+/* Thermocouple */
+thermo_status = temp_init( &thermo_config );
+if ( thermo_status != THERMO_OK )
+	{
+	Error_Handler();
+	}
 
 /* Indicate Successful MCU and Peripheral Hardware Setup */
 led_set_color( LED_GREEN );
