@@ -132,7 +132,7 @@ usb_status                         = USB_OK;
 flash_status = flash_init( &flash_handle );
 if ( flash_status != FLASH_OK )
 	{
-	Error_Handler();
+//	Error_Handler();
 	}
 
 /* Sensor module */
