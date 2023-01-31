@@ -576,7 +576,7 @@ GPIO_InitStruct.Pin   = PRESSURE_GAIN0_PIN |
                         PRESSURE_MUXC_PIN;
 GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
 GPIO_InitStruct.Pull  = GPIO_NOPULL;
-GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 HAL_GPIO_Init( PRESSURE_GPIO_PORT, &GPIO_InitStruct );
 
 
