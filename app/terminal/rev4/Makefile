@@ -12,8 +12,10 @@ TARGET = terminal
 ################################################################
 # building variables
 ################################################################
+
 # debug build?
 DEBUG = 1
+
 # optimization
 OPT   = -Og
 
@@ -52,6 +54,7 @@ $(MOD_DIR)/pressure/pressure.c                                       \
 $(MOD_DIR)/sensor/sensor.c                                           \
 $(MOD_DIR)/temp/temp.c                                               \
 $(MOD_DIR)/usb/usb.c                                                 \
+$(MOD_DIR)/valve/valve.c                                             \
 $(INIT_DIR)/config/Src/stm32h7xx_it.c                                \
 $(INIT_DIR)/config/Src/stm32h7xx_hal_msp.c                           \
 $(INIT_DIR)/config/Src/system_stm32h7xx.c                            \
@@ -157,7 +160,8 @@ C_INCLUDES =                                           \
 -I$(MOD_DIR)/pressure                                  \
 -I$(MOD_DIR)/sensor                                    \
 -I$(MOD_DIR)/temp                                      \
--I$(MOD_DIR)/usb                                       
+-I$(MOD_DIR)/usb                                       \
+-I$(MOD_DIR)/valve
 
 # compile gcc flags
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections

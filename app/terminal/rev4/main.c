@@ -35,21 +35,18 @@
 #include "sensor.h"
 #include "temp.h"
 #include "usb.h"
+#include "valve.h"
 
 
 /*------------------------------------------------------------------------------
- Global Variables                                                                  
+ MCU Peripheral Handles 
 ------------------------------------------------------------------------------*/
 ADC_HandleTypeDef  hadc1;  /* Pressure transducer ADC handle */
 ADC_HandleTypeDef  hadc2;  /* Load cell ADC handle           */
 I2C_HandleTypeDef  hi2c1;  /* Thermocouple I2C handle        */
 SPI_HandleTypeDef  hspi2;  /* Flash SPI handle               */
 UART_HandleTypeDef huart1; /* USB UART handler struct        */
-
-
-/*------------------------------------------------------------------------------
- Typedefs                                                                  
-------------------------------------------------------------------------------*/
+UART_HandleTypeDef huart2; /* Valve controller UART handle   */
 
 
 /*------------------------------------------------------------------------------
@@ -84,16 +81,17 @@ USB_STATUS    usb_status;       /* Status of USB operations                   */
 /*------------------------------------------------------------------------------
  MCU Initialization                                                                  
 ------------------------------------------------------------------------------*/
-HAL_Init();                 /* Reset peripherals, initialize flash interface and 
-                               Systick.                                       */
-SystemClock_Config();       /* System clock                                   */
+HAL_Init                (); /* Reset peripherals, initialize flash interface 
+                               and Systick.                                   */
+SystemClock_Config      (); /* System clock                                   */
 PeriphCommonClock_Config(); /* Shared peripheral clocks                       */
-GPIO_Init();                /* GPIO                                           */
-USB_UART_Init();            /* USB UART                                       */
-FLASH_SPI_Init();           /* Flash SPI Bus                                  */
-PRESSURE_ADC_Init();        /* Pressure transducers ADC                       */
-LOADCELL_ADC_Init();        /* Load Cell ADC                                  */
-Thermocouple_I2C_Init();    /* Thermocouple I2C                               */
+GPIO_Init               (); /* GPIO                                           */
+USB_UART_Init           (); /* USB UART                                       */
+Valve_UART_Init         (); /* Valve control UART                             */
+FLASH_SPI_Init          (); /* Flash SPI Bus                                  */
+PRESSURE_ADC_Init       (); /* Pressure transducers ADC                       */
+LOADCELL_ADC_Init       (); /* Load Cell ADC                                  */
+Thermocouple_I2C_Init   (); /* Thermocouple I2C                               */
 
 
 /*------------------------------------------------------------------------------

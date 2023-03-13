@@ -376,7 +376,7 @@ if ( HAL_SPI_Init( &hspi2 ) != HAL_OK )
 * PROCEDURE NAME:                                                              *
 * 		USB_UART_Init                                                          *
 *                                                                              *
-* DESCRIPTION:                                                                 * 
+* DESCRIPTION:                                                                 *
 * 		Initializes the UART interface used for USB communication with a host  *
 *       PC                                                                     *
 *                                                                              *
@@ -422,6 +422,54 @@ if (HAL_UARTEx_DisableFifoMode(&huart1) != HAL_OK)
 	}
 
 } /* USB_UART_Init */
+
+
+/*******************************************************************************
+*                                                                              *
+* PROCEDURE NAME:                                                              *
+* 		Valve_UART_Init                                                        *
+*                                                                              *
+* DESCRIPTION:                                                                 *
+* 		Initializes the UART interface used for serial communication with      *
+*       the valve controller                                                   *
+*                                                                              *
+*******************************************************************************/
+void Valve_UART_Init
+	(
+	void
+	)
+{
+/* Initialization Configuration */
+huart2.Instance                    = USART2;
+huart2.Init.BaudRate               = 921600;
+huart2.Init.WordLength             = UART_WORDLENGTH_8B;
+huart2.Init.StopBits               = UART_STOPBITS_1;
+huart2.Init.Parity                 = UART_PARITY_NONE;
+huart2.Init.Mode                   = UART_MODE_TX_RX;
+huart2.Init.HwFlowCtl              = UART_HWCONTROL_NONE;
+huart2.Init.OverSampling           = UART_OVERSAMPLING_16;
+huart2.Init.OneBitSampling         = UART_ONE_BIT_SAMPLE_DISABLE;
+huart2.Init.ClockPrescaler         = UART_PRESCALER_DIV1;
+huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+
+/* Initialize the UART interface */
+if ( HAL_UART_Init( &huart2 ) != HAL_OK )
+	{
+	Error_Handler();
+	}
+if ( HAL_UARTEx_SetTxFifoThreshold( &huart2, UART_TXFIFO_THRESHOLD_1_8 ) != HAL_OK )
+	{
+	Error_Handler();
+	}
+if ( HAL_UARTEx_SetRxFifoThreshold( &huart2, UART_RXFIFO_THRESHOLD_1_8 ) != HAL_OK )
+	{
+	Error_Handler();
+	}
+if ( HAL_UARTEx_DisableFifoMode( &huart2 ) != HAL_OK )
+	{
+	Error_Handler();
+	}
+} /* Valve_UART_Init */
 
 
 /*******************************************************************************
