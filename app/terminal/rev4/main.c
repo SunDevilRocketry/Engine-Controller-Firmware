@@ -60,7 +60,7 @@ int main
 /*------------------------------------------------------------------------------
  Local Variables                                                                  
 ------------------------------------------------------------------------------*/
-uint8_t       data;             /* USB Incoming Data Buffer                   */
+uint8_t       command;          /* SDEC command                               */
 uint8_t       subcommand;       /* subcommand code                            */
 uint8_t       pwr_source;       /* Power source code                          */
 
@@ -76,6 +76,7 @@ FLASH_STATUS  flash_status;     /* Status of flash operations                 */
 IGN_STATUS    ign_status;       /* Ignition status code                       */
 THERMO_STATUS thermo_status;    /* Thermocouple status code                   */
 USB_STATUS    usb_status;       /* Status of USB operations                   */
+VALVE_STATUS  valve_status;     /* Valve API return codes                     */
 
 
 /*------------------------------------------------------------------------------
@@ -120,6 +121,7 @@ thermo_config.status               = 0;
 flash_status                       = FLASH_OK;
 thermo_status                      = THERMO_OK;
 usb_status                         = USB_OK;
+valve_status                       = VALVE_OK;
 
 
 /*------------------------------------------------------------------------------
@@ -130,7 +132,7 @@ usb_status                         = USB_OK;
 flash_status = flash_init( &flash_handle );
 if ( flash_status != FLASH_OK )
 	{
-//	Error_Handler();
+	Error_Handler();
 	}
 
 /* Sensor module */
@@ -152,29 +154,34 @@ led_set_color( LED_GREEN );
 while (1)
 	{
 	/* Read data from UART reciever */
-    usb_status = usb_receive( &data, sizeof( data ), HAL_DEFAULT_TIMEOUT );
+    usb_status = usb_receive( &command, sizeof( command ), HAL_DEFAULT_TIMEOUT );
 
 	/* Parse command input if HAL_UART_Receive doesn't timeout */
 	if ( usb_status != USB_TIMEOUT )
 		{
-		switch( data )
+		switch( command )
 			{
-
-			/*------------------------- Ping Command -------------------------*/
+			/*-----------------------------------------------------------------
+			 PING Command	
+			------------------------------------------------------------------*/
 			case PING_OP:
 				{
 				ping();
 				break;
 				} /* PING_OP */
 
-			/*------------------------ Connect Command ------------------------*/
+			/*-----------------------------------------------------------------
+			 CONNECT Command	
+			------------------------------------------------------------------*/
 			case CONNECT_OP:
 				{
 				ping();
 				break;
 				} /* CONNECT_OP */
 
-			/*------------------------ Ignite Command -------------------------*/
+			/*-----------------------------------------------------------------
+			 IGNITE Command	
+			------------------------------------------------------------------*/
 			case IGNITE_OP:
 				{
                 /* Recieve ignition subcommand over USB */
@@ -201,7 +208,9 @@ while (1)
 				break;
 				} /* IGNITE_OP */
 
-			/*------------------------ Power Command -------------------------*/
+			/*-----------------------------------------------------------------
+			 POWER Command	
+			------------------------------------------------------------------*/
 			case POWER_OP:
 				{
                 /* Determine power source */
@@ -215,7 +224,9 @@ while (1)
 				break;
 				} /* POWER_OP */
 
-			/*------------------------ Flash Command -------------------------*/
+			/*-----------------------------------------------------------------
+			 FLASH Command	
+			------------------------------------------------------------------*/
 			case FLASH_OP:
 				{
                 /* Recieve flash subcommand over USB */
@@ -242,7 +253,9 @@ while (1)
 				break;
 				} /* FLASH_OP */
 
-			/*----------------------- Sensor Command -------------------------*/
+			/*-----------------------------------------------------------------
+			 SENSOR Command	
+			------------------------------------------------------------------*/
 			case SENSOR_OP:
 				{
 				/* Recieve subcommand from USB */
@@ -264,11 +277,45 @@ while (1)
 				break;
 				} /* SENSOR_OP */
 
-			/*-------------------- Unrecognized Command ----------------------*/
+			/*-----------------------------------------------------------------
+			 VALVE Command	
+			------------------------------------------------------------------*/
+			case VALVE_OP:
+				{
+				/* Get subcommand */
+				usb_status = usb_receive( &subcommand         ,
+				                          sizeof( subcommand ),
+										  HAL_DEFAULT_TIMEOUT );
+				if ( usb_status != USB_OK )
+					{
+					Error_Handler();
+					}
+				
+				/* Pass on command and subcommand to valve controller */
+				valve_status = valve_transmit( &command         , 
+				                               sizeof( command ), 
+											   HAL_DEFAULT_TIMEOUT );
+				if ( valve_status != VALVE_OK )
+					{
+					Error_Handler();
+					}
+				valve_status = valve_transmit( &command         , 
+				                               sizeof( command ),
+											   HAL_DEFAULT_TIMEOUT );
+				if ( valve_status != VALVE_OK )
+					{
+					Error_Handler();
+					}
+				break;
+				} /* VALVE_OP */
+
+			/*-----------------------------------------------------------------
+			 Unrecognized Command 
+			------------------------------------------------------------------*/
 			default:
 				{
 				/* Unsupported command code flash the red LED */
-				led_error_flash();
+				Error_Handler();
 				} /* default */
 			} 
 		} 
