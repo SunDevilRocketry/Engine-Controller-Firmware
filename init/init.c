@@ -20,6 +20,7 @@
 #include "sdr_pin_defines_L0002.h"
 #include "main.h"
 #include "init.h"
+#include "sdr_error.h"
 
 
 /*------------------------------------------------------------------------------
@@ -83,7 +84,7 @@ RCC_OscInitStruct.PLL.PLLVCOSEL  = RCC_PLL1VCOWIDE;
 RCC_OscInitStruct.PLL.PLLFRACN   = 0;
 if ( HAL_RCC_OscConfig( &RCC_OscInitStruct ) != HAL_OK )
 	{
-    Error_Handler();
+    Error_Handler( ERROR_SYSCLOCK_CONFIG_ERROR );
 	}
 else /* RCC Oscillator configuration is okay */
 	{
@@ -104,7 +105,7 @@ RCC_ClkInitStruct.APB4CLKDivider = RCC_APB4_DIV2;
 
 if ( HAL_RCC_ClockConfig( &RCC_ClkInitStruct, FLASH_LATENCY_4 ) != HAL_OK )
 	{
-	Error_Handler();
+	Error_Handler( ERROR_SYSCLOCK_CONFIG_ERROR );
 	}
 else /* RCC Configuration okay */
 	{
@@ -144,7 +145,7 @@ PeriphClkInitStruct.PLL2.PLL2FRACN       = 0;
 PeriphClkInitStruct.AdcClockSelection    = RCC_ADCCLKSOURCE_PLL2;
 if ( HAL_RCCEx_PeriphCLKConfig( &PeriphClkInitStruct ) != HAL_OK )
 	{
-	Error_Handler();
+	Error_Handler( ERROR_COMMON_CLOCK_CONFIG_ERROR );
 	}
 } /* PeriphCommonClock_Config */
 

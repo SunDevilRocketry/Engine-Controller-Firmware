@@ -1,0 +1,516 @@
+ARM GAS  /tmp/ccGBJC27.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"valve.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "../../mod/valve/valve.c"
+  19              		.section	.text.valve_transmit,"ax",%progbits
+  20              		.align	1
+  21              		.global	valve_transmit
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	valve_transmit:
+  27              	.LVL0:
+  28              	.LFB333:
+   1:../../mod/valve/valve.c **** /*******************************************************************************
+   2:../../mod/valve/valve.c **** *
+   3:../../mod/valve/valve.c **** * FILE:
+   4:../../mod/valve/valve.c **** * 		valve.c
+   5:../../mod/valve/valve.c **** *
+   6:../../mod/valve/valve.c **** * DESCRIPTION:
+   7:../../mod/valve/valve.c **** * 		Servo valve actuation API	
+   8:../../mod/valve/valve.c **** *
+   9:../../mod/valve/valve.c **** *******************************************************************************/
+  10:../../mod/valve/valve.c **** 
+  11:../../mod/valve/valve.c **** /*------------------------------------------------------------------------------
+  12:../../mod/valve/valve.c ****  Standard Includes                                                              
+  13:../../mod/valve/valve.c **** ------------------------------------------------------------------------------*/
+  14:../../mod/valve/valve.c **** #include <stdbool.h>
+  15:../../mod/valve/valve.c **** 
+  16:../../mod/valve/valve.c **** 
+  17:../../mod/valve/valve.c **** /*------------------------------------------------------------------------------
+  18:../../mod/valve/valve.c ****  Project Includes                                                               
+  19:../../mod/valve/valve.c **** ------------------------------------------------------------------------------*/
+  20:../../mod/valve/valve.c **** #if   defined( VALVE_CONTROLLER  )
+  21:../../mod/valve/valve.c **** 	#include "sdr_pin_defines_L0005.h"
+  22:../../mod/valve/valve.c **** #elif defined( ENGINE_CONTROLLER )
+  23:../../mod/valve/valve.c **** 	#include "sdr_pin_defines_L0002.h"
+  24:../../mod/valve/valve.c **** #endif
+  25:../../mod/valve/valve.c **** #include "stm32h7xx_hal.h"
+  26:../../mod/valve/valve.c **** #include "main.h"
+  27:../../mod/valve/valve.c **** #include "valve.h"
+  28:../../mod/valve/valve.c **** #include "usb.h"
+  29:../../mod/valve/valve.c **** 
+  30:../../mod/valve/valve.c **** 
+ARM GAS  /tmp/ccGBJC27.s 			page 2
+
+
+  31:../../mod/valve/valve.c **** /*------------------------------------------------------------------------------
+  32:../../mod/valve/valve.c ****  Global Variables 
+  33:../../mod/valve/valve.c **** ------------------------------------------------------------------------------*/
+  34:../../mod/valve/valve.c **** 
+  35:../../mod/valve/valve.c **** #ifdef VALVE_CONTROLLER
+  36:../../mod/valve/valve.c **** /* Encoder variables */
+  37:../../mod/valve/valve.c **** volatile static int32_t  lox_valve_pos       = 0;  /* LOX Valve Encoder count  */
+  38:../../mod/valve/valve.c **** volatile static bool     lox_channelA_state  = ENCODER_LOW; /* Voltage on channel 
+  39:../../mod/valve/valve.c ****                                                              A pin */
+  40:../../mod/valve/valve.c **** volatile static bool     lox_channelB_state  = ENCODER_LOW; /* Voltage on Channel 
+  41:../../mod/valve/valve.c ****                                                              B pin */
+  42:../../mod/valve/valve.c **** volatile static int32_t  fuel_valve_pos      = 0;  /* Fuel Valve Encoder count */
+  43:../../mod/valve/valve.c **** volatile static bool     fuel_channelA_state = ENCODER_LOW; /* Voltage on channel 
+  44:../../mod/valve/valve.c ****                                                              A pin */
+  45:../../mod/valve/valve.c **** volatile static bool     fuel_channelB_state = ENCODER_LOW; /* Voltage on Channel 
+  46:../../mod/valve/valve.c ****                                                              B pin */
+  47:../../mod/valve/valve.c **** 
+  48:../../mod/valve/valve.c **** /* Stepper Driver States */
+  49:../../mod/valve/valve.c **** static STEPPER_DRIVER_STATE lox_driver_state;
+  50:../../mod/valve/valve.c **** static STEPPER_DRIVER_STATE fuel_driver_state;
+  51:../../mod/valve/valve.c **** 
+  52:../../mod/valve/valve.c **** /* Valve openining/closing states */
+  53:../../mod/valve/valve.c **** volatile static bool ox_valve_closing   = false; /* LOX valve is closing  */
+  54:../../mod/valve/valve.c **** volatile static bool ox_valve_opening   = false; /* LOX valve is opening  */
+  55:../../mod/valve/valve.c **** volatile static bool fuel_valve_closing = false; /* Fuel valve is closing */
+  56:../../mod/valve/valve.c **** volatile static bool fuel_valve_opening = false; /* Fuel valve is opening */
+  57:../../mod/valve/valve.c **** #endif /* #ifdef VALVE_CONTROLLER */
+  58:../../mod/valve/valve.c **** 
+  59:../../mod/valve/valve.c **** 
+  60:../../mod/valve/valve.c **** /*------------------------------------------------------------------------------
+  61:../../mod/valve/valve.c ****  Internal Function Prototypes 
+  62:../../mod/valve/valve.c **** ------------------------------------------------------------------------------*/
+  63:../../mod/valve/valve.c **** 
+  64:../../mod/valve/valve.c **** #ifdef VALVE_CONTROLLER
+  65:../../mod/valve/valve.c **** /* Enable the lox stepper motor driver */
+  66:../../mod/valve/valve.c **** static void lox_driver_enable
+  67:../../mod/valve/valve.c **** 	(
+  68:../../mod/valve/valve.c **** 	void
+  69:../../mod/valve/valve.c **** 	);
+  70:../../mod/valve/valve.c **** 
+  71:../../mod/valve/valve.c **** /* Enable the fuel stepper motor driver */
+  72:../../mod/valve/valve.c **** static void fuel_driver_enable
+  73:../../mod/valve/valve.c **** 	(
+  74:../../mod/valve/valve.c **** 	void
+  75:../../mod/valve/valve.c **** 	);
+  76:../../mod/valve/valve.c **** 
+  77:../../mod/valve/valve.c **** /* Disable the lox stepper motor driver */
+  78:../../mod/valve/valve.c **** static void lox_driver_disable
+  79:../../mod/valve/valve.c **** 	(
+  80:../../mod/valve/valve.c **** 	void
+  81:../../mod/valve/valve.c **** 	);
+  82:../../mod/valve/valve.c **** 
+  83:../../mod/valve/valve.c **** /* Disable the fuel stepper motor driver */
+  84:../../mod/valve/valve.c **** static void fuel_driver_disable
+  85:../../mod/valve/valve.c **** 	(
+  86:../../mod/valve/valve.c **** 	void
+  87:../../mod/valve/valve.c **** 	);
+ARM GAS  /tmp/ccGBJC27.s 			page 3
+
+
+  88:../../mod/valve/valve.c **** 
+  89:../../mod/valve/valve.c **** /* Set the lox stepper motor direction */
+  90:../../mod/valve/valve.c **** static VALVE_STATUS lox_driver_set_direction
+  91:../../mod/valve/valve.c **** 	(
+  92:../../mod/valve/valve.c **** 	STEPPER_DRIVER_DIR_STATE direction
+  93:../../mod/valve/valve.c **** 	);
+  94:../../mod/valve/valve.c **** 
+  95:../../mod/valve/valve.c **** /* Set the fuel stepper motor direction */
+  96:../../mod/valve/valve.c **** static VALVE_STATUS fuel_driver_set_direction
+  97:../../mod/valve/valve.c **** 	(
+  98:../../mod/valve/valve.c **** 	STEPPER_DRIVER_DIR_STATE direction
+  99:../../mod/valve/valve.c **** 	);
+ 100:../../mod/valve/valve.c **** #endif
+ 101:../../mod/valve/valve.c **** 
+ 102:../../mod/valve/valve.c **** 
+ 103:../../mod/valve/valve.c **** /*------------------------------------------------------------------------------
+ 104:../../mod/valve/valve.c ****  API Functions 
+ 105:../../mod/valve/valve.c **** ------------------------------------------------------------------------------*/
+ 106:../../mod/valve/valve.c **** 
+ 107:../../mod/valve/valve.c **** #ifdef VALVE_CONTROLLER
+ 108:../../mod/valve/valve.c **** /*******************************************************************************
+ 109:../../mod/valve/valve.c **** *                                                                              *
+ 110:../../mod/valve/valve.c **** * PROCEDURE:                                                                   *
+ 111:../../mod/valve/valve.c **** * 		valve_cmd_execute                                                      *
+ 112:../../mod/valve/valve.c **** *                                                                              *
+ 113:../../mod/valve/valve.c **** * DESCRIPTION:                                                                 *
+ 114:../../mod/valve/valve.c **** *       Execute a valve subcommand                                             *
+ 115:../../mod/valve/valve.c **** *                                                                              *
+ 116:../../mod/valve/valve.c **** *******************************************************************************/
+ 117:../../mod/valve/valve.c **** VALVE_STATUS valve_cmd_execute
+ 118:../../mod/valve/valve.c **** 	(
+ 119:../../mod/valve/valve.c **** 	uint8_t subcommand
+ 120:../../mod/valve/valve.c **** 	)
+ 121:../../mod/valve/valve.c **** {
+ 122:../../mod/valve/valve.c **** /*------------------------------------------------------------------------------
+ 123:../../mod/valve/valve.c ****  Local Variables
+ 124:../../mod/valve/valve.c **** ------------------------------------------------------------------------------*/
+ 125:../../mod/valve/valve.c **** uint8_t      valve_num;    /* Valve number, 0 -> ox, 1 -> fuel   */
+ 126:../../mod/valve/valve.c **** 
+ 127:../../mod/valve/valve.c **** 
+ 128:../../mod/valve/valve.c **** /*------------------------------------------------------------------------------
+ 129:../../mod/valve/valve.c ****  Initializations 
+ 130:../../mod/valve/valve.c **** ------------------------------------------------------------------------------*/
+ 131:../../mod/valve/valve.c **** valve_num    = subcommand & 0x01;
+ 132:../../mod/valve/valve.c **** subcommand  -= valve_num;
+ 133:../../mod/valve/valve.c **** 
+ 134:../../mod/valve/valve.c **** 
+ 135:../../mod/valve/valve.c **** /*------------------------------------------------------------------------------
+ 136:../../mod/valve/valve.c ****  Implementation 
+ 137:../../mod/valve/valve.c **** ------------------------------------------------------------------------------*/
+ 138:../../mod/valve/valve.c **** switch( subcommand )
+ 139:../../mod/valve/valve.c **** 	{
+ 140:../../mod/valve/valve.c **** 	/*--------------------------------------------------------------------------
+ 141:../../mod/valve/valve.c **** 	 VALVE ENABLE	
+ 142:../../mod/valve/valve.c **** 	--------------------------------------------------------------------------*/
+ 143:../../mod/valve/valve.c **** 	case VALVE_ENABLE_CODE:
+ 144:../../mod/valve/valve.c **** 		{
+ARM GAS  /tmp/ccGBJC27.s 			page 4
+
+
+ 145:../../mod/valve/valve.c **** 		valve_enable_valves();
+ 146:../../mod/valve/valve.c **** 		return VALVE_OK;
+ 147:../../mod/valve/valve.c **** 		} /* VALVE_ENABLE_CODE*/
+ 148:../../mod/valve/valve.c **** 
+ 149:../../mod/valve/valve.c **** 	/*--------------------------------------------------------------------------
+ 150:../../mod/valve/valve.c **** 	 VALVE DISABLE 
+ 151:../../mod/valve/valve.c **** 	--------------------------------------------------------------------------*/
+ 152:../../mod/valve/valve.c **** 	case VALVE_DISABLE_CODE:
+ 153:../../mod/valve/valve.c **** 		{
+ 154:../../mod/valve/valve.c **** 		valve_disable_valves();
+ 155:../../mod/valve/valve.c **** 		return VALVE_OK;
+ 156:../../mod/valve/valve.c **** 		} /* VALVE_DISABLE_CODE */
+ 157:../../mod/valve/valve.c **** 
+ 158:../../mod/valve/valve.c **** 	/*--------------------------------------------------------------------------
+ 159:../../mod/valve/valve.c **** 	 VALVE OPEN 
+ 160:../../mod/valve/valve.c **** 	--------------------------------------------------------------------------*/
+ 161:../../mod/valve/valve.c **** 	case VALVE_OPEN_CODE:
+ 162:../../mod/valve/valve.c **** 		{
+ 163:../../mod/valve/valve.c **** 		if ( valve_num )
+ 164:../../mod/valve/valve.c **** 			{
+ 165:../../mod/valve/valve.c **** 			return valve_open_fuel_valve();
+ 166:../../mod/valve/valve.c **** 			}
+ 167:../../mod/valve/valve.c **** 		else
+ 168:../../mod/valve/valve.c **** 			{
+ 169:../../mod/valve/valve.c **** 			return valve_open_ox_valve();
+ 170:../../mod/valve/valve.c **** 			}
+ 171:../../mod/valve/valve.c **** 		} /* VALVE_OPEN_CODE */
+ 172:../../mod/valve/valve.c **** 
+ 173:../../mod/valve/valve.c **** 	/*--------------------------------------------------------------------------
+ 174:../../mod/valve/valve.c **** 	 VALVE CLOSE 
+ 175:../../mod/valve/valve.c **** 	--------------------------------------------------------------------------*/
+ 176:../../mod/valve/valve.c **** 	case VALVE_CLOSE_CODE:
+ 177:../../mod/valve/valve.c **** 		{
+ 178:../../mod/valve/valve.c **** 		if ( valve_num )
+ 179:../../mod/valve/valve.c **** 			{
+ 180:../../mod/valve/valve.c **** 			return valve_close_fuel_valve();
+ 181:../../mod/valve/valve.c **** 			}
+ 182:../../mod/valve/valve.c **** 		else
+ 183:../../mod/valve/valve.c **** 			{
+ 184:../../mod/valve/valve.c **** 			return valve_close_ox_valve();
+ 185:../../mod/valve/valve.c **** 			}
+ 186:../../mod/valve/valve.c **** 		} /* VALVE_CLOSE_CODE */
+ 187:../../mod/valve/valve.c **** 
+ 188:../../mod/valve/valve.c **** 	/*--------------------------------------------------------------------------
+ 189:../../mod/valve/valve.c **** 	 VALVE CALIBRATE 
+ 190:../../mod/valve/valve.c **** 	--------------------------------------------------------------------------*/
+ 191:../../mod/valve/valve.c **** 	case VALVE_CALIBRATE_CODE:
+ 192:../../mod/valve/valve.c **** 		{
+ 193:../../mod/valve/valve.c **** 		return valve_calibrate_valves();
+ 194:../../mod/valve/valve.c **** 		} /* VALVE_CALIBRATE_CODE */
+ 195:../../mod/valve/valve.c **** 
+ 196:../../mod/valve/valve.c **** 	/*--------------------------------------------------------------------------
+ 197:../../mod/valve/valve.c **** 	 UNRECOGNIZED SUBCOMMAND 
+ 198:../../mod/valve/valve.c **** 	--------------------------------------------------------------------------*/
+ 199:../../mod/valve/valve.c **** 	default:
+ 200:../../mod/valve/valve.c **** 		{
+ 201:../../mod/valve/valve.c **** 		return VALVE_UNRECOGNIZED_SUBCOMMAND;
+ARM GAS  /tmp/ccGBJC27.s 			page 5
+
+
+ 202:../../mod/valve/valve.c **** 		}
+ 203:../../mod/valve/valve.c **** 	
+ 204:../../mod/valve/valve.c **** 	} /* switch( subcommand ) */
+ 205:../../mod/valve/valve.c **** 
+ 206:../../mod/valve/valve.c **** } /* valve_cmd_execute */
+ 207:../../mod/valve/valve.c **** #endif
+ 208:../../mod/valve/valve.c **** 
+ 209:../../mod/valve/valve.c **** 
+ 210:../../mod/valve/valve.c **** /*******************************************************************************
+ 211:../../mod/valve/valve.c **** *                                                                              *
+ 212:../../mod/valve/valve.c **** * PROCEDURE:                                                                   *
+ 213:../../mod/valve/valve.c **** * 		valve_transmit                                                         *
+ 214:../../mod/valve/valve.c **** *                                                                              *
+ 215:../../mod/valve/valve.c **** * DESCRIPTION:                                                                 *
+ 216:../../mod/valve/valve.c **** *       Transmits a specified number of bytes over the valve control           *
+ 217:../../mod/valve/valve.c **** *       serial port                                                            *
+ 218:../../mod/valve/valve.c **** *                                                                              *
+ 219:../../mod/valve/valve.c **** *******************************************************************************/
+ 220:../../mod/valve/valve.c **** VALVE_STATUS valve_transmit
+ 221:../../mod/valve/valve.c **** 	(
+ 222:../../mod/valve/valve.c **** 	void*    tx_data_ptr , /* Data to send          */
+ 223:../../mod/valve/valve.c **** 	size_t   tx_data_size, /* Size of transmit data */
+ 224:../../mod/valve/valve.c **** 	uint32_t timeout
+ 225:../../mod/valve/valve.c **** 	)
+ 226:../../mod/valve/valve.c **** {
+  29              		.loc 1 226 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		.loc 1 226 1 is_stmt 0 view .LVU1
+  34 0000 08B5     		push	{r3, lr}
+  35              	.LCFI0:
+  36              		.cfi_def_cfa_offset 8
+  37              		.cfi_offset 3, -8
+  38              		.cfi_offset 14, -4
+  39 0002 1346     		mov	r3, r2
+ 227:../../mod/valve/valve.c **** /*------------------------------------------------------------------------------
+ 228:../../mod/valve/valve.c ****  Local Variables
+ 229:../../mod/valve/valve.c **** ------------------------------------------------------------------------------*/
+ 230:../../mod/valve/valve.c **** HAL_StatusTypeDef hal_status; /* Return code from HAL CMSIS API */
+  40              		.loc 1 230 1 is_stmt 1 view .LVU2
+ 231:../../mod/valve/valve.c **** 
+ 232:../../mod/valve/valve.c **** 
+ 233:../../mod/valve/valve.c **** /*------------------------------------------------------------------------------
+ 234:../../mod/valve/valve.c ****  Initializations 
+ 235:../../mod/valve/valve.c **** ------------------------------------------------------------------------------*/
+ 236:../../mod/valve/valve.c **** hal_status = HAL_OK;
+  41              		.loc 1 236 1 view .LVU3
+  42              	.LVL1:
+ 237:../../mod/valve/valve.c **** 
+ 238:../../mod/valve/valve.c **** 
+ 239:../../mod/valve/valve.c **** /*------------------------------------------------------------------------------
+ 240:../../mod/valve/valve.c ****  Implementation 
+ 241:../../mod/valve/valve.c **** ------------------------------------------------------------------------------*/
+ 242:../../mod/valve/valve.c **** 
+ 243:../../mod/valve/valve.c **** /* Transmit buffer */
+ 244:../../mod/valve/valve.c **** hal_status = HAL_UART_Transmit( &( VALVE_HUART ), 
+ARM GAS  /tmp/ccGBJC27.s 			page 6
+
+
+  43              		.loc 1 244 1 view .LVU4
+  44              		.loc 1 244 14 is_stmt 0 view .LVU5
+  45 0004 8AB2     		uxth	r2, r1
+  46              	.LVL2:
+  47              		.loc 1 244 14 view .LVU6
+  48 0006 0146     		mov	r1, r0
+  49              	.LVL3:
+  50              		.loc 1 244 14 view .LVU7
+  51 0008 0548     		ldr	r0, .L5
+  52              	.LVL4:
+  53              		.loc 1 244 14 view .LVU8
+  54 000a FFF7FEFF 		bl	HAL_UART_Transmit
+  55              	.LVL5:
+ 245:../../mod/valve/valve.c ****                                 tx_data_ptr     , 
+ 246:../../mod/valve/valve.c **** 								tx_data_size    , 
+ 247:../../mod/valve/valve.c **** 								timeout );
+ 248:../../mod/valve/valve.c **** 
+ 249:../../mod/valve/valve.c **** /* Return status */
+ 250:../../mod/valve/valve.c **** switch ( hal_status )
+  56              		.loc 1 250 1 is_stmt 1 view .LVU9
+  57 000e 0346     		mov	r3, r0
+  58 0010 10B1     		cbz	r0, .L2
+  59 0012 0328     		cmp	r0, #3
+  60 0014 02D1     		bne	.L3
+  61 0016 0423     		movs	r3, #4
+  62              	.L2:
+ 251:../../mod/valve/valve.c **** 	{
+ 252:../../mod/valve/valve.c **** 	case HAL_TIMEOUT:
+ 253:../../mod/valve/valve.c **** 		{
+ 254:../../mod/valve/valve.c **** 		return VALVE_UART_TIMEOUT;
+ 255:../../mod/valve/valve.c **** 		}
+ 256:../../mod/valve/valve.c **** 	case HAL_OK:
+ 257:../../mod/valve/valve.c **** 		{
+ 258:../../mod/valve/valve.c **** 		return VALVE_OK;
+ 259:../../mod/valve/valve.c **** 		}
+ 260:../../mod/valve/valve.c **** 	default:
+ 261:../../mod/valve/valve.c **** 		{
+ 262:../../mod/valve/valve.c **** 		return VALVE_UART_ERROR;
+ 263:../../mod/valve/valve.c **** 		}
+ 264:../../mod/valve/valve.c **** 	} /* switch ( hal_status ) */
+ 265:../../mod/valve/valve.c **** 
+ 266:../../mod/valve/valve.c **** } /* valve_transmit */
+  63              		.loc 1 266 1 is_stmt 0 view .LVU10
+  64 0018 1846     		mov	r0, r3
+  65              	.LVL6:
+  66              		.loc 1 266 1 view .LVU11
+  67 001a 08BD     		pop	{r3, pc}
+  68              	.LVL7:
+  69              	.L3:
+ 262:../../mod/valve/valve.c **** 		}
+  70              		.loc 1 262 10 view .LVU12
+  71 001c 0323     		movs	r3, #3
+  72 001e FBE7     		b	.L2
+  73              	.L6:
+  74              		.align	2
+  75              	.L5:
+  76 0020 00000000 		.word	huart2
+ARM GAS  /tmp/ccGBJC27.s 			page 7
+
+
+  77              		.cfi_endproc
+  78              	.LFE333:
+  80              		.section	.text.valve_receive,"ax",%progbits
+  81              		.align	1
+  82              		.global	valve_receive
+  83              		.syntax unified
+  84              		.thumb
+  85              		.thumb_func
+  87              	valve_receive:
+  88              	.LVL8:
+  89              	.LFB334:
+ 267:../../mod/valve/valve.c **** 
+ 268:../../mod/valve/valve.c **** 
+ 269:../../mod/valve/valve.c **** /*******************************************************************************
+ 270:../../mod/valve/valve.c **** *                                                                              *
+ 271:../../mod/valve/valve.c **** * PROCEDURE:                                                                   *
+ 272:../../mod/valve/valve.c **** * 		valve_receive                                                          *
+ 273:../../mod/valve/valve.c **** *                                                                              *
+ 274:../../mod/valve/valve.c **** * DESCRIPTION:                                                                 *
+ 275:../../mod/valve/valve.c **** *       Receive bytes from the valve control serial port                       *
+ 276:../../mod/valve/valve.c **** *                                                                              *
+ 277:../../mod/valve/valve.c **** *******************************************************************************/
+ 278:../../mod/valve/valve.c **** VALVE_STATUS valve_receive
+ 279:../../mod/valve/valve.c **** 	(
+ 280:../../mod/valve/valve.c **** 	void*    rx_data_ptr , /* Buffer to export data to        */
+ 281:../../mod/valve/valve.c **** 	size_t   rx_data_size, /* Size of the data to be received */
+ 282:../../mod/valve/valve.c **** 	uint32_t timeout       /* UART timeout                    */
+ 283:../../mod/valve/valve.c **** 	)
+ 284:../../mod/valve/valve.c **** {
+  90              		.loc 1 284 1 is_stmt 1 view -0
+  91              		.cfi_startproc
+  92              		@ args = 0, pretend = 0, frame = 0
+  93              		@ frame_needed = 0, uses_anonymous_args = 0
+  94              		.loc 1 284 1 is_stmt 0 view .LVU14
+  95 0000 08B5     		push	{r3, lr}
+  96              	.LCFI1:
+  97              		.cfi_def_cfa_offset 8
+  98              		.cfi_offset 3, -8
+  99              		.cfi_offset 14, -4
+ 100 0002 1346     		mov	r3, r2
+ 285:../../mod/valve/valve.c **** /*------------------------------------------------------------------------------
+ 286:../../mod/valve/valve.c ****  Local Variables
+ 287:../../mod/valve/valve.c **** ------------------------------------------------------------------------------*/
+ 288:../../mod/valve/valve.c **** HAL_StatusTypeDef hal_status; /* Return code from HAL CMSIS API */
+ 101              		.loc 1 288 1 is_stmt 1 view .LVU15
+ 289:../../mod/valve/valve.c **** 
+ 290:../../mod/valve/valve.c **** 
+ 291:../../mod/valve/valve.c **** /*------------------------------------------------------------------------------
+ 292:../../mod/valve/valve.c ****  Initializations 
+ 293:../../mod/valve/valve.c **** ------------------------------------------------------------------------------*/
+ 294:../../mod/valve/valve.c **** hal_status = HAL_OK;
+ 102              		.loc 1 294 1 view .LVU16
+ 103              	.LVL9:
+ 295:../../mod/valve/valve.c **** 
+ 296:../../mod/valve/valve.c **** 
+ 297:../../mod/valve/valve.c **** /*------------------------------------------------------------------------------
+ 298:../../mod/valve/valve.c ****  Implementation 
+ARM GAS  /tmp/ccGBJC27.s 			page 8
+
+
+ 299:../../mod/valve/valve.c **** ------------------------------------------------------------------------------*/
+ 300:../../mod/valve/valve.c **** 
+ 301:../../mod/valve/valve.c **** /* Transmit buffer */
+ 302:../../mod/valve/valve.c **** hal_status = HAL_UART_Receive( &( VALVE_HUART ), 
+ 104              		.loc 1 302 1 view .LVU17
+ 105              		.loc 1 302 14 is_stmt 0 view .LVU18
+ 106 0004 8AB2     		uxth	r2, r1
+ 107              	.LVL10:
+ 108              		.loc 1 302 14 view .LVU19
+ 109 0006 0146     		mov	r1, r0
+ 110              	.LVL11:
+ 111              		.loc 1 302 14 view .LVU20
+ 112 0008 0548     		ldr	r0, .L11
+ 113              	.LVL12:
+ 114              		.loc 1 302 14 view .LVU21
+ 115 000a FFF7FEFF 		bl	HAL_UART_Receive
+ 116              	.LVL13:
+ 303:../../mod/valve/valve.c ****                                rx_data_ptr     , 
+ 304:../../mod/valve/valve.c **** 							   rx_data_size    , 
+ 305:../../mod/valve/valve.c **** 							   timeout );
+ 306:../../mod/valve/valve.c **** 
+ 307:../../mod/valve/valve.c **** /* Return status */
+ 308:../../mod/valve/valve.c **** switch ( hal_status )
+ 117              		.loc 1 308 1 is_stmt 1 view .LVU22
+ 118 000e 0346     		mov	r3, r0
+ 119 0010 10B1     		cbz	r0, .L8
+ 120 0012 0328     		cmp	r0, #3
+ 121 0014 02D1     		bne	.L9
+ 122 0016 0423     		movs	r3, #4
+ 123              	.L8:
+ 309:../../mod/valve/valve.c **** 	{
+ 310:../../mod/valve/valve.c **** 	case HAL_TIMEOUT:
+ 311:../../mod/valve/valve.c **** 		{
+ 312:../../mod/valve/valve.c **** 		return VALVE_UART_TIMEOUT;
+ 313:../../mod/valve/valve.c **** 		}
+ 314:../../mod/valve/valve.c **** 	case HAL_OK:
+ 315:../../mod/valve/valve.c **** 		{
+ 316:../../mod/valve/valve.c **** 		return VALVE_OK;
+ 317:../../mod/valve/valve.c **** 		}
+ 318:../../mod/valve/valve.c **** 	default:
+ 319:../../mod/valve/valve.c **** 		{
+ 320:../../mod/valve/valve.c **** 		return VALVE_UART_ERROR;
+ 321:../../mod/valve/valve.c **** 		}
+ 322:../../mod/valve/valve.c **** 	} /* switch ( hal_status ) */
+ 323:../../mod/valve/valve.c **** 
+ 324:../../mod/valve/valve.c **** } /* valve_receive */
+ 124              		.loc 1 324 1 is_stmt 0 view .LVU23
+ 125 0018 1846     		mov	r0, r3
+ 126              	.LVL14:
+ 127              		.loc 1 324 1 view .LVU24
+ 128 001a 08BD     		pop	{r3, pc}
+ 129              	.LVL15:
+ 130              	.L9:
+ 320:../../mod/valve/valve.c **** 		}
+ 131              		.loc 1 320 10 view .LVU25
+ 132 001c 0323     		movs	r3, #3
+ 133 001e FBE7     		b	.L8
+ARM GAS  /tmp/ccGBJC27.s 			page 9
+
+
+ 134              	.L12:
+ 135              		.align	2
+ 136              	.L11:
+ 137 0020 00000000 		.word	huart2
+ 138              		.cfi_endproc
+ 139              	.LFE334:
+ 141              		.text
+ 142              	.Letext0:
+ 143              		.file 2 "/usr/arm-none-eabi/include/machine/_default_types.h"
+ 144              		.file 3 "/usr/arm-none-eabi/include/sys/_stdint.h"
+ 145              		.file 4 "../../lib/Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h750xx.h"
+ 146              		.file 5 "/usr/lib/gcc/arm-none-eabi/12.2.0/include/stddef.h"
+ 147              		.file 6 "../../lib/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h"
+ 148              		.file 7 "../../lib/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma.h"
+ 149              		.file 8 "../../lib/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h"
+ 150              		.file 9 "../../mod/valve/valve.h"
+ 151              		.file 10 "../../lib/sdr_pin_defines_L0002.h"
+ARM GAS  /tmp/ccGBJC27.s 			page 10
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 valve.c
+     /tmp/ccGBJC27.s:20     .text.valve_transmit:0000000000000000 $t
+     /tmp/ccGBJC27.s:26     .text.valve_transmit:0000000000000000 valve_transmit
+     /tmp/ccGBJC27.s:76     .text.valve_transmit:0000000000000020 $d
+     /tmp/ccGBJC27.s:81     .text.valve_receive:0000000000000000 $t
+     /tmp/ccGBJC27.s:87     .text.valve_receive:0000000000000000 valve_receive
+     /tmp/ccGBJC27.s:137    .text.valve_receive:0000000000000020 $d
+
+UNDEFINED SYMBOLS
+HAL_UART_Transmit
+huart2
+HAL_UART_Receive

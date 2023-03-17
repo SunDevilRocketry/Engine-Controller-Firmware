@@ -1,0 +1,1193 @@
+ARM GAS  /tmp/ccuy5Pq9.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"pressure.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "../../mod/pressure/pressure.c"
+  19              		.section	.text.amplifier_gain_map,"ax",%progbits
+  20              		.align	1
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	amplifier_gain_map:
+  26              	.LVL0:
+  27              	.LFB339:
+   1:../../mod/pressure/pressure.c **** /*******************************************************************************
+   2:../../mod/pressure/pressure.c **** *
+   3:../../mod/pressure/pressure.c **** * FILE: 
+   4:../../mod/pressure/pressure.c **** * 		pressure.c
+   5:../../mod/pressure/pressure.c **** *
+   6:../../mod/pressure/pressure.c **** * DESCRIPTION: 
+   7:../../mod/pressure/pressure.c **** * 		Contains API functions for reading data from the engine's pressure
+   8:../../mod/pressure/pressure.c **** *       transducers 
+   9:../../mod/pressure/pressure.c **** *
+  10:../../mod/pressure/pressure.c **** *******************************************************************************/
+  11:../../mod/pressure/pressure.c **** 
+  12:../../mod/pressure/pressure.c **** 
+  13:../../mod/pressure/pressure.c **** /*------------------------------------------------------------------------------
+  14:../../mod/pressure/pressure.c ****  Standard Includes                                                              
+  15:../../mod/pressure/pressure.c **** ------------------------------------------------------------------------------*/
+  16:../../mod/pressure/pressure.c **** 
+  17:../../mod/pressure/pressure.c **** 
+  18:../../mod/pressure/pressure.c **** /*------------------------------------------------------------------------------
+  19:../../mod/pressure/pressure.c ****  Project Includes                                                               
+  20:../../mod/pressure/pressure.c **** ------------------------------------------------------------------------------*/
+  21:../../mod/pressure/pressure.c **** #include "main.h"
+  22:../../mod/pressure/pressure.c **** #include "sdr_pin_defines_L0002.h"
+  23:../../mod/pressure/pressure.c **** #include "pressure.h"
+  24:../../mod/pressure/pressure.c **** #include "led.h"
+  25:../../mod/pressure/pressure.c **** 
+  26:../../mod/pressure/pressure.c **** 
+  27:../../mod/pressure/pressure.c **** /*------------------------------------------------------------------------------
+  28:../../mod/pressure/pressure.c ****  Global Variables 
+  29:../../mod/pressure/pressure.c **** ------------------------------------------------------------------------------*/
+  30:../../mod/pressure/pressure.c **** 
+  31:../../mod/pressure/pressure.c **** /* Amplifier gain settings */
+ARM GAS  /tmp/ccuy5Pq9.s 			page 2
+
+
+  32:../../mod/pressure/pressure.c **** static uint8_t           pt_gains[] = { 0, 0, 0, 0, 0, 0, 0, 0 } ; 
+  33:../../mod/pressure/pressure.c **** 
+  34:../../mod/pressure/pressure.c **** 
+  35:../../mod/pressure/pressure.c **** /*------------------------------------------------------------------------------
+  36:../../mod/pressure/pressure.c ****  Internal function prototypes 
+  37:../../mod/pressure/pressure.c **** ------------------------------------------------------------------------------*/
+  38:../../mod/pressure/pressure.c **** 
+  39:../../mod/pressure/pressure.c **** /* PT number to GPIO pin butmask mapping */
+  40:../../mod/pressure/pressure.c **** static inline uint16_t mux_map
+  41:../../mod/pressure/pressure.c **** 	(
+  42:../../mod/pressure/pressure.c ****     PRESSURE_PT_NUM    pt_num    
+  43:../../mod/pressure/pressure.c ****     );
+  44:../../mod/pressure/pressure.c **** 
+  45:../../mod/pressure/pressure.c **** /* Sample ADC in polling mode */
+  46:../../mod/pressure/pressure.c **** static PRESSURE_STATUS sample_adc_poll
+  47:../../mod/pressure/pressure.c **** 	(
+  48:../../mod/pressure/pressure.c ****     uint16_t     num_samples,
+  49:../../mod/pressure/pressure.c ****     uint32_t*    psample_buffer
+  50:../../mod/pressure/pressure.c ****     );
+  51:../../mod/pressure/pressure.c **** 
+  52:../../mod/pressure/pressure.c **** /* Mapping from PT number to amplifer gain GPIO pin bitmask */
+  53:../../mod/pressure/pressure.c **** static uint16_t amplifier_gain_map
+  54:../../mod/pressure/pressure.c **** 	(
+  55:../../mod/pressure/pressure.c ****     uint8_t gain_setting 
+  56:../../mod/pressure/pressure.c ****     );
+  57:../../mod/pressure/pressure.c **** 
+  58:../../mod/pressure/pressure.c **** 
+  59:../../mod/pressure/pressure.c **** /*------------------------------------------------------------------------------
+  60:../../mod/pressure/pressure.c ****  API Functions 
+  61:../../mod/pressure/pressure.c **** ------------------------------------------------------------------------------*/
+  62:../../mod/pressure/pressure.c **** 
+  63:../../mod/pressure/pressure.c **** 
+  64:../../mod/pressure/pressure.c **** /*******************************************************************************
+  65:../../mod/pressure/pressure.c **** *                                                                              *
+  66:../../mod/pressure/pressure.c **** * PROCEDURE:                                                                   * 
+  67:../../mod/pressure/pressure.c **** * 		pressure_get_pt_reading                                                *
+  68:../../mod/pressure/pressure.c **** *                                                                              *
+  69:../../mod/pressure/pressure.c **** * DESCRIPTION:                                                                 * 
+  70:../../mod/pressure/pressure.c **** *       Get a single pressure transducer reading                               *
+  71:../../mod/pressure/pressure.c **** *                                                                              *
+  72:../../mod/pressure/pressure.c **** *******************************************************************************/
+  73:../../mod/pressure/pressure.c **** uint32_t pressure_get_pt_reading 
+  74:../../mod/pressure/pressure.c **** 	(
+  75:../../mod/pressure/pressure.c ****     PRESSURE_PT_NUM pt_num
+  76:../../mod/pressure/pressure.c ****     )
+  77:../../mod/pressure/pressure.c **** {
+  78:../../mod/pressure/pressure.c **** /*------------------------------------------------------------------------------
+  79:../../mod/pressure/pressure.c ****  Local Variables  
+  80:../../mod/pressure/pressure.c **** ------------------------------------------------------------------------------*/
+  81:../../mod/pressure/pressure.c **** uint16_t        gain_GPIO_pins_bitmask; /* GPIO pins for amplifier gain       */
+  82:../../mod/pressure/pressure.c **** uint16_t        mux_GPIO_pins_bitmask;  /* GPIO pins for multiplexor          */
+  83:../../mod/pressure/pressure.c **** uint32_t        pt_reading;             /* PT reading, return value           */
+  84:../../mod/pressure/pressure.c **** PRESSURE_STATUS pt_status_code;         /* Status code from adc conversion    */
+  85:../../mod/pressure/pressure.c **** 
+  86:../../mod/pressure/pressure.c **** /*------------------------------------------------------------------------------
+  87:../../mod/pressure/pressure.c ****  Initializations 
+  88:../../mod/pressure/pressure.c **** ------------------------------------------------------------------------------*/
+ARM GAS  /tmp/ccuy5Pq9.s 			page 3
+
+
+  89:../../mod/pressure/pressure.c **** gain_GPIO_pins_bitmask = amplifier_gain_map( pt_gains[ pt_num ] );
+  90:../../mod/pressure/pressure.c **** mux_GPIO_pins_bitmask  = mux_map( pt_num );
+  91:../../mod/pressure/pressure.c **** pt_reading             = 0;
+  92:../../mod/pressure/pressure.c **** 
+  93:../../mod/pressure/pressure.c **** /*------------------------------------------------------------------------------
+  94:../../mod/pressure/pressure.c ****  Setup mux and gain circuits  
+  95:../../mod/pressure/pressure.c **** ------------------------------------------------------------------------------*/
+  96:../../mod/pressure/pressure.c **** 
+  97:../../mod/pressure/pressure.c **** /* Reset all GPIO */
+  98:../../mod/pressure/pressure.c **** HAL_GPIO_WritePin( PRESSURE_GPIO_PORT    , 
+  99:../../mod/pressure/pressure.c ****                    PRESSURE_MUX_ALL_PINS |
+ 100:../../mod/pressure/pressure.c ****                    PRESSURE_GAIN_ALL_PINS,
+ 101:../../mod/pressure/pressure.c ****                    GPIO_PIN_RESET );
+ 102:../../mod/pressure/pressure.c **** 
+ 103:../../mod/pressure/pressure.c **** /* Set MUX */
+ 104:../../mod/pressure/pressure.c **** HAL_GPIO_WritePin( PRESSURE_GPIO_PORT   , 
+ 105:../../mod/pressure/pressure.c ****                    mux_GPIO_pins_bitmask,
+ 106:../../mod/pressure/pressure.c ****                    GPIO_PIN_SET );
+ 107:../../mod/pressure/pressure.c **** 
+ 108:../../mod/pressure/pressure.c **** /* Set gain */
+ 109:../../mod/pressure/pressure.c **** HAL_GPIO_WritePin( PRESSURE_GPIO_PORT    ,
+ 110:../../mod/pressure/pressure.c ****                    gain_GPIO_pins_bitmask,
+ 111:../../mod/pressure/pressure.c ****                    GPIO_PIN_SET );
+ 112:../../mod/pressure/pressure.c **** 
+ 113:../../mod/pressure/pressure.c **** /*------------------------------------------------------------------------------
+ 114:../../mod/pressure/pressure.c ****  Poll ADC once 
+ 115:../../mod/pressure/pressure.c **** ------------------------------------------------------------------------------*/
+ 116:../../mod/pressure/pressure.c **** pt_status_code = sample_adc_poll( 1, &pt_reading );
+ 117:../../mod/pressure/pressure.c **** if ( pt_status_code != PRESSURE_OK )
+ 118:../../mod/pressure/pressure.c **** 	{
+ 119:../../mod/pressure/pressure.c ****     Error_Handler();
+ 120:../../mod/pressure/pressure.c ****     }
+ 121:../../mod/pressure/pressure.c **** 
+ 122:../../mod/pressure/pressure.c **** /*------------------------------------------------------------------------------
+ 123:../../mod/pressure/pressure.c ****  Reset gain cicuitry and return  
+ 124:../../mod/pressure/pressure.c **** ------------------------------------------------------------------------------*/
+ 125:../../mod/pressure/pressure.c **** 
+ 126:../../mod/pressure/pressure.c **** /* Reset all GPIO */
+ 127:../../mod/pressure/pressure.c **** HAL_GPIO_WritePin( PRESSURE_GPIO_PORT    , 
+ 128:../../mod/pressure/pressure.c ****                    PRESSURE_MUX_ALL_PINS |
+ 129:../../mod/pressure/pressure.c ****                    PRESSURE_GAIN_ALL_PINS,
+ 130:../../mod/pressure/pressure.c ****                    GPIO_PIN_RESET );
+ 131:../../mod/pressure/pressure.c **** 
+ 132:../../mod/pressure/pressure.c **** /* Return pt reading */
+ 133:../../mod/pressure/pressure.c **** return pt_reading;
+ 134:../../mod/pressure/pressure.c **** 
+ 135:../../mod/pressure/pressure.c **** } /* pressure_get_pt_reading */
+ 136:../../mod/pressure/pressure.c **** 
+ 137:../../mod/pressure/pressure.c **** 
+ 138:../../mod/pressure/pressure.c **** /*******************************************************************************
+ 139:../../mod/pressure/pressure.c **** *                                                                              *
+ 140:../../mod/pressure/pressure.c **** * PROCEDURE:                                                                   * 
+ 141:../../mod/pressure/pressure.c **** * 		pressure_poll_pts                                                      *
+ 142:../../mod/pressure/pressure.c **** *                                                                              *
+ 143:../../mod/pressure/pressure.c **** * DESCRIPTION:                                                                 * 
+ 144:../../mod/pressure/pressure.c **** *       Get readings from all pressure transducers                             *
+ 145:../../mod/pressure/pressure.c **** *                                                                              *
+ARM GAS  /tmp/ccuy5Pq9.s 			page 4
+
+
+ 146:../../mod/pressure/pressure.c **** *******************************************************************************/
+ 147:../../mod/pressure/pressure.c **** PRESSURE_STATUS pressure_poll_pts
+ 148:../../mod/pressure/pressure.c **** 	(
+ 149:../../mod/pressure/pressure.c ****     uint32_t* pPT_readings /* array of size NUM_PTS */ 
+ 150:../../mod/pressure/pressure.c ****     )
+ 151:../../mod/pressure/pressure.c **** {
+ 152:../../mod/pressure/pressure.c **** /*------------------------------------------------------------------------------
+ 153:../../mod/pressure/pressure.c ****  Local Variables  
+ 154:../../mod/pressure/pressure.c **** ------------------------------------------------------------------------------*/
+ 155:../../mod/pressure/pressure.c **** uint16_t        gain_GPIO_pins_bitmask; /* GPIO pins for amplifier gain       */
+ 156:../../mod/pressure/pressure.c **** uint16_t        mux_GPIO_pins_bitmask;  /* GPIO pins for multiplexor          */
+ 157:../../mod/pressure/pressure.c **** PRESSURE_STATUS pt_status_code;         /* Status code from adc conversion    */
+ 158:../../mod/pressure/pressure.c **** 
+ 159:../../mod/pressure/pressure.c **** /*------------------------------------------------------------------------------
+ 160:../../mod/pressure/pressure.c ****  Initializations  
+ 161:../../mod/pressure/pressure.c **** ------------------------------------------------------------------------------*/
+ 162:../../mod/pressure/pressure.c **** 
+ 163:../../mod/pressure/pressure.c **** /* Reset all GPIO */
+ 164:../../mod/pressure/pressure.c **** HAL_GPIO_WritePin( PRESSURE_GPIO_PORT    , 
+ 165:../../mod/pressure/pressure.c **** 				   PRESSURE_MUX_ALL_PINS |
+ 166:../../mod/pressure/pressure.c **** 				   PRESSURE_GAIN_ALL_PINS,
+ 167:../../mod/pressure/pressure.c **** 				   GPIO_PIN_RESET );
+ 168:../../mod/pressure/pressure.c **** 
+ 169:../../mod/pressure/pressure.c **** /*------------------------------------------------------------------------------
+ 170:../../mod/pressure/pressure.c ****  Get a reading from each PT 
+ 171:../../mod/pressure/pressure.c **** ------------------------------------------------------------------------------*/
+ 172:../../mod/pressure/pressure.c **** 
+ 173:../../mod/pressure/pressure.c **** for ( uint8_t i = 0; i < NUM_PTS; ++i )
+ 174:../../mod/pressure/pressure.c **** 	{
+ 175:../../mod/pressure/pressure.c **** 	/*--------------------------------------------------------------------------
+ 176:../../mod/pressure/pressure.c **** 	 Setup mux and gain circuits  
+ 177:../../mod/pressure/pressure.c **** 	--------------------------------------------------------------------------*/
+ 178:../../mod/pressure/pressure.c **** 
+ 179:../../mod/pressure/pressure.c **** 	/* GPIO pin mapping */
+ 180:../../mod/pressure/pressure.c **** 	gain_GPIO_pins_bitmask = amplifier_gain_map( pt_gains[ i ] );
+ 181:../../mod/pressure/pressure.c **** 	mux_GPIO_pins_bitmask  = mux_map( i );
+ 182:../../mod/pressure/pressure.c **** 
+ 183:../../mod/pressure/pressure.c **** 	/* Set MUX */
+ 184:../../mod/pressure/pressure.c **** 	HAL_GPIO_WritePin( PRESSURE_GPIO_PORT   , 
+ 185:../../mod/pressure/pressure.c **** 					   mux_GPIO_pins_bitmask,
+ 186:../../mod/pressure/pressure.c **** 					   GPIO_PIN_SET );
+ 187:../../mod/pressure/pressure.c **** 
+ 188:../../mod/pressure/pressure.c **** 	/* Set gain */
+ 189:../../mod/pressure/pressure.c **** 	HAL_GPIO_WritePin( PRESSURE_GPIO_PORT    ,
+ 190:../../mod/pressure/pressure.c **** 					   gain_GPIO_pins_bitmask,
+ 191:../../mod/pressure/pressure.c **** 					   GPIO_PIN_SET );
+ 192:../../mod/pressure/pressure.c ****     HAL_Delay( 1 );
+ 193:../../mod/pressure/pressure.c **** 
+ 194:../../mod/pressure/pressure.c **** 	/*--------------------------------------------------------------------------
+ 195:../../mod/pressure/pressure.c **** 	 Poll ADC once 
+ 196:../../mod/pressure/pressure.c **** 	--------------------------------------------------------------------------*/
+ 197:../../mod/pressure/pressure.c **** 	pt_status_code = sample_adc_poll( 1, (pPT_readings + i) );
+ 198:../../mod/pressure/pressure.c **** 	if ( pt_status_code != PRESSURE_OK )
+ 199:../../mod/pressure/pressure.c **** 		{
+ 200:../../mod/pressure/pressure.c **** 		Error_Handler();
+ 201:../../mod/pressure/pressure.c **** 		}
+ 202:../../mod/pressure/pressure.c **** 
+ARM GAS  /tmp/ccuy5Pq9.s 			page 5
+
+
+ 203:../../mod/pressure/pressure.c **** 	/*--------------------------------------------------------------------------
+ 204:../../mod/pressure/pressure.c **** 	 Reset gain cicuitry 
+ 205:../../mod/pressure/pressure.c **** 	--------------------------------------------------------------------------*/
+ 206:../../mod/pressure/pressure.c **** 
+ 207:../../mod/pressure/pressure.c **** 	/* Reset all GPIO */
+ 208:../../mod/pressure/pressure.c **** 	HAL_GPIO_WritePin( PRESSURE_GPIO_PORT    , 
+ 209:../../mod/pressure/pressure.c **** 					   PRESSURE_MUX_ALL_PINS |
+ 210:../../mod/pressure/pressure.c **** 					   PRESSURE_GAIN_ALL_PINS,
+ 211:../../mod/pressure/pressure.c **** 					   GPIO_PIN_RESET );
+ 212:../../mod/pressure/pressure.c **** 
+ 213:../../mod/pressure/pressure.c ****     }
+ 214:../../mod/pressure/pressure.c **** 
+ 215:../../mod/pressure/pressure.c **** /* Conversions successful */
+ 216:../../mod/pressure/pressure.c **** return PRESSURE_OK;
+ 217:../../mod/pressure/pressure.c **** 
+ 218:../../mod/pressure/pressure.c **** } /* pressure_poll_pts */
+ 219:../../mod/pressure/pressure.c **** 
+ 220:../../mod/pressure/pressure.c **** 
+ 221:../../mod/pressure/pressure.c **** /*******************************************************************************
+ 222:../../mod/pressure/pressure.c **** *                                                                              *
+ 223:../../mod/pressure/pressure.c **** * PROCEDURE:                                                                   * 
+ 224:../../mod/pressure/pressure.c **** * 		pressure_set_gain                                                      *
+ 225:../../mod/pressure/pressure.c **** *                                                                              *
+ 226:../../mod/pressure/pressure.c **** * DESCRIPTION:                                                                 * 
+ 227:../../mod/pressure/pressure.c **** *       Set the amplifier gain for a single pressure transducer                *
+ 228:../../mod/pressure/pressure.c **** *                                                                              *
+ 229:../../mod/pressure/pressure.c **** *******************************************************************************/
+ 230:../../mod/pressure/pressure.c **** void pressure_set_gain
+ 231:../../mod/pressure/pressure.c **** 	(
+ 232:../../mod/pressure/pressure.c ****     PRESSURE_PT_NUM pt_num,
+ 233:../../mod/pressure/pressure.c ****     uint8_t         gain
+ 234:../../mod/pressure/pressure.c ****     )
+ 235:../../mod/pressure/pressure.c **** {
+ 236:../../mod/pressure/pressure.c **** 
+ 237:../../mod/pressure/pressure.c **** // TODO: Throw an assert if pt_num is out of range
+ 238:../../mod/pressure/pressure.c **** 
+ 239:../../mod/pressure/pressure.c **** /* Update gain within global pt_gains array */
+ 240:../../mod/pressure/pressure.c **** pt_gains[ pt_num ] = gain;
+ 241:../../mod/pressure/pressure.c **** 
+ 242:../../mod/pressure/pressure.c **** } /* pressure_set_gain */
+ 243:../../mod/pressure/pressure.c **** 
+ 244:../../mod/pressure/pressure.c **** 
+ 245:../../mod/pressure/pressure.c **** /*******************************************************************************
+ 246:../../mod/pressure/pressure.c **** *                                                                              *
+ 247:../../mod/pressure/pressure.c **** * PROCEDURE:                                                                   * 
+ 248:../../mod/pressure/pressure.c **** * 		pressure_set_all_gains                                                 *
+ 249:../../mod/pressure/pressure.c **** *                                                                              *
+ 250:../../mod/pressure/pressure.c **** * DESCRIPTION:                                                                 * 
+ 251:../../mod/pressure/pressure.c **** *       Set the amplifier gain for all pressure transducers                    *
+ 252:../../mod/pressure/pressure.c **** *                                                                              *
+ 253:../../mod/pressure/pressure.c **** *******************************************************************************/
+ 254:../../mod/pressure/pressure.c **** void pressure_set_all_gains
+ 255:../../mod/pressure/pressure.c **** 	(
+ 256:../../mod/pressure/pressure.c ****     uint8_t gains[] 
+ 257:../../mod/pressure/pressure.c ****     )
+ 258:../../mod/pressure/pressure.c **** {
+ 259:../../mod/pressure/pressure.c **** 
+ARM GAS  /tmp/ccuy5Pq9.s 			page 6
+
+
+ 260:../../mod/pressure/pressure.c **** /* iterate over pressure transducers */
+ 261:../../mod/pressure/pressure.c **** for ( int i = 0; i < NUM_PTS; ++i )
+ 262:../../mod/pressure/pressure.c **** 	{
+ 263:../../mod/pressure/pressure.c **** 	/* Update gain within global pt_gains array */
+ 264:../../mod/pressure/pressure.c ****     pt_gains[i] = gains[i];
+ 265:../../mod/pressure/pressure.c ****     }
+ 266:../../mod/pressure/pressure.c **** 
+ 267:../../mod/pressure/pressure.c **** } /* pressure_set_gains */
+ 268:../../mod/pressure/pressure.c **** 
+ 269:../../mod/pressure/pressure.c **** 
+ 270:../../mod/pressure/pressure.c **** /*******************************************************************************
+ 271:../../mod/pressure/pressure.c **** *                                                                              *
+ 272:../../mod/pressure/pressure.c **** * PROCEDURE:                                                                   * 
+ 273:../../mod/pressure/pressure.c **** * 		pressure_get_gain                                                      *
+ 274:../../mod/pressure/pressure.c **** *                                                                              *
+ 275:../../mod/pressure/pressure.c **** * DESCRIPTION:                                                                 * 
+ 276:../../mod/pressure/pressure.c **** *       Get the gain for a single pressure transducer                          *
+ 277:../../mod/pressure/pressure.c **** *                                                                              *
+ 278:../../mod/pressure/pressure.c **** *******************************************************************************/
+ 279:../../mod/pressure/pressure.c **** uint8_t pressure_get_gain
+ 280:../../mod/pressure/pressure.c **** 	(
+ 281:../../mod/pressure/pressure.c ****     PRESSURE_PT_NUM pt_num
+ 282:../../mod/pressure/pressure.c ****     )
+ 283:../../mod/pressure/pressure.c **** {
+ 284:../../mod/pressure/pressure.c **** 
+ 285:../../mod/pressure/pressure.c **** // TODO: Throw an assert if pt_num is out of range
+ 286:../../mod/pressure/pressure.c **** 
+ 287:../../mod/pressure/pressure.c **** return pt_gains[ pt_num ];
+ 288:../../mod/pressure/pressure.c **** 
+ 289:../../mod/pressure/pressure.c **** } /* pressure_get_gain */
+ 290:../../mod/pressure/pressure.c **** 
+ 291:../../mod/pressure/pressure.c **** 
+ 292:../../mod/pressure/pressure.c **** /*******************************************************************************
+ 293:../../mod/pressure/pressure.c **** *                                                                              *
+ 294:../../mod/pressure/pressure.c **** * PROCEDURE:                                                                   * 
+ 295:../../mod/pressure/pressure.c **** * 		pressure_get_all_gains                                                 *
+ 296:../../mod/pressure/pressure.c **** *                                                                              *
+ 297:../../mod/pressure/pressure.c **** * DESCRIPTION:                                                                 * 
+ 298:../../mod/pressure/pressure.c **** *       Get the gain for all pressure transducers                              *
+ 299:../../mod/pressure/pressure.c **** *                                                                              *
+ 300:../../mod/pressure/pressure.c **** *******************************************************************************/
+ 301:../../mod/pressure/pressure.c **** void pressure_get_all_gains
+ 302:../../mod/pressure/pressure.c **** 	(
+ 303:../../mod/pressure/pressure.c ****     uint8_t* pgains 
+ 304:../../mod/pressure/pressure.c ****     )
+ 305:../../mod/pressure/pressure.c **** {
+ 306:../../mod/pressure/pressure.c **** 
+ 307:../../mod/pressure/pressure.c **** /* Loop over all pressure transducer gains */
+ 308:../../mod/pressure/pressure.c **** for ( int i = 0; i < NUM_PTS; ++i )
+ 309:../../mod/pressure/pressure.c **** 	{
+ 310:../../mod/pressure/pressure.c ****     /* Read gain from global gains array */
+ 311:../../mod/pressure/pressure.c ****     *( pgains + i ) = pt_gains[i];
+ 312:../../mod/pressure/pressure.c ****     }
+ 313:../../mod/pressure/pressure.c **** 
+ 314:../../mod/pressure/pressure.c **** } /* pressure_get_all_gains */
+ 315:../../mod/pressure/pressure.c **** 
+ 316:../../mod/pressure/pressure.c **** 
+ARM GAS  /tmp/ccuy5Pq9.s 			page 7
+
+
+ 317:../../mod/pressure/pressure.c **** /*------------------------------------------------------------------------------
+ 318:../../mod/pressure/pressure.c ****  Internal procedures 
+ 319:../../mod/pressure/pressure.c **** ------------------------------------------------------------------------------*/
+ 320:../../mod/pressure/pressure.c **** 
+ 321:../../mod/pressure/pressure.c **** 
+ 322:../../mod/pressure/pressure.c **** /*******************************************************************************
+ 323:../../mod/pressure/pressure.c **** *                                                                              *
+ 324:../../mod/pressure/pressure.c **** * PROCEDURE:                                                                   * 
+ 325:../../mod/pressure/pressure.c **** * 		amplifer_gain_map                                                      *
+ 326:../../mod/pressure/pressure.c **** *                                                                              *
+ 327:../../mod/pressure/pressure.c **** * DESCRIPTION:                                                                 * 
+ 328:../../mod/pressure/pressure.c **** *       Mapping from pressure transducer number to amplifer gain GPIO pin      *
+ 329:../../mod/pressure/pressure.c **** *       bitmask. ex. gain setting 128 -> PRESSURE_GAIN7_PIN                    * 
+ 330:../../mod/pressure/pressure.c **** *                                                                              *
+ 331:../../mod/pressure/pressure.c **** *******************************************************************************/
+ 332:../../mod/pressure/pressure.c **** static uint16_t amplifier_gain_map
+ 333:../../mod/pressure/pressure.c **** 	(
+ 334:../../mod/pressure/pressure.c ****     uint8_t gain_setting 
+ 335:../../mod/pressure/pressure.c ****     )
+ 336:../../mod/pressure/pressure.c **** {
+  28              		.loc 1 336 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+ 337:../../mod/pressure/pressure.c **** /* PT gain GPIO pins are consecutively numbered, except GPIO_pin 2. Shift bits
+ 338:../../mod/pressure/pressure.c ****    2-7 up one */
+ 339:../../mod/pressure/pressure.c **** uint16_t gain_setting_16b       = (uint16_t) gain_setting;
+  33              		.loc 1 339 1 view .LVU1
+ 340:../../mod/pressure/pressure.c **** uint16_t gain_setting_low_bits  = gain_setting_16b &   0x0003;
+  34              		.loc 1 340 1 view .LVU2
+  35              		.loc 1 340 10 is_stmt 0 view .LVU3
+  36 0000 00F00303 		and	r3, r0, #3
+  37              	.LVL1:
+ 341:../../mod/pressure/pressure.c **** uint16_t gain_setting_high_bits = gain_setting_16b & (~0x0003);
+  38              		.loc 1 341 1 is_stmt 1 view .LVU4
+ 342:../../mod/pressure/pressure.c **** 
+ 343:../../mod/pressure/pressure.c **** /* Shift and recombine bits */
+ 344:../../mod/pressure/pressure.c **** gain_setting_high_bits = gain_setting_high_bits << 1; 
+  39              		.loc 1 344 1 view .LVU5
+  40              		.loc 1 344 24 is_stmt 0 view .LVU6
+  41 0004 4000     		lsls	r0, r0, #1
+  42              	.LVL2:
+  43              		.loc 1 344 24 view .LVU7
+  44 0006 00F4FC70 		and	r0, r0, #504
+  45              	.LVL3:
+ 345:../../mod/pressure/pressure.c **** return ( gain_setting_high_bits | gain_setting_low_bits );
+  46              		.loc 1 345 1 is_stmt 1 view .LVU8
+ 346:../../mod/pressure/pressure.c **** 
+ 347:../../mod/pressure/pressure.c **** } /* amplifier_gain_map */
+  47              		.loc 1 347 1 is_stmt 0 view .LVU9
+  48 000a 1843     		orrs	r0, r0, r3
+  49              	.LVL4:
+  50              		.loc 1 347 1 view .LVU10
+  51 000c 7047     		bx	lr
+  52              		.cfi_endproc
+  53              	.LFE339:
+ARM GAS  /tmp/ccuy5Pq9.s 			page 8
+
+
+  55              		.section	.text.sample_adc_poll,"ax",%progbits
+  56              		.align	1
+  57              		.syntax unified
+  58              		.thumb
+  59              		.thumb_func
+  61              	sample_adc_poll:
+  62              	.LVL5:
+  63              	.LFB341:
+ 348:../../mod/pressure/pressure.c **** 
+ 349:../../mod/pressure/pressure.c **** 
+ 350:../../mod/pressure/pressure.c **** /*******************************************************************************
+ 351:../../mod/pressure/pressure.c **** *                                                                              *
+ 352:../../mod/pressure/pressure.c **** * PROCEDURE:                                                                   * 
+ 353:../../mod/pressure/pressure.c **** * 		mux_map                                                                *
+ 354:../../mod/pressure/pressure.c **** *                                                                              *
+ 355:../../mod/pressure/pressure.c **** * DESCRIPTION:                                                                 * 
+ 356:../../mod/pressure/pressure.c **** *       Mapping from pressure transducer number to mutliplexor GPIO pin        *
+ 357:../../mod/pressure/pressure.c **** *       bitmask. ex. PTNUM5 -> 101 -> GPIO_PIN_C | GPIO_PIN_A                  * 
+ 358:../../mod/pressure/pressure.c **** *                                                                              *
+ 359:../../mod/pressure/pressure.c **** *******************************************************************************/
+ 360:../../mod/pressure/pressure.c **** static inline uint16_t mux_map
+ 361:../../mod/pressure/pressure.c **** 	(
+ 362:../../mod/pressure/pressure.c ****     PRESSURE_PT_NUM    pt_num    
+ 363:../../mod/pressure/pressure.c ****     )
+ 364:../../mod/pressure/pressure.c **** {
+ 365:../../mod/pressure/pressure.c **** /* Mux pins are adjacent and from the same port. Just shift the ptnum bits up
+ 366:../../mod/pressure/pressure.c ****    to create the bitmask */
+ 367:../../mod/pressure/pressure.c **** return ( (uint16_t) pt_num) << PT_MUX_BITMASK_SHIFT; 
+ 368:../../mod/pressure/pressure.c **** 
+ 369:../../mod/pressure/pressure.c **** } /* mux_map */
+ 370:../../mod/pressure/pressure.c **** 
+ 371:../../mod/pressure/pressure.c **** 
+ 372:../../mod/pressure/pressure.c **** /*******************************************************************************
+ 373:../../mod/pressure/pressure.c **** *                                                                              *
+ 374:../../mod/pressure/pressure.c **** * PROCEDURE:                                                                   * 
+ 375:../../mod/pressure/pressure.c **** * 		sample_adc_poll                                                        *
+ 376:../../mod/pressure/pressure.c **** *                                                                              *
+ 377:../../mod/pressure/pressure.c **** * DESCRIPTION:                                                                 * 
+ 378:../../mod/pressure/pressure.c **** *       Sample the pressure transducer ADC a specified number of times in      *
+ 379:../../mod/pressure/pressure.c **** *       polling mode                                                           *
+ 380:../../mod/pressure/pressure.c **** *                                                                              *
+ 381:../../mod/pressure/pressure.c **** *******************************************************************************/
+ 382:../../mod/pressure/pressure.c **** static PRESSURE_STATUS sample_adc_poll
+ 383:../../mod/pressure/pressure.c **** 	(
+ 384:../../mod/pressure/pressure.c ****     uint16_t    num_samples,
+ 385:../../mod/pressure/pressure.c ****     uint32_t*   psample_buffer
+ 386:../../mod/pressure/pressure.c ****     )
+ 387:../../mod/pressure/pressure.c **** {
+  64              		.loc 1 387 1 is_stmt 1 view -0
+  65              		.cfi_startproc
+  66              		@ args = 0, pretend = 0, frame = 0
+  67              		@ frame_needed = 0, uses_anonymous_args = 0
+  68              		.loc 1 387 1 is_stmt 0 view .LVU12
+  69 0000 70B5     		push	{r4, r5, r6, lr}
+  70              	.LCFI0:
+  71              		.cfi_def_cfa_offset 16
+  72              		.cfi_offset 4, -16
+ARM GAS  /tmp/ccuy5Pq9.s 			page 9
+
+
+  73              		.cfi_offset 5, -12
+  74              		.cfi_offset 6, -8
+  75              		.cfi_offset 14, -4
+  76 0002 0546     		mov	r5, r0
+  77 0004 0E46     		mov	r6, r1
+ 388:../../mod/pressure/pressure.c **** /* Conversion status indicator */
+ 389:../../mod/pressure/pressure.c **** HAL_StatusTypeDef adc_status;
+  78              		.loc 1 389 1 is_stmt 1 view .LVU13
+ 390:../../mod/pressure/pressure.c **** 
+ 391:../../mod/pressure/pressure.c **** /* Start the ADC */
+ 392:../../mod/pressure/pressure.c **** HAL_ADC_Start( &( PRESS_ADC ) );
+  79              		.loc 1 392 1 view .LVU14
+  80 0006 0F48     		ldr	r0, .L11
+  81              	.LVL6:
+  82              		.loc 1 392 1 is_stmt 0 view .LVU15
+  83 0008 FFF7FEFF 		bl	HAL_ADC_Start
+  84              	.LVL7:
+ 393:../../mod/pressure/pressure.c **** 
+ 394:../../mod/pressure/pressure.c **** /* Poll ADC */
+ 395:../../mod/pressure/pressure.c **** for ( int i = 0; i < num_samples; ++i )
+  85              		.loc 1 395 1 is_stmt 1 view .LVU16
+  86              	.LBB9:
+  87              		.loc 1 395 7 view .LVU17
+  88              		.loc 1 395 11 is_stmt 0 view .LVU18
+  89 000c 0024     		movs	r4, #0
+  90              		.loc 1 395 1 view .LVU19
+  91 000e 05E0     		b	.L3
+  92              	.LVL8:
+  93              	.L10:
+ 396:../../mod/pressure/pressure.c **** 	{
+ 397:../../mod/pressure/pressure.c **** 	/* Wait for end of conversion */
+ 398:../../mod/pressure/pressure.c ****     adc_status = HAL_ADC_PollForConversion( &( PRESS_ADC ), ADC_TIMEOUT );
+ 399:../../mod/pressure/pressure.c ****     if      ( adc_status == HAL_TIMEOUT )
+ 400:../../mod/pressure/pressure.c **** 		{
+ 401:../../mod/pressure/pressure.c ****         return PRESSURE_ADC_TIMEOUT;
+ 402:../../mod/pressure/pressure.c ****         }
+ 403:../../mod/pressure/pressure.c **** 	else if ( adc_status != HAL_OK      )
+ 404:../../mod/pressure/pressure.c **** 		{
+ 405:../../mod/pressure/pressure.c ****         return PRESSURE_ADC_POLL_ERROR;
+ 406:../../mod/pressure/pressure.c ****         }
+ 407:../../mod/pressure/pressure.c **** 	else /* No error */
+ 408:../../mod/pressure/pressure.c **** 		{
+ 409:../../mod/pressure/pressure.c **** 		/* Read the ADC value */
+ 410:../../mod/pressure/pressure.c **** 		*(psample_buffer + i) = HAL_ADC_GetValue( &( PRESS_ADC ) ); 
+  94              		.loc 1 410 3 is_stmt 1 discriminator 2 view .LVU20
+  95              		.loc 1 410 27 is_stmt 0 discriminator 2 view .LVU21
+  96 0010 0C48     		ldr	r0, .L11
+  97              	.LVL9:
+  98              		.loc 1 410 27 discriminator 2 view .LVU22
+  99 0012 FFF7FEFF 		bl	HAL_ADC_GetValue
+ 100              	.LVL10:
+ 101              		.loc 1 410 25 discriminator 2 view .LVU23
+ 102 0016 46F82400 		str	r0, [r6, r4, lsl #2]
+ 395:../../mod/pressure/pressure.c **** 	{
+ 103              		.loc 1 395 35 is_stmt 1 discriminator 2 view .LVU24
+ 104 001a 0134     		adds	r4, r4, #1
+ 105              	.LVL11:
+ARM GAS  /tmp/ccuy5Pq9.s 			page 10
+
+
+ 106              	.L3:
+ 395:../../mod/pressure/pressure.c **** 	{
+ 107              		.loc 1 395 20 discriminator 1 view .LVU25
+ 108 001c A542     		cmp	r5, r4
+ 109 001e 09DD     		ble	.L9
+ 398:../../mod/pressure/pressure.c ****     if      ( adc_status == HAL_TIMEOUT )
+ 110              		.loc 1 398 5 view .LVU26
+ 398:../../mod/pressure/pressure.c ****     if      ( adc_status == HAL_TIMEOUT )
+ 111              		.loc 1 398 18 is_stmt 0 view .LVU27
+ 112 0020 6421     		movs	r1, #100
+ 113 0022 0848     		ldr	r0, .L11
+ 114 0024 FFF7FEFF 		bl	HAL_ADC_PollForConversion
+ 115              	.LVL12:
+ 399:../../mod/pressure/pressure.c **** 		{
+ 116              		.loc 1 399 5 is_stmt 1 view .LVU28
+ 399:../../mod/pressure/pressure.c **** 		{
+ 117              		.loc 1 399 13 is_stmt 0 view .LVU29
+ 118 0028 0328     		cmp	r0, #3
+ 119 002a 08D0     		beq	.L6
+ 403:../../mod/pressure/pressure.c **** 		{
+ 120              		.loc 1 403 7 is_stmt 1 view .LVU30
+ 403:../../mod/pressure/pressure.c **** 		{
+ 121              		.loc 1 403 10 is_stmt 0 view .LVU31
+ 122 002c 0028     		cmp	r0, #0
+ 123 002e EFD0     		beq	.L10
+ 405:../../mod/pressure/pressure.c ****         }
+ 124              		.loc 1 405 16 view .LVU32
+ 125 0030 0220     		movs	r0, #2
+ 126              	.LVL13:
+ 405:../../mod/pressure/pressure.c ****         }
+ 127              		.loc 1 405 16 view .LVU33
+ 128 0032 03E0     		b	.L4
+ 129              	.LVL14:
+ 130              	.L9:
+ 405:../../mod/pressure/pressure.c ****         }
+ 131              		.loc 1 405 16 view .LVU34
+ 132              	.LBE9:
+ 411:../../mod/pressure/pressure.c ****         }
+ 412:../../mod/pressure/pressure.c ****     }
+ 413:../../mod/pressure/pressure.c **** 
+ 414:../../mod/pressure/pressure.c **** /* Stop the ADC */
+ 415:../../mod/pressure/pressure.c **** HAL_ADC_Stop( &( PRESS_ADC ) );
+ 133              		.loc 1 415 1 is_stmt 1 view .LVU35
+ 134 0034 0348     		ldr	r0, .L11
+ 135 0036 FFF7FEFF 		bl	HAL_ADC_Stop
+ 136              	.LVL15:
+ 416:../../mod/pressure/pressure.c **** 
+ 417:../../mod/pressure/pressure.c **** /* Conversion successful */
+ 418:../../mod/pressure/pressure.c **** return PRESSURE_OK;
+ 137              		.loc 1 418 1 view .LVU36
+ 138              		.loc 1 418 8 is_stmt 0 view .LVU37
+ 139 003a 0020     		movs	r0, #0
+ 140              	.L4:
+ 419:../../mod/pressure/pressure.c **** 
+ 420:../../mod/pressure/pressure.c **** } /* sample_adc_poll */
+ 141              		.loc 1 420 1 view .LVU38
+ 142 003c 70BD     		pop	{r4, r5, r6, pc}
+ARM GAS  /tmp/ccuy5Pq9.s 			page 11
+
+
+ 143              	.LVL16:
+ 144              	.L6:
+ 145              	.LBB10:
+ 401:../../mod/pressure/pressure.c ****         }
+ 146              		.loc 1 401 16 view .LVU39
+ 147 003e 0120     		movs	r0, #1
+ 148              	.LVL17:
+ 401:../../mod/pressure/pressure.c ****         }
+ 149              		.loc 1 401 16 view .LVU40
+ 150 0040 FCE7     		b	.L4
+ 151              	.L12:
+ 152 0042 00BF     		.align	2
+ 153              	.L11:
+ 154 0044 00000000 		.word	hadc1
+ 155              	.LBE10:
+ 156              		.cfi_endproc
+ 157              	.LFE341:
+ 159              		.section	.text.pressure_get_pt_reading,"ax",%progbits
+ 160              		.align	1
+ 161              		.global	pressure_get_pt_reading
+ 162              		.syntax unified
+ 163              		.thumb
+ 164              		.thumb_func
+ 166              	pressure_get_pt_reading:
+ 167              	.LVL18:
+ 168              	.LFB333:
+  77:../../mod/pressure/pressure.c **** /*------------------------------------------------------------------------------
+ 169              		.loc 1 77 1 is_stmt 1 view -0
+ 170              		.cfi_startproc
+ 171              		@ args = 0, pretend = 0, frame = 8
+ 172              		@ frame_needed = 0, uses_anonymous_args = 0
+  77:../../mod/pressure/pressure.c **** /*------------------------------------------------------------------------------
+ 173              		.loc 1 77 1 is_stmt 0 view .LVU42
+ 174 0000 70B5     		push	{r4, r5, r6, lr}
+ 175              	.LCFI1:
+ 176              		.cfi_def_cfa_offset 16
+ 177              		.cfi_offset 4, -16
+ 178              		.cfi_offset 5, -12
+ 179              		.cfi_offset 6, -8
+ 180              		.cfi_offset 14, -4
+ 181 0002 82B0     		sub	sp, sp, #8
+ 182              	.LCFI2:
+ 183              		.cfi_def_cfa_offset 24
+ 184 0004 0446     		mov	r4, r0
+  81:../../mod/pressure/pressure.c **** uint16_t        mux_GPIO_pins_bitmask;  /* GPIO pins for multiplexor          */
+ 185              		.loc 1 81 1 is_stmt 1 view .LVU43
+  82:../../mod/pressure/pressure.c **** uint32_t        pt_reading;             /* PT reading, return value           */
+ 186              		.loc 1 82 1 view .LVU44
+  83:../../mod/pressure/pressure.c **** PRESSURE_STATUS pt_status_code;         /* Status code from adc conversion    */
+ 187              		.loc 1 83 1 view .LVU45
+  84:../../mod/pressure/pressure.c **** 
+ 188              		.loc 1 84 1 view .LVU46
+  89:../../mod/pressure/pressure.c **** mux_GPIO_pins_bitmask  = mux_map( pt_num );
+ 189              		.loc 1 89 1 view .LVU47
+  89:../../mod/pressure/pressure.c **** mux_GPIO_pins_bitmask  = mux_map( pt_num );
+ 190              		.loc 1 89 26 is_stmt 0 view .LVU48
+ 191 0006 154B     		ldr	r3, .L17
+ARM GAS  /tmp/ccuy5Pq9.s 			page 12
+
+
+ 192 0008 185C     		ldrb	r0, [r3, r0]	@ zero_extendqisi2
+ 193              	.LVL19:
+  89:../../mod/pressure/pressure.c **** mux_GPIO_pins_bitmask  = mux_map( pt_num );
+ 194              		.loc 1 89 26 view .LVU49
+ 195 000a FFF7FEFF 		bl	amplifier_gain_map
+ 196              	.LVL20:
+ 197 000e 0646     		mov	r6, r0
+ 198              	.LVL21:
+  90:../../mod/pressure/pressure.c **** pt_reading             = 0;
+ 199              		.loc 1 90 1 is_stmt 1 view .LVU50
+ 200              	.LBB11:
+ 201              	.LBI11:
+ 360:../../mod/pressure/pressure.c **** 	(
+ 202              		.loc 1 360 24 view .LVU51
+ 203              	.LBB12:
+ 367:../../mod/pressure/pressure.c **** 
+ 204              		.loc 1 367 1 view .LVU52
+ 367:../../mod/pressure/pressure.c **** 
+ 205              		.loc 1 367 29 is_stmt 0 view .LVU53
+ 206 0010 6402     		lsls	r4, r4, #9
+ 207              	.LVL22:
+ 367:../../mod/pressure/pressure.c **** 
+ 208              		.loc 1 367 29 view .LVU54
+ 209 0012 A4B2     		uxth	r4, r4
+ 210              	.LVL23:
+ 367:../../mod/pressure/pressure.c **** 
+ 211              		.loc 1 367 29 view .LVU55
+ 212              	.LBE12:
+ 213              	.LBE11:
+  91:../../mod/pressure/pressure.c **** 
+ 214              		.loc 1 91 1 is_stmt 1 view .LVU56
+  91:../../mod/pressure/pressure.c **** 
+ 215              		.loc 1 91 24 is_stmt 0 view .LVU57
+ 216 0014 0022     		movs	r2, #0
+ 217 0016 0192     		str	r2, [sp, #4]
+  98:../../mod/pressure/pressure.c ****                    PRESSURE_MUX_ALL_PINS |
+ 218              		.loc 1 98 1 is_stmt 1 view .LVU58
+ 219 0018 114D     		ldr	r5, .L17+4
+ 220 001a 40F6FB71 		movw	r1, #4091
+ 221 001e 2846     		mov	r0, r5
+ 222 0020 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 223              	.LVL24:
+ 104:../../mod/pressure/pressure.c ****                    mux_GPIO_pins_bitmask,
+ 224              		.loc 1 104 1 view .LVU59
+ 225 0024 0122     		movs	r2, #1
+ 226 0026 2146     		mov	r1, r4
+ 227 0028 2846     		mov	r0, r5
+ 228 002a FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 229              	.LVL25:
+ 109:../../mod/pressure/pressure.c ****                    gain_GPIO_pins_bitmask,
+ 230              		.loc 1 109 1 view .LVU60
+ 231 002e 0122     		movs	r2, #1
+ 232 0030 3146     		mov	r1, r6
+ 233 0032 2846     		mov	r0, r5
+ 234 0034 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 235              	.LVL26:
+ 116:../../mod/pressure/pressure.c **** if ( pt_status_code != PRESSURE_OK )
+ARM GAS  /tmp/ccuy5Pq9.s 			page 13
+
+
+ 236              		.loc 1 116 1 view .LVU61
+ 116:../../mod/pressure/pressure.c **** if ( pt_status_code != PRESSURE_OK )
+ 237              		.loc 1 116 18 is_stmt 0 view .LVU62
+ 238 0038 01A9     		add	r1, sp, #4
+ 239 003a 0120     		movs	r0, #1
+ 240 003c FFF7FEFF 		bl	sample_adc_poll
+ 241              	.LVL27:
+ 117:../../mod/pressure/pressure.c **** 	{
+ 242              		.loc 1 117 1 is_stmt 1 view .LVU63
+ 117:../../mod/pressure/pressure.c **** 	{
+ 243              		.loc 1 117 4 is_stmt 0 view .LVU64
+ 244 0040 40B9     		cbnz	r0, .L16
+ 245              	.LVL28:
+ 246              	.L14:
+ 127:../../mod/pressure/pressure.c ****                    PRESSURE_MUX_ALL_PINS |
+ 247              		.loc 1 127 1 is_stmt 1 view .LVU65
+ 248 0042 0022     		movs	r2, #0
+ 249 0044 40F6FB71 		movw	r1, #4091
+ 250 0048 0548     		ldr	r0, .L17+4
+ 251 004a FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 252              	.LVL29:
+ 133:../../mod/pressure/pressure.c **** 
+ 253              		.loc 1 133 1 view .LVU66
+ 135:../../mod/pressure/pressure.c **** 
+ 254              		.loc 1 135 1 is_stmt 0 view .LVU67
+ 255 004e 0198     		ldr	r0, [sp, #4]
+ 256 0050 02B0     		add	sp, sp, #8
+ 257              	.LCFI3:
+ 258              		.cfi_remember_state
+ 259              		.cfi_def_cfa_offset 16
+ 260              		@ sp needed
+ 261 0052 70BD     		pop	{r4, r5, r6, pc}
+ 262              	.LVL30:
+ 263              	.L16:
+ 264              	.LCFI4:
+ 265              		.cfi_restore_state
+ 266              	.LBB13:
+ 119:../../mod/pressure/pressure.c ****     }
+ 267              		.loc 1 119 5 is_stmt 1 view .LVU68
+ 268 0054 FFF7FEFF 		bl	Error_Handler
+ 269              	.LVL31:
+ 119:../../mod/pressure/pressure.c ****     }
+ 270              		.loc 1 119 5 is_stmt 0 view .LVU69
+ 271 0058 F3E7     		b	.L14
+ 272              	.L18:
+ 273 005a 00BF     		.align	2
+ 274              	.L17:
+ 275 005c 00000000 		.word	pt_gains
+ 276 0060 000C0258 		.word	1476529152
+ 277              	.LBE13:
+ 278              		.cfi_endproc
+ 279              	.LFE333:
+ 281              		.section	.text.pressure_poll_pts,"ax",%progbits
+ 282              		.align	1
+ 283              		.global	pressure_poll_pts
+ 284              		.syntax unified
+ 285              		.thumb
+ARM GAS  /tmp/ccuy5Pq9.s 			page 14
+
+
+ 286              		.thumb_func
+ 288              	pressure_poll_pts:
+ 289              	.LVL32:
+ 290              	.LFB334:
+ 151:../../mod/pressure/pressure.c **** /*------------------------------------------------------------------------------
+ 291              		.loc 1 151 1 is_stmt 1 view -0
+ 292              		.cfi_startproc
+ 293              		@ args = 0, pretend = 0, frame = 0
+ 294              		@ frame_needed = 0, uses_anonymous_args = 0
+ 151:../../mod/pressure/pressure.c **** /*------------------------------------------------------------------------------
+ 295              		.loc 1 151 1 is_stmt 0 view .LVU71
+ 296 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 297              	.LCFI5:
+ 298              		.cfi_def_cfa_offset 24
+ 299              		.cfi_offset 3, -24
+ 300              		.cfi_offset 4, -20
+ 301              		.cfi_offset 5, -16
+ 302              		.cfi_offset 6, -12
+ 303              		.cfi_offset 7, -8
+ 304              		.cfi_offset 14, -4
+ 305 0002 0746     		mov	r7, r0
+ 155:../../mod/pressure/pressure.c **** uint16_t        mux_GPIO_pins_bitmask;  /* GPIO pins for multiplexor          */
+ 306              		.loc 1 155 1 is_stmt 1 view .LVU72
+ 156:../../mod/pressure/pressure.c **** PRESSURE_STATUS pt_status_code;         /* Status code from adc conversion    */
+ 307              		.loc 1 156 1 view .LVU73
+ 157:../../mod/pressure/pressure.c **** 
+ 308              		.loc 1 157 1 view .LVU74
+ 164:../../mod/pressure/pressure.c **** 				   PRESSURE_MUX_ALL_PINS |
+ 309              		.loc 1 164 1 view .LVU75
+ 310 0004 0022     		movs	r2, #0
+ 311 0006 40F6FB71 		movw	r1, #4091
+ 312 000a 1848     		ldr	r0, .L25
+ 313              	.LVL33:
+ 164:../../mod/pressure/pressure.c **** 				   PRESSURE_MUX_ALL_PINS |
+ 314              		.loc 1 164 1 is_stmt 0 view .LVU76
+ 315 000c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 316              	.LVL34:
+ 173:../../mod/pressure/pressure.c **** 	{
+ 317              		.loc 1 173 1 is_stmt 1 view .LVU77
+ 318              	.LBB14:
+ 173:../../mod/pressure/pressure.c **** 	{
+ 319              		.loc 1 173 7 view .LVU78
+ 173:../../mod/pressure/pressure.c **** 	{
+ 320              		.loc 1 173 15 is_stmt 0 view .LVU79
+ 321 0010 0024     		movs	r4, #0
+ 173:../../mod/pressure/pressure.c **** 	{
+ 322              		.loc 1 173 1 view .LVU80
+ 323 0012 07E0     		b	.L20
+ 324              	.LVL35:
+ 325              	.L21:
+ 208:../../mod/pressure/pressure.c **** 					   PRESSURE_MUX_ALL_PINS |
+ 326              		.loc 1 208 2 is_stmt 1 discriminator 2 view .LVU81
+ 327 0014 0022     		movs	r2, #0
+ 328 0016 40F6FB71 		movw	r1, #4091
+ 329 001a 1448     		ldr	r0, .L25
+ 330 001c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 331              	.LVL36:
+ARM GAS  /tmp/ccuy5Pq9.s 			page 15
+
+
+ 173:../../mod/pressure/pressure.c **** 	{
+ 332              		.loc 1 173 35 discriminator 2 view .LVU82
+ 333 0020 0134     		adds	r4, r4, #1
+ 334              	.LVL37:
+ 173:../../mod/pressure/pressure.c **** 	{
+ 335              		.loc 1 173 35 is_stmt 0 discriminator 2 view .LVU83
+ 336 0022 E4B2     		uxtb	r4, r4
+ 337              	.LVL38:
+ 338              	.L20:
+ 173:../../mod/pressure/pressure.c **** 	{
+ 339              		.loc 1 173 24 is_stmt 1 discriminator 1 view .LVU84
+ 340 0024 072C     		cmp	r4, #7
+ 341 0026 1ED8     		bhi	.L24
+ 180:../../mod/pressure/pressure.c **** 	mux_GPIO_pins_bitmask  = mux_map( i );
+ 342              		.loc 1 180 2 view .LVU85
+ 180:../../mod/pressure/pressure.c **** 	mux_GPIO_pins_bitmask  = mux_map( i );
+ 343              		.loc 1 180 27 is_stmt 0 view .LVU86
+ 344 0028 114B     		ldr	r3, .L25+4
+ 345 002a 185D     		ldrb	r0, [r3, r4]	@ zero_extendqisi2
+ 346 002c FFF7FEFF 		bl	amplifier_gain_map
+ 347              	.LVL39:
+ 348 0030 0546     		mov	r5, r0
+ 349              	.LVL40:
+ 181:../../mod/pressure/pressure.c **** 
+ 350              		.loc 1 181 2 is_stmt 1 view .LVU87
+ 351              	.LBB15:
+ 352              	.LBI15:
+ 360:../../mod/pressure/pressure.c **** 	(
+ 353              		.loc 1 360 24 view .LVU88
+ 354              	.LBB16:
+ 367:../../mod/pressure/pressure.c **** 
+ 355              		.loc 1 367 1 view .LVU89
+ 367:../../mod/pressure/pressure.c **** 
+ 356              		.loc 1 367 29 is_stmt 0 view .LVU90
+ 357 0032 6102     		lsls	r1, r4, #9
+ 358              	.LVL41:
+ 367:../../mod/pressure/pressure.c **** 
+ 359              		.loc 1 367 29 view .LVU91
+ 360              	.LBE16:
+ 361              	.LBE15:
+ 184:../../mod/pressure/pressure.c **** 					   mux_GPIO_pins_bitmask,
+ 362              		.loc 1 184 2 is_stmt 1 view .LVU92
+ 363 0034 0D4E     		ldr	r6, .L25
+ 364 0036 0122     		movs	r2, #1
+ 365 0038 01F47E41 		and	r1, r1, #65024
+ 366 003c 3046     		mov	r0, r6
+ 367 003e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 368              	.LVL42:
+ 189:../../mod/pressure/pressure.c **** 					   gain_GPIO_pins_bitmask,
+ 369              		.loc 1 189 2 view .LVU93
+ 370 0042 0122     		movs	r2, #1
+ 371 0044 2946     		mov	r1, r5
+ 372 0046 3046     		mov	r0, r6
+ 373 0048 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 374              	.LVL43:
+ 192:../../mod/pressure/pressure.c **** 
+ 375              		.loc 1 192 5 view .LVU94
+ARM GAS  /tmp/ccuy5Pq9.s 			page 16
+
+
+ 376 004c 0120     		movs	r0, #1
+ 377 004e FFF7FEFF 		bl	HAL_Delay
+ 378              	.LVL44:
+ 197:../../mod/pressure/pressure.c **** 	if ( pt_status_code != PRESSURE_OK )
+ 379              		.loc 1 197 2 view .LVU95
+ 197:../../mod/pressure/pressure.c **** 	if ( pt_status_code != PRESSURE_OK )
+ 380              		.loc 1 197 19 is_stmt 0 view .LVU96
+ 381 0052 07EB8401 		add	r1, r7, r4, lsl #2
+ 382 0056 0120     		movs	r0, #1
+ 383 0058 FFF7FEFF 		bl	sample_adc_poll
+ 384              	.LVL45:
+ 198:../../mod/pressure/pressure.c **** 		{
+ 385              		.loc 1 198 2 is_stmt 1 view .LVU97
+ 198:../../mod/pressure/pressure.c **** 		{
+ 386              		.loc 1 198 5 is_stmt 0 view .LVU98
+ 387 005c 0028     		cmp	r0, #0
+ 388 005e D9D0     		beq	.L21
+ 389              	.LBB17:
+ 200:../../mod/pressure/pressure.c **** 		}
+ 390              		.loc 1 200 3 is_stmt 1 view .LVU99
+ 391 0060 FFF7FEFF 		bl	Error_Handler
+ 392              	.LVL46:
+ 200:../../mod/pressure/pressure.c **** 		}
+ 393              		.loc 1 200 3 is_stmt 0 view .LVU100
+ 394 0064 D6E7     		b	.L21
+ 395              	.LVL47:
+ 396              	.L24:
+ 200:../../mod/pressure/pressure.c **** 		}
+ 397              		.loc 1 200 3 view .LVU101
+ 398              	.LBE17:
+ 399              	.LBE14:
+ 216:../../mod/pressure/pressure.c **** 
+ 400              		.loc 1 216 1 is_stmt 1 view .LVU102
+ 218:../../mod/pressure/pressure.c **** 
+ 401              		.loc 1 218 1 is_stmt 0 view .LVU103
+ 402 0066 0020     		movs	r0, #0
+ 403 0068 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 404              	.LVL48:
+ 405              	.L26:
+ 218:../../mod/pressure/pressure.c **** 
+ 406              		.loc 1 218 1 view .LVU104
+ 407 006a 00BF     		.align	2
+ 408              	.L25:
+ 409 006c 000C0258 		.word	1476529152
+ 410 0070 00000000 		.word	pt_gains
+ 411              		.cfi_endproc
+ 412              	.LFE334:
+ 414              		.section	.text.pressure_set_gain,"ax",%progbits
+ 415              		.align	1
+ 416              		.global	pressure_set_gain
+ 417              		.syntax unified
+ 418              		.thumb
+ 419              		.thumb_func
+ 421              	pressure_set_gain:
+ 422              	.LVL49:
+ 423              	.LFB335:
+ 235:../../mod/pressure/pressure.c **** 
+ARM GAS  /tmp/ccuy5Pq9.s 			page 17
+
+
+ 424              		.loc 1 235 1 is_stmt 1 view -0
+ 425              		.cfi_startproc
+ 426              		@ args = 0, pretend = 0, frame = 0
+ 427              		@ frame_needed = 0, uses_anonymous_args = 0
+ 428              		@ link register save eliminated.
+ 240:../../mod/pressure/pressure.c **** 
+ 429              		.loc 1 240 1 view .LVU106
+ 240:../../mod/pressure/pressure.c **** 
+ 430              		.loc 1 240 20 is_stmt 0 view .LVU107
+ 431 0000 014B     		ldr	r3, .L28
+ 432 0002 1954     		strb	r1, [r3, r0]
+ 242:../../mod/pressure/pressure.c **** 
+ 433              		.loc 1 242 1 view .LVU108
+ 434 0004 7047     		bx	lr
+ 435              	.L29:
+ 436 0006 00BF     		.align	2
+ 437              	.L28:
+ 438 0008 00000000 		.word	pt_gains
+ 439              		.cfi_endproc
+ 440              	.LFE335:
+ 442              		.section	.text.pressure_set_all_gains,"ax",%progbits
+ 443              		.align	1
+ 444              		.global	pressure_set_all_gains
+ 445              		.syntax unified
+ 446              		.thumb
+ 447              		.thumb_func
+ 449              	pressure_set_all_gains:
+ 450              	.LVL50:
+ 451              	.LFB336:
+ 258:../../mod/pressure/pressure.c **** 
+ 452              		.loc 1 258 1 is_stmt 1 view -0
+ 453              		.cfi_startproc
+ 454              		@ args = 0, pretend = 0, frame = 0
+ 455              		@ frame_needed = 0, uses_anonymous_args = 0
+ 456              		@ link register save eliminated.
+ 261:../../mod/pressure/pressure.c **** 	{
+ 457              		.loc 1 261 1 view .LVU110
+ 458              	.LBB18:
+ 261:../../mod/pressure/pressure.c **** 	{
+ 459              		.loc 1 261 7 view .LVU111
+ 261:../../mod/pressure/pressure.c **** 	{
+ 460              		.loc 1 261 11 is_stmt 0 view .LVU112
+ 461 0000 0023     		movs	r3, #0
+ 261:../../mod/pressure/pressure.c **** 	{
+ 462              		.loc 1 261 1 view .LVU113
+ 463 0002 03E0     		b	.L31
+ 464              	.LVL51:
+ 465              	.L32:
+ 264:../../mod/pressure/pressure.c ****     }
+ 466              		.loc 1 264 5 is_stmt 1 discriminator 3 view .LVU114
+ 264:../../mod/pressure/pressure.c ****     }
+ 467              		.loc 1 264 24 is_stmt 0 discriminator 3 view .LVU115
+ 468 0004 C15C     		ldrb	r1, [r0, r3]	@ zero_extendqisi2
+ 264:../../mod/pressure/pressure.c ****     }
+ 469              		.loc 1 264 17 discriminator 3 view .LVU116
+ 470 0006 034A     		ldr	r2, .L33
+ 471 0008 D154     		strb	r1, [r2, r3]
+ARM GAS  /tmp/ccuy5Pq9.s 			page 18
+
+
+ 261:../../mod/pressure/pressure.c **** 	{
+ 472              		.loc 1 261 31 is_stmt 1 discriminator 3 view .LVU117
+ 473 000a 0133     		adds	r3, r3, #1
+ 474              	.LVL52:
+ 475              	.L31:
+ 261:../../mod/pressure/pressure.c **** 	{
+ 476              		.loc 1 261 20 discriminator 1 view .LVU118
+ 477 000c 072B     		cmp	r3, #7
+ 478 000e F9DD     		ble	.L32
+ 479              	.LBE18:
+ 267:../../mod/pressure/pressure.c **** 
+ 480              		.loc 1 267 1 is_stmt 0 view .LVU119
+ 481 0010 7047     		bx	lr
+ 482              	.L34:
+ 483 0012 00BF     		.align	2
+ 484              	.L33:
+ 485 0014 00000000 		.word	pt_gains
+ 486              		.cfi_endproc
+ 487              	.LFE336:
+ 489              		.section	.text.pressure_get_gain,"ax",%progbits
+ 490              		.align	1
+ 491              		.global	pressure_get_gain
+ 492              		.syntax unified
+ 493              		.thumb
+ 494              		.thumb_func
+ 496              	pressure_get_gain:
+ 497              	.LVL53:
+ 498              	.LFB337:
+ 283:../../mod/pressure/pressure.c **** 
+ 499              		.loc 1 283 1 is_stmt 1 view -0
+ 500              		.cfi_startproc
+ 501              		@ args = 0, pretend = 0, frame = 0
+ 502              		@ frame_needed = 0, uses_anonymous_args = 0
+ 503              		@ link register save eliminated.
+ 287:../../mod/pressure/pressure.c **** 
+ 504              		.loc 1 287 1 view .LVU121
+ 289:../../mod/pressure/pressure.c **** 
+ 505              		.loc 1 289 1 is_stmt 0 view .LVU122
+ 506 0000 014B     		ldr	r3, .L36
+ 507 0002 185C     		ldrb	r0, [r3, r0]	@ zero_extendqisi2
+ 508              	.LVL54:
+ 289:../../mod/pressure/pressure.c **** 
+ 509              		.loc 1 289 1 view .LVU123
+ 510 0004 7047     		bx	lr
+ 511              	.L37:
+ 512 0006 00BF     		.align	2
+ 513              	.L36:
+ 514 0008 00000000 		.word	pt_gains
+ 515              		.cfi_endproc
+ 516              	.LFE337:
+ 518              		.section	.text.pressure_get_all_gains,"ax",%progbits
+ 519              		.align	1
+ 520              		.global	pressure_get_all_gains
+ 521              		.syntax unified
+ 522              		.thumb
+ 523              		.thumb_func
+ 525              	pressure_get_all_gains:
+ARM GAS  /tmp/ccuy5Pq9.s 			page 19
+
+
+ 526              	.LVL55:
+ 527              	.LFB338:
+ 305:../../mod/pressure/pressure.c **** 
+ 528              		.loc 1 305 1 is_stmt 1 view -0
+ 529              		.cfi_startproc
+ 530              		@ args = 0, pretend = 0, frame = 0
+ 531              		@ frame_needed = 0, uses_anonymous_args = 0
+ 532              		@ link register save eliminated.
+ 308:../../mod/pressure/pressure.c **** 	{
+ 533              		.loc 1 308 1 view .LVU125
+ 534              	.LBB19:
+ 308:../../mod/pressure/pressure.c **** 	{
+ 535              		.loc 1 308 7 view .LVU126
+ 308:../../mod/pressure/pressure.c **** 	{
+ 536              		.loc 1 308 11 is_stmt 0 view .LVU127
+ 537 0000 0023     		movs	r3, #0
+ 308:../../mod/pressure/pressure.c **** 	{
+ 538              		.loc 1 308 1 view .LVU128
+ 539 0002 03E0     		b	.L39
+ 540              	.LVL56:
+ 541              	.L40:
+ 311:../../mod/pressure/pressure.c ****     }
+ 542              		.loc 1 311 5 is_stmt 1 discriminator 3 view .LVU129
+ 311:../../mod/pressure/pressure.c ****     }
+ 543              		.loc 1 311 31 is_stmt 0 discriminator 3 view .LVU130
+ 544 0004 034A     		ldr	r2, .L41
+ 545 0006 D25C     		ldrb	r2, [r2, r3]	@ zero_extendqisi2
+ 311:../../mod/pressure/pressure.c ****     }
+ 546              		.loc 1 311 21 discriminator 3 view .LVU131
+ 547 0008 C254     		strb	r2, [r0, r3]
+ 308:../../mod/pressure/pressure.c **** 	{
+ 548              		.loc 1 308 31 is_stmt 1 discriminator 3 view .LVU132
+ 549 000a 0133     		adds	r3, r3, #1
+ 550              	.LVL57:
+ 551              	.L39:
+ 308:../../mod/pressure/pressure.c **** 	{
+ 552              		.loc 1 308 20 discriminator 1 view .LVU133
+ 553 000c 072B     		cmp	r3, #7
+ 554 000e F9DD     		ble	.L40
+ 555              	.LBE19:
+ 314:../../mod/pressure/pressure.c **** 
+ 556              		.loc 1 314 1 is_stmt 0 view .LVU134
+ 557 0010 7047     		bx	lr
+ 558              	.L42:
+ 559 0012 00BF     		.align	2
+ 560              	.L41:
+ 561 0014 00000000 		.word	pt_gains
+ 562              		.cfi_endproc
+ 563              	.LFE338:
+ 565              		.section	.bss.pt_gains,"aw",%nobits
+ 566              		.align	2
+ 569              	pt_gains:
+ 570 0000 00000000 		.space	8
+ 570      00000000 
+ 571              		.text
+ 572              	.Letext0:
+ 573              		.file 2 "/usr/arm-none-eabi/include/machine/_default_types.h"
+ARM GAS  /tmp/ccuy5Pq9.s 			page 20
+
+
+ 574              		.file 3 "/usr/arm-none-eabi/include/sys/_stdint.h"
+ 575              		.file 4 "../../lib/Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h750xx.h"
+ 576              		.file 5 "../../lib/Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h7xx.h"
+ 577              		.file 6 "../../lib/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h"
+ 578              		.file 7 "../../lib/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_gpio.h"
+ 579              		.file 8 "../../lib/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma.h"
+ 580              		.file 9 "../../lib/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_adc.h"
+ 581              		.file 10 "../../mod/pressure/pressure.h"
+ 582              		.file 11 "../../lib/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h"
+ 583              		.file 12 "../../lib/sdr_pin_defines_L0002.h"
+ARM GAS  /tmp/ccuy5Pq9.s 			page 21
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 pressure.c
+     /tmp/ccuy5Pq9.s:20     .text.amplifier_gain_map:0000000000000000 $t
+     /tmp/ccuy5Pq9.s:25     .text.amplifier_gain_map:0000000000000000 amplifier_gain_map
+     /tmp/ccuy5Pq9.s:56     .text.sample_adc_poll:0000000000000000 $t
+     /tmp/ccuy5Pq9.s:61     .text.sample_adc_poll:0000000000000000 sample_adc_poll
+     /tmp/ccuy5Pq9.s:154    .text.sample_adc_poll:0000000000000044 $d
+     /tmp/ccuy5Pq9.s:160    .text.pressure_get_pt_reading:0000000000000000 $t
+     /tmp/ccuy5Pq9.s:166    .text.pressure_get_pt_reading:0000000000000000 pressure_get_pt_reading
+     /tmp/ccuy5Pq9.s:275    .text.pressure_get_pt_reading:000000000000005c $d
+     /tmp/ccuy5Pq9.s:569    .bss.pt_gains:0000000000000000 pt_gains
+     /tmp/ccuy5Pq9.s:282    .text.pressure_poll_pts:0000000000000000 $t
+     /tmp/ccuy5Pq9.s:288    .text.pressure_poll_pts:0000000000000000 pressure_poll_pts
+     /tmp/ccuy5Pq9.s:409    .text.pressure_poll_pts:000000000000006c $d
+     /tmp/ccuy5Pq9.s:415    .text.pressure_set_gain:0000000000000000 $t
+     /tmp/ccuy5Pq9.s:421    .text.pressure_set_gain:0000000000000000 pressure_set_gain
+     /tmp/ccuy5Pq9.s:438    .text.pressure_set_gain:0000000000000008 $d
+     /tmp/ccuy5Pq9.s:443    .text.pressure_set_all_gains:0000000000000000 $t
+     /tmp/ccuy5Pq9.s:449    .text.pressure_set_all_gains:0000000000000000 pressure_set_all_gains
+     /tmp/ccuy5Pq9.s:485    .text.pressure_set_all_gains:0000000000000014 $d
+     /tmp/ccuy5Pq9.s:490    .text.pressure_get_gain:0000000000000000 $t
+     /tmp/ccuy5Pq9.s:496    .text.pressure_get_gain:0000000000000000 pressure_get_gain
+     /tmp/ccuy5Pq9.s:514    .text.pressure_get_gain:0000000000000008 $d
+     /tmp/ccuy5Pq9.s:519    .text.pressure_get_all_gains:0000000000000000 $t
+     /tmp/ccuy5Pq9.s:525    .text.pressure_get_all_gains:0000000000000000 pressure_get_all_gains
+     /tmp/ccuy5Pq9.s:561    .text.pressure_get_all_gains:0000000000000014 $d
+     /tmp/ccuy5Pq9.s:566    .bss.pt_gains:0000000000000000 $d
+
+UNDEFINED SYMBOLS
+HAL_ADC_Start
+HAL_ADC_GetValue
+HAL_ADC_PollForConversion
+HAL_ADC_Stop
+hadc1
+HAL_GPIO_WritePin
+Error_Handler
+HAL_Delay
