@@ -11,13 +11,13 @@
 
 
 /*------------------------------------------------------------------------------
- Standard Includes                                                                     
+ Standard Includes                                                              
 ------------------------------------------------------------------------------*/
 #include <stdbool.h>
 
 
 /*------------------------------------------------------------------------------
- Project Includes                                                                     
+ Project Includes                                                              
 ------------------------------------------------------------------------------*/
 
 /* Application Layer */
@@ -75,6 +75,9 @@ THERMO_CONFIG thermo_config;    /* Thermocouple configuration settings        */
 FLASH_STATUS  flash_status;     /* Status of flash operations                 */
 THERMO_STATUS thermo_status;    /* Thermocouple status code                   */
 
+/* Hotfire state */
+FSM_STATE     fsm_state;        /* Finite State Machine state variable        */
+
 
 /*------------------------------------------------------------------------------
  MCU Initialization                                                                  
@@ -119,6 +122,9 @@ thermo_config.status               = 0;
 flash_status                       = FLASH_OK;
 thermo_status                      = THERMO_OK;
 
+/* Finite State Machine */
+fsm_state                         = FSM_INIT_STATE;
+
 
 /*------------------------------------------------------------------------------
  External Hardware Initializations 
@@ -152,11 +158,93 @@ led_set_color( LED_GREEN );
 /* Calibrate the main propellant valves */
 /* Reset solenoid positions             */
 
+/* Enter the READY state                */
+fsm_state = FSM_READY_STATE;
+
 /*------------------------------------------------------------------------------
- Event Loop                                                                  
+ Hotfire Sequencing 
 ------------------------------------------------------------------------------*/
+
+/* Nominal Sequence: READY > PRE-FIRE PURGE > FILL-CHILL > STANDBY >
+                     FIRE  > DISARM         > POST-FLIGHT 
+   Failure Contingencies : FILL_CHILL > MANUAL
+                           FIRE       > ABORT 
+						   DISARM     > MANUAL */
 while (1)
 	{
+	/* Run the current state */
+	switch ( fsm_state )
+		{
+		/* READY state */
+		case FSM_READY_STATE:
+			{
+			fsm_state = run_ready_state();
+			break;
+			} /* case FSM_READY_STATE */
+		
+		/* PRE-FIRE PURGE state */
+		case FSM_PRE_FIRE_PURGE_STATE:
+			{
+			fsm_state = run_pre_fire_purge_state();
+			break;
+			}
+		
+		/* FILL-CHILL state */
+		case FSM_FILL_CHILL_STATE:
+			{
+			fsm_state = run_fill_chill_state();
+			break;
+			}
+
+		/* STANDBY state */
+		case FSM_STANDBY_STATE:
+			{
+			fsm_state = run_standby_state();
+			break;
+			}
+		
+		/* FIRE state */
+		case FSM_FIRE_STATE:
+			{
+			fsm_state = run_fire_state();
+			break;
+			}
+		
+		/* DISARM state */
+		case FSM_DISARM_STATE:
+			{
+			fsm_state = run_disarm_state();
+			break;
+			}
+		
+		/* POST-FIRE state */
+		case FSM_POST_FIRE_STATE:
+			{
+			fsm_state = run_post_fire_state();
+			break;
+			}
+
+		/* Manual control mode */
+		case FSM_MANUAL_STATE:
+			{
+			fsm_state = run_manual_state();
+			break;
+			}
+
+		/* ABORT state */
+		case FSM_ABORT_STATE:
+			{
+			fsm_state = run_abort_state();
+			break;
+			}
+		
+		/* Invalid state */
+		default:
+			{
+			Error_Handler( ERROR_FSM_INVALID_STATE_ERROR );
+			}
+		
+		} /* case ( fsm_state ) */
 	}
 } /* main */
 

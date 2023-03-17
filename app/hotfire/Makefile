@@ -47,6 +47,15 @@ UTIL_DIR = $(LIB_DIR)/util
 # C sources
 C_SOURCES =                                                          \
 main.c                                                               \
+ready.c                                                              \
+prefire_purge.c                                                      \
+fill_chill.c                                                         \
+standby.c                                                            \
+fire.c                                                               \
+disarm.c                                                             \
+post_fire.c                                                          \
+manual.c                                                             \
+abort_hotfire.c                                                      \
 $(INIT_DIR)/init.c                                                   \
 $(UTIL_DIR)/sdr_error.c                                              \
 $(MOD_DIR)/commands/commands.c                                       \
