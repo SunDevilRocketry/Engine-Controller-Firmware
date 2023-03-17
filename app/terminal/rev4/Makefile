@@ -36,6 +36,9 @@ MOD_DIR = ../../../mod
 # MCU initialization path
 INIT_DIR = ../../../init
 
+# Utitlities path
+UTIL_DIR = $(LIB_DIR)/util
+
 ################################################################
 # source
 ################################################################
@@ -44,6 +47,7 @@ INIT_DIR = ../../../init
 C_SOURCES =                                                          \
 main.c                                                               \
 $(INIT_DIR)/init.c                                                   \
+$(UTIL_DIR)/sdr_error.c                                              \
 $(MOD_DIR)/commands/commands.c                                       \
 $(MOD_DIR)/ignition/ignition.c                                       \
 $(MOD_DIR)/led/led.c                                                 \
@@ -146,6 +150,7 @@ AS_INCLUDES =
 C_INCLUDES =                                           \
 -I.                                                    \
 -I$(INIT_DIR)                                          \
+-I$(UTIL_DIR)                                          \
 -I$(INIT_DIR)/config/Inc                               \
 -I$(LIB_DIR)                                           \
 -I$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Inc          \

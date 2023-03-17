@@ -42,11 +42,6 @@ extern "C" {
 #endif /* SDR_DEBUG */
 
 
-/*------------------------------------------------------------------------------
- Exported functions prototypes                                             
-------------------------------------------------------------------------------*/
-void Error_Handler(void);
-
 #ifdef __cplusplus
 }
 #endif

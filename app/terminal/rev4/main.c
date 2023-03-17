@@ -24,6 +24,7 @@
 #include "main.h"
 #include "sdr_pin_defines_L0002.h"
 #include "init.h"
+#include "sdr_error.h"
 
 /* Low-level modules */
 #include "commands.h"
@@ -135,7 +136,7 @@ valve_status                       = VALVE_OK;
 flash_status = flash_init( &flash_handle );
 if ( flash_status != FLASH_OK )
 	{
-	Error_Handler();
+	Error_Handler( ERROR_FLASH_INIT_ERROR );
 	}
 
 /* Sensor module */
@@ -145,7 +146,7 @@ sensor_init();
 thermo_status = temp_init( &thermo_config );
 if ( thermo_status != THERMO_OK )
 	{
-	Error_Handler();
+	Error_Handler( ERROR_THERMO_INIT_ERROR );
 	}
 
 /* Indicate Successful MCU and Peripheral Hardware Setup */
@@ -201,7 +202,7 @@ while (1)
 				else
 					{
                     /* Error: no subcommand recieved */
-                    Error_Handler();
+                    Error_Handler( ERROR_IGN_CMD_ERROR );
                     }
 
                 /* Return response code to terminal */
@@ -246,7 +247,7 @@ while (1)
 				else
 					{
 					/* Subcommand code not recieved */
-					Error_Handler();
+					Error_Handler( ERROR_FLASH_CMD_ERROR );
 					}
 
 				/* Transmit status code to PC */
@@ -270,7 +271,7 @@ while (1)
 				if ( usb_status != USB_OK )
 					{
                     /* Subcommand not recieved */
-                    Error_Handler();
+                    Error_Handler( ERROR_SENSOR_CMD_ERROR );
                     }
 				else
 					{
@@ -291,7 +292,7 @@ while (1)
 										  HAL_DEFAULT_TIMEOUT );
 				if ( usb_status != USB_OK )
 					{
-					Error_Handler();
+					Error_Handler( ERROR_VALVE_CMD_ERROR );
 					}
 				
 				/* Pass on command and subcommand to valve controller */
@@ -300,14 +301,14 @@ while (1)
 											   HAL_DEFAULT_TIMEOUT );
 				if ( valve_status != VALVE_OK )
 					{
-					Error_Handler();
+					Error_Handler( ERROR_VALVE_CMD_ERROR );
 					}
 				valve_status = valve_transmit( &command         , 
 				                               sizeof( command ),
 											   HAL_DEFAULT_TIMEOUT );
 				if ( valve_status != VALVE_OK )
 					{
-					Error_Handler();
+					Error_Handler( ERROR_VALVE_CMD_ERROR );
 					}
 				break;
 				} /* VALVE_OP */
@@ -318,7 +319,7 @@ while (1)
 			default:
 				{
 				/* Unsupported command code flash the red LED */
-				Error_Handler();
+				//Error_Handler();
 				} /* default */
 			} 
 		} 
@@ -328,24 +329,6 @@ while (1)
 		}
 	}
 } /* main */
-
-
-
-
-/**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
-void Error_Handler(void)
-{
-    /* User can add his own implementation to report the HAL error return state */
-    __disable_irq();
-	led_error_assert();
-    while (1)
-    {
-      /* application hangs when error handler is invoked */
-    }
-}
 
 
 /*******************************************************************************
