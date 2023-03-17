@@ -14,6 +14,7 @@
  Standard Includes                                                              
 ------------------------------------------------------------------------------*/
 #include "main.h"
+#include "sdr_error.h"
 
 
 /*------------------------------------------------------------------------------
@@ -36,11 +37,8 @@ void HAL_MspInit
     void
     )
 {
-
-  __HAL_RCC_SYSCFG_CLK_ENABLE();
-
-  /* System interrupt init*/
-
+__HAL_RCC_SYSCFG_CLK_ENABLE();
+/* System interrupt init*/
 } /* HAL_MspInit */
 
 
@@ -72,9 +70,8 @@ if ( hadc->Instance == ADC1 )
 		}
 	__HAL_RCC_GPIOC_CLK_ENABLE();
 
-	/**ADC1 GPIO Configuration
-	PC0     ------> ADC1_INP10
-	*/
+	/* ADC1 GPIO Configuration
+	PC0     ------> ADC1_INP10 */
 	GPIO_InitStruct.Pin  = GPIO_PIN_0;
 	GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -91,9 +88,8 @@ else if( hadc->Instance == ADC2 )
 		}
 	__HAL_RCC_GPIOC_CLK_ENABLE();
 
-	/**ADC2 GPIO Configuration
-	PC1     ------> ADC2_INP11
-	*/
+	/* ADC2 GPIO Configuration
+	PC1     ------> ADC2_INP11 */
 	GPIO_InitStruct.Pin  = GPIO_PIN_1;
 	GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -127,9 +123,8 @@ if( hadc -> Instance == ADC1 )
 		__HAL_RCC_ADC12_CLK_DISABLE();
 		}
 
-	/**ADC1 GPIO Configuration
-	PC0     ------> ADC1_INP10
-	*/
+	/* ADC1 GPIO Configuration
+	PC0     ------> ADC1_INP10 */
 	HAL_GPIO_DeInit( GPIOC, GPIO_PIN_0 );
 	}
 /* Load Cell ADC Disable */
@@ -142,9 +137,8 @@ else if ( hadc->Instance == ADC2 )
 		__HAL_RCC_ADC12_CLK_DISABLE();
 		}
 
-	/**ADC2 GPIO Configuration
-	PC1     ------> ADC2_INP11
-	*/
+	/* ADC2 GPIO Configuration
+	PC1     ------> ADC2_INP11 */
 	HAL_GPIO_DeInit( GPIOC, GPIO_PIN_1 );
 	}
 
@@ -170,14 +164,14 @@ GPIO_InitTypeDef         GPIO_InitStruct     = {0};
 RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
 
 /* Thermcouple I2C Config */
-if(hi2c->Instance==I2C1)
+if( hi2c->Instance == I2C1 )
 	{
 	/* Initializes the peripherals clock */
 	PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_I2C1;
 	PeriphClkInitStruct.I2c123ClockSelection = RCC_I2C123CLKSOURCE_D2PCLK1;
 	if ( HAL_RCCEx_PeriphCLKConfig( &PeriphClkInitStruct ) != HAL_OK )
 		{
-		Error_Handler();
+		Error_Handler( ERROR_I2C_HAL_MSP_ERROR );
 		}
 	__HAL_RCC_GPIOB_CLK_ENABLE();
 
@@ -261,7 +255,7 @@ if( hspi->Instance == SPI2 )
     PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL3;
     if ( HAL_RCCEx_PeriphCLKConfig( &PeriphClkInitStruct ) != HAL_OK )
 		{
-		Error_Handler();
+		Error_Handler( ERROR_SPI_HAL_MSP_ERROR );
 		}
 
 	/* Peripheral clock enable */
@@ -340,7 +334,7 @@ if ( huart->Instance == UART4 )
 	PeriphClkInitStruct.Usart234578ClockSelection = RCC_USART234578CLKSOURCE_D2PCLK1;
 	if ( HAL_RCCEx_PeriphCLKConfig( &PeriphClkInitStruct ) != HAL_OK )
 		{
-		Error_Handler();
+		Error_Handler( ERROR_UART_HAL_MSP_ERROR );
 		}
 
 	/* Peripheral clock enable */
@@ -355,7 +349,7 @@ if ( huart->Instance == UART4 )
 	GPIO_InitStruct.Pull      = GPIO_NOPULL;
 	GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_LOW;
 	GPIO_InitStruct.Alternate = GPIO_AF8_UART4;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	HAL_GPIO_Init( GPIOA, &GPIO_InitStruct );
 	} /* if ( huart->Instance == UART4 )*/
 
 /* USB UART */
@@ -364,9 +358,9 @@ else if ( huart->Instance == USART1 )
 	/* Initializes the peripherals clock */
 	PeriphClkInitStruct.PeriphClockSelection  = RCC_PERIPHCLK_USART1;
 	PeriphClkInitStruct.Usart16ClockSelection = RCC_USART16CLKSOURCE_D2PCLK2;
-	if ( HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK )
+	if ( HAL_RCCEx_PeriphCLKConfig( &PeriphClkInitStruct ) != HAL_OK )
 		{
-		Error_Handler();
+		Error_Handler( ERROR_UART_HAL_MSP_ERROR );
 		}
 
 	/* Peripheral clock enable */
@@ -392,7 +386,7 @@ else if( huart->Instance == USART2 )
 	PeriphClkInitStruct.Usart234578ClockSelection = RCC_USART234578CLKSOURCE_D2PCLK1;
 	if ( HAL_RCCEx_PeriphCLKConfig( &PeriphClkInitStruct ) != HAL_OK )
 		{
-		Error_Handler();
+		Error_Handler( ERROR_UART_HAL_MSP_ERROR );
 		}
 
 	/* Peripheral clock enable */

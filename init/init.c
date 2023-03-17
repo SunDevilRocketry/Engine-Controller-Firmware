@@ -189,7 +189,7 @@ hadc1.Init.OversamplingMode         = DISABLE;
 /* Call MSPinit function to configure ADC registers */
 if ( HAL_ADC_Init( &hadc1 ) != HAL_OK )
 	{
-	Error_Handler();
+	Error_Handler( ERROR_PT_ADC_INIT_ERROR );
 	}
 else
 	{
@@ -198,9 +198,9 @@ else
 
 /* Configure the ADC multi-mode */
 multimode.Mode = ADC_MODE_INDEPENDENT;
-if (HAL_ADCEx_MultiModeConfigChannel(&hadc1, &multimode) != HAL_OK)
+if ( HAL_ADCEx_MultiModeConfigChannel( &hadc1, &multimode ) != HAL_OK )
 	{
-	Error_Handler();
+	Error_Handler( ERROR_PT_ADC_INIT_ERROR );
 	}
 else
 	{
@@ -215,14 +215,10 @@ sConfig.SingleDiff             = ADC_SINGLE_ENDED;
 sConfig.OffsetNumber           = ADC_OFFSET_NONE;
 sConfig.Offset                 = 0;
 sConfig.OffsetSignedSaturation = DISABLE;
-if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+if ( HAL_ADC_ConfigChannel( &hadc1, &sConfig ) != HAL_OK )
 	{
-	Error_Handler();
+	Error_Handler( ERROR_PT_ADC_INIT_ERROR );
 	}
-else
-	{
-    /* ADC channel configuration okay, do nothing */
-    }
 
 } /* PRESSURE_ADC_Init */
 
@@ -263,7 +259,7 @@ hadc2.Init.LeftBitShift             = ADC_LEFTBITSHIFT_NONE;
 hadc2.Init.OversamplingMode         = DISABLE;
 if ( HAL_ADC_Init( &hadc2 ) != HAL_OK )
 	{
-	Error_Handler();
+	Error_Handler( ERROR_LC_ADC_INIT_ERROR );
 	}
 
 /* Configure Regular Channel */
@@ -276,7 +272,7 @@ sConfig.Offset                      = 0;
 sConfig.OffsetSignedSaturation      = DISABLE;
 if ( HAL_ADC_ConfigChannel( &hadc2, &sConfig ) != HAL_OK )
 	{
-	Error_Handler();
+	Error_Handler( ERROR_LC_ADC_INIT_ERROR );
 	}
 
 } /* LOADCELL_ADC_Init */
@@ -309,19 +305,19 @@ hi2c1.Init.GeneralCallMode  = I2C_GENERALCALL_DISABLE;
 hi2c1.Init.NoStretchMode    = I2C_NOSTRETCH_DISABLE;
 if ( HAL_I2C_Init( &hi2c1 ) != HAL_OK )
 	{
-	Error_Handler();
+	Error_Handler( ERROR_THERMO_I2C_INIT_ERROR );
 	}
 
 /* Configure Analogue filter */
 if ( HAL_I2CEx_ConfigAnalogFilter( &hi2c1, I2C_ANALOGFILTER_ENABLE ) != HAL_OK )
 	{
-	Error_Handler();
+	Error_Handler( ERROR_THERMO_I2C_INIT_ERROR );
 	}
 
 /* Configure Digital filter */
 if ( HAL_I2CEx_ConfigDigitalFilter( &hi2c1, 0 ) != HAL_OK )
 	{
-	Error_Handler();
+	Error_Handler( ERROR_THERMO_I2C_INIT_ERROR );
 	}
 } /* Thermocouple_I2C_Init */
 
@@ -338,7 +334,10 @@ if ( HAL_I2CEx_ConfigDigitalFilter( &hi2c1, 0 ) != HAL_OK )
 *       Uses MCU SPI2 peripheral                                               *
 *                                                                              *
 *******************************************************************************/
-void FLASH_SPI_Init(void)
+void FLASH_SPI_Init
+	(
+	void
+	)
 {
 
 /* SPI2 parameter configuration */
@@ -366,7 +365,7 @@ hspi2.Init.MasterKeepIOState          = SPI_MASTER_KEEP_IO_STATE_DISABLE;
 hspi2.Init.IOSwap                     = SPI_IO_SWAP_DISABLE;
 if ( HAL_SPI_Init( &hspi2 ) != HAL_OK )
 	{
-	Error_Handler();
+	Error_Handler( ERROR_FLASH_SPI_INIT_ERROR );
 	}
 
 } /* FLASH_SPI_Init */
@@ -405,21 +404,21 @@ huart1.Init.ClockPrescaler         = UART_PRESCALER_DIV1;
 huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
 
 /* Write to registers and call error handler if initialization fails */
-if (HAL_UART_Init(&huart1) != HAL_OK)
+if ( HAL_UART_Init( &huart1 ) != HAL_OK )
 	{
-	Error_Handler();
+	Error_Handler( ERROR_USB_UART_INIT_ERROR );
 	}
-if (HAL_UARTEx_SetTxFifoThreshold(&huart1, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
+if ( HAL_UARTEx_SetTxFifoThreshold( &huart1, UART_TXFIFO_THRESHOLD_1_8 ) != HAL_OK )
 	{
-	Error_Handler();
+	Error_Handler( ERROR_USB_UART_INIT_ERROR );
 	}
 if (HAL_UARTEx_SetRxFifoThreshold(&huart1, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
 	{
-	Error_Handler();
+	Error_Handler( ERROR_USB_UART_INIT_ERROR );
 	}
 if (HAL_UARTEx_DisableFifoMode(&huart1) != HAL_OK)
 	{
-	Error_Handler();
+	Error_Handler( ERROR_USB_UART_INIT_ERROR );
 	}
 
 } /* USB_UART_Init */
@@ -456,19 +455,19 @@ huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
 /* Initialize the UART interface */
 if ( HAL_UART_Init( &huart2 ) != HAL_OK )
 	{
-	Error_Handler();
+	Error_Handler( ERROR_VALVE_UART_INIT_ERROR );
 	}
 if ( HAL_UARTEx_SetTxFifoThreshold( &huart2, UART_TXFIFO_THRESHOLD_1_8 ) != HAL_OK )
 	{
-	Error_Handler();
+	Error_Handler( ERROR_VALVE_UART_INIT_ERROR );
 	}
 if ( HAL_UARTEx_SetRxFifoThreshold( &huart2, UART_RXFIFO_THRESHOLD_1_8 ) != HAL_OK )
 	{
-	Error_Handler();
+	Error_Handler( ERROR_VALVE_UART_INIT_ERROR );
 	}
 if ( HAL_UARTEx_DisableFifoMode( &huart2 ) != HAL_OK )
 	{
-	Error_Handler();
+	Error_Handler( ERROR_VALVE_UART_INIT_ERROR );
 	}
 } /* Valve_UART_Init */
 
@@ -504,19 +503,19 @@ huart4.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
 /* Initialize the UART peripheral */
 if ( HAL_UART_Init( &huart4 ) != HAL_OK )
 	{
-	Error_Handler();
+	Error_Handler( ERROR_RF_UART_INIT_ERROR );
 	}
 if ( HAL_UARTEx_SetTxFifoThreshold( &huart4, UART_TXFIFO_THRESHOLD_1_8 ) != HAL_OK )
 	{
-	Error_Handler();
+	Error_Handler( ERROR_RF_UART_INIT_ERROR );
 	}
 if ( HAL_UARTEx_SetRxFifoThreshold( &huart4, UART_RXFIFO_THRESHOLD_1_8 ) != HAL_OK )
 	{
-	Error_Handler();
+	Error_Handler( ERROR_RF_UART_INIT_ERROR );
 	}
 if ( HAL_UARTEx_DisableFifoMode( &huart4 ) != HAL_OK )
 	{
-	Error_Handler();
+	Error_Handler( ERROR_RF_UART_INIT_ERROR );
 	}
 } /* Wireless_UART_Init */
 
