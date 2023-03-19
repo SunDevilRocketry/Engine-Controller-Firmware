@@ -56,6 +56,7 @@ disarm.c                                                             \
 post_fire.c                                                          \
 manual.c                                                             \
 abort_hotfire.c                                                      \
+valve_control.c                                                      \
 $(INIT_DIR)/init.c                                                   \
 $(UTIL_DIR)/sdr_error.c                                              \
 $(MOD_DIR)/commands/commands.c                                       \
@@ -175,6 +176,7 @@ C_INCLUDES =                                           \
 -I$(MOD_DIR)/power                                     \
 -I$(MOD_DIR)/pressure                                  \
 -I$(MOD_DIR)/sensor                                    \
+-I$(MOD_DIR)/solenoid                                  \
 -I$(MOD_DIR)/temp                                      \
 -I$(MOD_DIR)/usb                                       \
 -I$(MOD_DIR)/valve                                     \
