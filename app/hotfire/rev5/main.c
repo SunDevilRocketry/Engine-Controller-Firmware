@@ -46,6 +46,7 @@
 ------------------------------------------------------------------------------*/
 ADC_HandleTypeDef  hadc1;  /* Pressure transducer ADC handle */
 ADC_HandleTypeDef  hadc2;  /* Load cell ADC handle           */
+ADC_HandleTypeDef  hadc3;  /* Pressure transducer 5 ADC handle */
 I2C_HandleTypeDef  hi2c1;  /* Thermocouple I2C handle        */
 SPI_HandleTypeDef  hspi2;  /* Flash SPI handle               */
 UART_HandleTypeDef huart1; /* USB UART handler struct        */
@@ -93,6 +94,7 @@ Valve_UART_Init         (); /* Valve control UART                             */
 Wireless_UART_Init      (); /* Wireless interface UART                        */
 FLASH_SPI_Init          (); /* Flash SPI Bus                                  */
 PRESSURE_ADC_Init       (); /* Pressure transducers ADC                       */
+PRESSURE5_ADC_Init      (); /* Pressure transducers ADC                       */
 LOADCELL_ADC_Init       (); /* Load Cell ADC                                  */
 Thermocouple_I2C_Init   (); /* Thermocouple I2C                               */
 

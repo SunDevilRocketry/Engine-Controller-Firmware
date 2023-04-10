@@ -95,6 +95,17 @@ else if( hadc->Instance == ADC2 )
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init( GPIOC, &GPIO_InitStruct );
 	}
+/* Pressure Transducer 5 ADC Setup -> ADC3 */
+else if( hadc->Instance == ADC3 )
+	{
+	/* Peripheral clock enable */
+	__HAL_RCC_ADC3_CLK_ENABLE();
+	__HAL_RCC_GPIOC_CLK_ENABLE();
+
+	/* ADC3 GPIO Configuration
+	PC2_C     ------> ADC3_INP0 */
+	HAL_SYSCFG_AnalogSwitchConfig( SYSCFG_SWITCH_PC2, SYSCFG_SWITCH_PC2_OPEN );
+	}
 
 } /* HAL_ADC_MspInit */
 
@@ -140,6 +151,12 @@ else if ( hadc->Instance == ADC2 )
 	/* ADC2 GPIO Configuration
 	PC1     ------> ADC2_INP11 */
 	HAL_GPIO_DeInit( GPIOC, GPIO_PIN_1 );
+	}
+/* Pressure Transducer 5 ADC Disable */
+else if( hadc->Instance == ADC3 )
+	{
+	/* Peripheral clock disable */
+	__HAL_RCC_ADC3_CLK_DISABLE();
 	}
 
 } /* HAL_ADC_MspDeInit */
