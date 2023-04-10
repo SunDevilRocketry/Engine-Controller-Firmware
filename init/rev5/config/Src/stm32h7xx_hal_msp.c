@@ -71,8 +71,9 @@ if ( hadc->Instance == ADC1 )
 	__HAL_RCC_GPIOC_CLK_ENABLE();
 
 	/* ADC1 GPIO Configuration
-	PC0     ------> ADC1_INP10 */
-	GPIO_InitStruct.Pin  = GPIO_PIN_0;
+	PC0     ------> ADC1_INP10 
+    PC4     ------> ADC1_INP4 */
+	GPIO_InitStruct.Pin  = GPIO_PIN_0 | GPIO_PIN_0;
 	GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init( GPIOC, &GPIO_InitStruct );
@@ -137,9 +138,11 @@ if( hadc -> Instance == ADC1 )
 		}
 
 	/* ADC1 GPIO Configuration
-	PC0     ------> ADC1_INP10 */
-	HAL_GPIO_DeInit( GPIOC, GPIO_PIN_0 );
+	PC0     ------> ADC1_INP10 
+    PC4     ------> ADC1_INP4  */
+	HAL_GPIO_DeInit( GPIOC, GPIO_PIN_0 | GPIO_PIN_4 );
 	}
+
 /* Load Cell ADC Disable */
 else if ( hadc->Instance == ADC2 )
 	{
@@ -154,7 +157,8 @@ else if ( hadc->Instance == ADC2 )
 	PC1     ------> ADC2_INP11 */
 	HAL_GPIO_DeInit( GPIOC, GPIO_PIN_1 );
 	}
-/* Pressure Transducer 5 ADC Disable */
+
+/* Pressure Transducer 5-6 ADC Disable */
 else if( hadc->Instance == ADC3 )
 	{
 	/* Peripheral clock disable */
