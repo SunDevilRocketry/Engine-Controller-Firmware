@@ -1,12 +1,12 @@
 # --------------------------------------------------------------
-# Terminal Makefile (based on gcc)
+# Hotfire Makefile (based on gcc)
 #
 # --------------------------------------------------------------
 
 ################################################################
 # target
 ################################################################
-TARGET = terminal
+TARGET = hotfire
 
 
 ################################################################
@@ -36,8 +36,9 @@ MOD_DIR = ../../../mod
 # MCU initialization path
 INIT_DIR = ../../../init/rev4
 
-# Utitlities path
+# Utilities path
 UTIL_DIR = $(LIB_DIR)/util
+
 
 ################################################################
 # source
@@ -46,6 +47,16 @@ UTIL_DIR = $(LIB_DIR)/util
 # C sources
 C_SOURCES =                                                          \
 main.c                                                               \
+ready.c                                                              \
+prefire_purge.c                                                      \
+fill_chill.c                                                         \
+standby.c                                                            \
+fire.c                                                               \
+disarm.c                                                             \
+post_fire.c                                                          \
+manual.c                                                             \
+abort_hotfire.c                                                      \
+valve_control.c                                                      \
 $(INIT_DIR)/init.c                                                   \
 $(UTIL_DIR)/sdr_error.c                                              \
 $(MOD_DIR)/commands/commands.c                                       \
@@ -113,6 +124,7 @@ SZ = $(PREFIX)size
 endif
 HEX = $(CP) -O ihex
 BIN = $(CP) -O binary -S
+
  
 ################################################################
 # CFLAGS
@@ -138,7 +150,6 @@ AS_DEFS =
 C_DEFS =            \
 -DUSE_HAL_DRIVER    \
 -DSTM32H750xx       \
--DTERMINAL          \
 -DENGINE_CONTROLLER \
 -DL0002_REV4
 
@@ -150,8 +161,8 @@ AS_INCLUDES =
 C_INCLUDES =                                           \
 -I.                                                    \
 -I$(INIT_DIR)                                          \
--I$(UTIL_DIR)                                          \
 -I$(INIT_DIR)/config/Inc                               \
+-I$(UTIL_DIR)                                          \
 -I$(LIB_DIR)                                           \
 -I$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Inc          \
 -I$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Inc/Legacy   \
@@ -165,6 +176,7 @@ C_INCLUDES =                                           \
 -I$(MOD_DIR)/power                                     \
 -I$(MOD_DIR)/pressure                                  \
 -I$(MOD_DIR)/sensor                                    \
+-I$(MOD_DIR)/solenoid                                  \
 -I$(MOD_DIR)/temp                                      \
 -I$(MOD_DIR)/usb                                       \
 -I$(MOD_DIR)/valve                                     \
