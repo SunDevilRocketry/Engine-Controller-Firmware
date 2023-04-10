@@ -646,28 +646,12 @@ HAL_GPIO_Init(FLASH_HOLD_GPIO_PORT, &GPIO_InitStruct);
 /* Pressure transducer gain and multiplexor pins */
 HAL_GPIO_WritePin      (
                         PRESSURE_GPIO_PORT  , 
-                        PRESSURE_GAIN0_PIN | 
-                        PRESSURE_GAIN1_PIN | 
-                        PRESSURE_GAIN2_PIN | 
-                        PRESSURE_GAIN3_PIN | 
-                        PRESSURE_GAIN4_PIN | 
-                        PRESSURE_GAIN5_PIN | 
-                        PRESSURE_GAIN6_PIN | 
-                        PRESSURE_GAIN7_PIN | 
                         PRESSURE_MUXA_PIN  |
                         PRESSURE_MUXB_PIN  |
                         PRESSURE_MUXC_PIN   , 
                         GPIO_PIN_RESET 
                         );
-GPIO_InitStruct.Pin   = PRESSURE_GAIN0_PIN | 
-                        PRESSURE_GAIN1_PIN | 
-                        PRESSURE_GAIN2_PIN | 
-                        PRESSURE_GAIN3_PIN | 
-                        PRESSURE_GAIN4_PIN | 
-                        PRESSURE_GAIN5_PIN | 
-                        PRESSURE_GAIN6_PIN | 
-                        PRESSURE_GAIN7_PIN | 
-                        PRESSURE_MUXA_PIN  |
+GPIO_InitStruct.Pin   = PRESSURE_MUXA_PIN  |
                         PRESSURE_MUXB_PIN  |
                         PRESSURE_MUXC_PIN;
 GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
