@@ -26,7 +26,7 @@ extern "C" {
  Macros 
 ------------------------------------------------------------------------------*/
 
-#define NUM_SOLENOIDS    ( 6 ) /* Number of solenoids in engine */
+//#define NUM_SOLENOIDS    ( 6 ) /* Number of solenoids in engine */
 
 /* Timeouts */
 #ifndef SDR_DEBUG
