@@ -54,7 +54,7 @@ VALVE_STATUS valve_status;      /* Return codes from valve API  */
 /*------------------------------------------------------------------------------
  Initializations 
 ------------------------------------------------------------------------------*/
-sol_subcommand   = SOL_ON_BASE_CODE; 
+sol_subcommand   = SOL_OPEN_CODE; 
 valve_status     = VALVE_OK;
 sol_tx_buffer[0] = SOL_OP;
 sol_tx_buffer[1] = 0;
@@ -69,12 +69,6 @@ for ( uint8_t i = 0; i < NUM_SOLENOIDS; ++i )
     {
     if ( solenoids & ( 1 << i ) )
         {
-        /* Determine NO/NC status */
-        if ( i >= 2 )
-            {
-            sol_subcommand = SOL_OFF_BASE_CODE;
-            }
-
         /* Set valve number and subcommand */
         sol_tx_buffer[1] = sol_subcommand | i;
 
@@ -117,7 +111,7 @@ VALVE_STATUS valve_status;      /* Return codes from valve API  */
 /*------------------------------------------------------------------------------
  Initializations 
 ------------------------------------------------------------------------------*/
-sol_subcommand   = SOL_OFF_BASE_CODE; 
+sol_subcommand   = SOL_CLOSE_CODE; 
 valve_status     = VALVE_OK;
 sol_tx_buffer[0] = SOL_OP;
 sol_tx_buffer[1] = 0;
@@ -132,12 +126,6 @@ for ( uint8_t i = 0; i < NUM_SOLENOIDS; ++i )
     {
     if ( solenoids & ( 1 << i ) )
         {
-        /* Determine NO/NC status */
-        if ( i >= 2 )
-            {
-            sol_subcommand = SOL_ON_BASE_CODE;
-            }
-
         /* Set valve number and subcommand */
         sol_tx_buffer[1] = sol_subcommand | i;
 

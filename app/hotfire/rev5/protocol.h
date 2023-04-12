@@ -1,0 +1,110 @@
+/*******************************************************************************
+*
+* FILE: 
+* 		protocol.h
+*
+* DESCRIPTION: 
+* 	    Implements a protocol for communicating with the ground station over 
+*       the wireless interface 
+*
+*******************************************************************************/
+
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef PROTOCOL_H 
+#define PROTOCOL_H 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*------------------------------------------------------------------------------
+ Includes                                                              
+------------------------------------------------------------------------------*/
+#include "valve_control.h"
+
+
+/*------------------------------------------------------------------------------
+ Macros 
+------------------------------------------------------------------------------*/
+
+
+/*------------------------------------------------------------------------------
+ Typedefs 
+------------------------------------------------------------------------------*/
+
+/* Return codes */
+typedef enum _PROTOCOL_STATUS
+    {
+    PROTOCOL_OK,      /* Function returned normally */
+    PROTOCOL_TIMEOUT, /* IO layer timeout occured   */
+    PROTOCOL_ERROR    /* Misc error                 */
+    } PROTOCOL_STATUS;
+
+/* Operation codes */
+typedef enum _PROTOCOL_OPCODE
+    {
+    PROTOCOL_SOL_OPCODE     = 0x51, /* Manual solenoid control   */
+    PROTOCOL_VALVE_OPCODE   = 0x52, /* Manual main valve control */
+    PROTOCOL_ABORT_OPCODE   = 0x90, /* Abort hotfire opcode      */
+    PROTOCOL_TELREQ_OPCODE  = 0x96, /* Telemetry request opcode  */
+    PROTOCOL_PFPURGE_OPCODE = 0x91, /* Pre-fire purge opcode     */
+    PROTOCOL_FILL_OPCODE    = 0x92, /* Fill/Chill opcode         */
+    PROTOCOL_STANDBY_OPCODE = 0x93, /* Standby opcode            */
+    PROTOCOL_FIRE_OPCODE    = 0x94, /* Engine Fire opcode        */ 
+    PROTOCOL_STOP_OPCODE    = 0x97, /* Stop purge opcode         */
+    PROTOCOL_ACK_OPCODE     = 0x95  /* Frame Acknowledge opcde   */
+    } PROTOCOL_OPCODE;
+
+/* Solenoid subcommand codes */
+typedef enum _PROTOCOL_SOL_SUBCMD
+    {
+    PROTOCOL_SOL_OPEN     = 0x28, /* Open solenoids                   */ 
+    PROTOCOL_SOL_CLOSE    = 0x30, /* Close solenoids                  */
+    PROTOCOL_SOL_RESET    = 0x18, /* Reset solenoids to default state */
+    PROTOCOL_SOL_GETSTATE = 0x20  /* Get the state of the solenoids   */
+    } PROTOCOL_SOL_SUBCMD;
+
+/* Main valve subcommand codes */
+typedef enum _PROTOCOL_VALVE_SUBCMD
+    {
+    PROTOCOL_VALVE_OPEN  = 0x04, /* Open main valve   */
+    PROTOCOL_VALVE_CLOSE = 0x06, /* Close main valve  */
+    PROTOCOL_VALVE_CRACK = 0x0A, /* Crack main valve  */
+    PROTOCOL_VALVE_RESET = 0x10  /* Reset main valves */
+    } PROTOCOL_VALVE_SUBCMD;
+
+/* Frame Struct Type */
+typedef struct _PROTOCOL_FRAME
+    {
+    uint8_t opcode;
+    uint8_t control[2];
+    } PROTOCOL_FRAME; 
+
+
+/*------------------------------------------------------------------------------
+ Public Function Prototypes 
+------------------------------------------------------------------------------*/
+
+/* Send a frame of data over the long-range communication interface */
+PROTOCOL_STATUS protocol_send_frame
+    (
+    PROTOCOL_FRAME frame 
+    );
+
+
+/* Get a frame of data over the long-range communication interface */
+PROTOCOL_STATUS protocol_get_frame
+    (
+    PROTOCOL_FRAME* frame_ptr
+    );
+
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* PROTOCOL_H */
+
+/*******************************************************************************
+* END OF FILE                                                                  *
+*******************************************************************************/

@@ -113,7 +113,7 @@ flash_handle.bpl_bits              = FLASH_BPL_NONE;
 flash_handle.bpl_write_protect     = FLASH_BPL_READ_WRITE;
 
 /* Thermocouple configuration */
-thermo_config.type                 = THERMO_TYPE_T;
+thermo_config.type                 = THERMO_TYPE_K;
 thermo_config.filter_coeff         = THERMO_FILTER_OFF; 
 thermo_config.adc_resolution       = THERMO_18BIT_ADC;
 thermo_config.cold_junc_resolution = THERMO_COLD_JUNC_MIN_RES;
