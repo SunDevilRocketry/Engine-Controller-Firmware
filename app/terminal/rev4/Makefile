@@ -165,6 +165,7 @@ C_INCLUDES =                                           \
 -I$(MOD_DIR)/power                                     \
 -I$(MOD_DIR)/pressure                                  \
 -I$(MOD_DIR)/sensor                                    \
+-I$(MOD_DIR)/solenoid                                  \
 -I$(MOD_DIR)/temp                                      \
 -I$(MOD_DIR)/usb                                       \
 -I$(MOD_DIR)/valve                                     \
