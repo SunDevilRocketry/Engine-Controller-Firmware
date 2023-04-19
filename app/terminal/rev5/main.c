@@ -34,6 +34,7 @@
 #include "power.h"
 #include "pressure.h"
 #include "sensor.h"
+#include "solenoid.h"
 #include "temp.h"
 #include "usb.h"
 #include "valve.h"
@@ -74,6 +75,9 @@ uint8_t       flash_buffer[ DEF_BUFFER_SIZE ]; /* Flash data buffer */
 
 /* Thermocouple */
 THERMO_CONFIG thermo_config;    /* Thermocouple configuration settings        */
+
+/* Solenoids */
+SOL_STATE     sol_state;        /* State of solenoids */
 
 /* Module return codes */
 FLASH_STATUS  flash_status;     /* Status of flash operations                 */
@@ -122,6 +126,9 @@ thermo_config.cold_junc_resolution = THERMO_COLD_JUNC_MIN_RES;
 thermo_config.burst_mode           = THERMO_BURST_MODE_1;
 thermo_config.shutdown_mode        = THERMO_NORMAL_MODE;
 thermo_config.status               = 0;
+
+/* Solenoids */
+sol_state                          = 0;
 
 /* Module return codes */
 flash_status                       = FLASH_OK;
@@ -306,7 +313,7 @@ while (1)
 					{
 					Error_Handler( ERROR_VALVE_CMD_ERROR );
 					}
-				valve_status = valve_transmit( &command         , 
+				valve_status = valve_transmit( &subcommand, 
 				                               sizeof( command ),
 											   HAL_DEFAULT_TIMEOUT );
 				if ( valve_status != VALVE_OK )
@@ -315,6 +322,57 @@ while (1)
 					}
 				break;
 				} /* VALVE_OP */
+
+			/*-----------------------------------------------------------------
+			 SOL Command 
+			------------------------------------------------------------------*/
+			case SOL_OP:
+				{
+				/* Get Subcommand */
+				usb_status = usb_receive( &subcommand, 
+							 sizeof( subcommand ), 
+							 HAL_DEFAULT_TIMEOUT );
+				if ( usb_status != USB_OK )
+					{
+					Error_Handler( ERROR_SOL_CMD_ERROR );
+					}
+
+				/* Pass on command and subcommand to valve controller */
+				valve_status = valve_transmit( &command         , 
+				                               sizeof( command ), 
+											   HAL_DEFAULT_TIMEOUT );
+				if ( valve_status != VALVE_OK )
+					{
+					Error_Handler( ERROR_SOL_CMD_ERROR );
+					}
+				valve_status = valve_transmit( &subcommand      , 
+				                               sizeof( command ),
+											   HAL_DEFAULT_TIMEOUT );
+				if ( valve_status != VALVE_OK )
+					{
+					Error_Handler( ERROR_SOL_CMD_ERROR );
+					}
+
+				/* Pass on valve state if sol getstate command */
+				if ( subcommand == SOL_GETSTATE_CODE )
+					{
+					valve_status = valve_receive( &sol_state, 
+					                              sizeof( sol_state ), 
+												  HAL_DEFAULT_TIMEOUT );
+					if ( valve_status != VALVE_OK )
+						{
+						Error_Handler( ERROR_SOL_CMD_ERROR );
+						}
+					usb_status = usb_transmit( &sol_state,
+					                           sizeof( sol_state ),
+											   HAL_DEFAULT_TIMEOUT );
+					if ( usb_status != USB_OK )
+						{
+						Error_Handler( ERROR_SOL_CMD_ERROR );
+						}
+					}
+				break;
+				} /* SOL_OP */
 
 			/*-----------------------------------------------------------------
 			 Unrecognized Command 
