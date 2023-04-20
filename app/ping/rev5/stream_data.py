@@ -3,7 +3,7 @@ import time
 
 # Open the serial port
 serObj = serial.Serial()
-serObj.baudrate = 9600
+serObj.baudrate = 921600 
 serObj.port = "/dev/ttyUSB0"
 #serObj.timeout = 5
 serObj.open()

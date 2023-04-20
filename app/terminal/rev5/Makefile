@@ -55,6 +55,7 @@ $(MOD_DIR)/power/power.c                                             \
 $(MOD_DIR)/flash/flash.c                                             \
 $(MOD_DIR)/loadcell/loadcell.c                                       \
 $(MOD_DIR)/pressure/pressure.c                                       \
+$(MOD_DIR)/rs485/rs485.c                                             \
 $(MOD_DIR)/sensor/sensor.c                                           \
 $(MOD_DIR)/temp/temp.c                                               \
 $(MOD_DIR)/usb/usb.c                                                 \
@@ -139,6 +140,7 @@ C_DEFS =            \
 -DUSE_HAL_DRIVER    \
 -DSTM32H750xx       \
 -DTERMINAL          \
+-DUSE_RS485         \
 -DENGINE_CONTROLLER \
 -DL0002_REV5
 
@@ -164,6 +166,7 @@ C_INCLUDES =                                           \
 -I$(MOD_DIR)/loadcell                                  \
 -I$(MOD_DIR)/power                                     \
 -I$(MOD_DIR)/pressure                                  \
+-I$(MOD_DIR)/rs485                                     \
 -I$(MOD_DIR)/sensor                                    \
 -I$(MOD_DIR)/solenoid                                  \
 -I$(MOD_DIR)/temp                                      \

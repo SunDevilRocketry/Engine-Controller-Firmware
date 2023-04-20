@@ -33,6 +33,7 @@
 #include "led.h"
 #include "power.h"
 #include "pressure.h"
+#include "rs485.h"
 #include "sensor.h"
 #include "solenoid.h"
 #include "temp.h"
@@ -82,6 +83,7 @@ SOL_STATE     sol_state;        /* State of solenoids */
 /* Module return codes */
 FLASH_STATUS  flash_status;     /* Status of flash operations                 */
 IGN_STATUS    ign_status;       /* Ignition status code                       */
+RS485_STATUS  rs485_status;     /* Status codes from RS485 module             */
 THERMO_STATUS thermo_status;    /* Thermocouple status code                   */
 USB_STATUS    usb_status;       /* Status of USB operations                   */
 VALVE_STATUS  valve_status;     /* Valve API return codes                     */
@@ -132,6 +134,7 @@ sol_state                          = 0;
 
 /* Module return codes */
 flash_status                       = FLASH_OK;
+rs485_status                       = RS485_OK;
 thermo_status                      = THERMO_OK;
 usb_status                         = USB_OK;
 valve_status                       = VALVE_OK;
@@ -168,10 +171,18 @@ led_set_color( LED_GREEN );
 while (1)
 	{
 	/* Read data from UART reciever */
-    usb_status = usb_receive( &command, sizeof( command ), HAL_DEFAULT_TIMEOUT );
+	#ifdef USE_RS485
+		rs485_status = rs485_receive( &command         , 
+		                              sizeof( command ), 
+									  RS485_DEFAULT_TIMEOUT );
+	#else
+		usb_status = usb_receive( &command, 
+		                          sizeof( command ), 
+								  HAL_DEFAULT_TIMEOUT );
+	#endif
 
 	/* Parse command input if HAL_UART_Receive doesn't timeout */
-	if ( usb_status != USB_TIMEOUT )
+	if ( ( usb_status != USB_TIMEOUT ) && ( rs485_status != RS485_TIMEOUT ) )
 		{
 		switch( command )
 			{
