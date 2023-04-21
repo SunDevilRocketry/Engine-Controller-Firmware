@@ -140,7 +140,6 @@ C_DEFS =            \
 -DUSE_HAL_DRIVER    \
 -DSTM32H750xx       \
 -DTERMINAL          \
--DUSE_RS485         \
 -DENGINE_CONTROLLER \
 -DL0002_REV5
 
