@@ -178,8 +178,7 @@ hadc1.Init.EOCSelection             = ADC_EOC_SINGLE_CONV;
 hadc1.Init.LowPowerAutoWait         = DISABLE;
 hadc1.Init.ContinuousConvMode       = DISABLE;
 hadc1.Init.NbrOfConversion          = 1;
-hadc1.Init.DiscontinuousConvMode    = ENABLE;
-hadc1.Init.NbrOfDiscConversion      = 2;
+hadc1.Init.DiscontinuousConvMode    = DISABLE;
 hadc1.Init.ExternalTrigConv         = ADC_SOFTWARE_START;
 hadc1.Init.ExternalTrigConvEdge     = ADC_EXTERNALTRIGCONVEDGE_NONE;
 hadc1.Init.ConversionDataManagement = ADC_CONVERSIONDATA_DR;
@@ -259,8 +258,7 @@ hadc2.Init.EOCSelection             = ADC_EOC_SINGLE_CONV;
 hadc2.Init.LowPowerAutoWait         = DISABLE;
 hadc2.Init.ContinuousConvMode       = DISABLE;
 hadc2.Init.NbrOfConversion          = 1;
-hadc1.Init.DiscontinuousConvMode    = ENABLE;
-hadc1.Init.NbrOfDiscConversion      = 2;
+hadc1.Init.DiscontinuousConvMode    = DISABLE;
 hadc2.Init.ExternalTrigConv         = ADC_SOFTWARE_START;
 hadc2.Init.ExternalTrigConvEdge     = ADC_EXTERNALTRIGCONVEDGE_NONE;
 hadc2.Init.ConversionDataManagement = ADC_CONVERSIONDATA_DR;
@@ -322,8 +320,7 @@ hadc3.Init.EOCSelection             = ADC_EOC_SINGLE_CONV;
 hadc3.Init.LowPowerAutoWait         = DISABLE;
 hadc3.Init.ContinuousConvMode       = DISABLE;
 hadc3.Init.NbrOfConversion          = 1;
-hadc1.Init.DiscontinuousConvMode    = ENABLE;
-hadc1.Init.NbrOfDiscConversion      = 2;
+hadc1.Init.DiscontinuousConvMode    = DISABLE;
 hadc3.Init.ExternalTrigConv         = ADC_SOFTWARE_START;
 hadc3.Init.ExternalTrigConvEdge     = ADC_EXTERNALTRIGCONVEDGE_NONE;
 hadc3.Init.ConversionDataManagement = ADC_CONVERSIONDATA_DR;
@@ -349,7 +346,8 @@ if ( HAL_ADC_ConfigChannel( &hadc3, &sConfig ) != HAL_OK )
 	}
 
 /* Configure Regular Channel */
-sConfig.Rank = ADC_REGULAR_RANK_2;
+sConfig.Channel = ADC_CHANNEL_1;
+sConfig.Rank    = ADC_REGULAR_RANK_2;
 if ( HAL_ADC_ConfigChannel( &hadc3, &sConfig ) != HAL_OK )
 	{
 	Error_Handler( ERROR_PT_ADC_INIT_ERROR );
