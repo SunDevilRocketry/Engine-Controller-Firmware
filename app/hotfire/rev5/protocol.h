@@ -27,6 +27,17 @@ extern "C" {
  Macros 
 ------------------------------------------------------------------------------*/
 
+/* Protocol Commands */
+#define ABORT_OP                ( 0x90 )
+#define TELREQ_OP               ( 0x96 )
+#define PFPURGE_OP              ( 0x91 )
+#define CHILL_OP                ( 0x92 )
+#define STANDBY_OP              ( 0x93 )
+#define FIRE_OP                 ( 0x94 )
+#define STOPPURGE_OP            ( 0x97 )
+#define ACK_OP                  ( 0x95 )
+#define NO_ACK_OP               ( 0x98 )
+
 
 /*------------------------------------------------------------------------------
  Typedefs 
@@ -84,6 +95,12 @@ typedef struct _PROTOCOL_FRAME
 /*------------------------------------------------------------------------------
  Public Function Prototypes 
 ------------------------------------------------------------------------------*/
+
+/* Handles commands received from the ground station */
+void protocol_command_handler
+    (
+    uint8_t command /* Ground station command */
+    );
 
 /* Send a frame of data over the long-range communication interface */
 PROTOCOL_STATUS protocol_send_frame
