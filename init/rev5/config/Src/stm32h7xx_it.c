@@ -13,13 +13,16 @@
  Standard Includes                                                              
 ------------------------------------------------------------------------------*/
 #include "main.h"
+#include "protocol.h"
+#include "rs485.h"
 #include "stm32h7xx_it.h"
 
 
 /*------------------------------------------------------------------------------
  Global Variables 
 ------------------------------------------------------------------------------*/
-extern UART_HandleTypeDef huart4; /* Wireless/RS485 UART */
+extern UART_HandleTypeDef huart4;     /* Wireless/RS485 UART     */
+extern uint8_t            gs_command; /* Ground station commands */
 
 
 /*------------------------------------------------------------------------------
@@ -217,7 +220,14 @@ void UART4_IRQHandler
     void
     )
 {
+/* Process the ground station command */
+protocol_command_handler( gs_command );
+
+/* HAL Error Handling */
 HAL_UART_IRQHandler( &huart4 );
+
+/* Continue listening when done */
+rs485_receive_IT( &gs_command, sizeof( gs_command) );
 } /* UART4_IRQHandler */
 
 

@@ -34,6 +34,7 @@
 #include "led.h"
 #include "power.h"
 #include "pressure.h"
+#include "rs485.h"
 #include "sensor.h"
 #include "temp.h"
 #include "usb.h"
@@ -57,9 +58,8 @@ UART_HandleTypeDef huart4; /* Wireless interface UART handle */
 /*------------------------------------------------------------------------------
  Global Variables  
 ------------------------------------------------------------------------------*/
-
-/* Finite State Machine */
-FSM_STATE fsm_state = FSM_INIT_STATE;        
+FSM_STATE fsm_state  = FSM_INIT_STATE;   /* Finite State Machine state */
+uint8_t   gs_command = 0;                /* Ground Station commands    */
 
 
 /*------------------------------------------------------------------------------
@@ -84,6 +84,7 @@ THERMO_CONFIG thermo_config;    /* Thermocouple configuration settings        */
 /* Module return codes */
 FLASH_STATUS  flash_status;     /* Status of flash operations                 */
 THERMO_STATUS thermo_status;    /* Thermocouple status code                   */
+RS485_STATUS  rs485_status;     /* RS485 Module return codes                  */
 
 
 /*------------------------------------------------------------------------------
@@ -130,9 +131,6 @@ thermo_config.status               = 0;
 flash_status                       = FLASH_OK;
 thermo_status                      = THERMO_OK;
 
-/* Finite State Machine */
-fsm_state                         = FSM_INIT_STATE;
-
 
 /*------------------------------------------------------------------------------
  External Hardware Initializations 
@@ -157,6 +155,11 @@ if ( thermo_status != THERMO_OK )
 
 /* Indicate Successful MCU and Peripheral Hardware Setup */
 led_set_color( LED_GREEN );
+
+
+/*------------------------------------------------------------------------------
+ USB Data Acquisition Mode 
+------------------------------------------------------------------------------*/
 
 
 /*------------------------------------------------------------------------------
@@ -190,6 +193,14 @@ if ( vc_reset_solenoids() != VC_OK )
 
 /* Enter the READY state                */
 fsm_state = FSM_READY_STATE;
+
+/* Start listening for commands from the ground station */
+rs485_status = rs485_receive_IT( &gs_command, sizeof( gs_command ) );
+if ( rs485_status != RS485_OK )
+	{
+	Error_Handler( ERROR_RS485_UART_ERROR );
+	}
+
 
 /*------------------------------------------------------------------------------
  Hotfire Sequencing 

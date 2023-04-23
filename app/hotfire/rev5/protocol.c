@@ -334,7 +334,9 @@ PROTOCOL_STATUS protocol_send_frame
  Implementation
 ------------------------------------------------------------------------------*/
 #ifdef USE_RS485
-    rs485_status = rs485_transmit( &frame, sizeof( frame ) );
+    rs485_status = rs485_transmit( &frame, 
+                                   sizeof( frame ), 
+                                   RS485_DEFAULT_TIMEOUT*sizeof( frame ) );
     if ( rs485_status == RS485_TIMEOUT )
         {
         return PROTOCOL_TIMEOUT;
@@ -397,7 +399,9 @@ PROTOCOL_STATUS protocol_get_frame
  Implementation
 ------------------------------------------------------------------------------*/
 #ifdef USE_RS485
-    rs485_status = rs485_receive( frame_ptr, sizeof( PROTOCOL_FRAME ) );
+    rs485_status = rs485_receive( frame_ptr, 
+                                  sizeof( PROTOCOL_FRAME ), 
+                                  RS485_DEFAULT_TIMEOUT*sizeof( PROTOCOL_FRAME) );
     if ( rs485_status == RS485_TIMEOUT )
         {
         return PROTOCOL_TIMEOUT;

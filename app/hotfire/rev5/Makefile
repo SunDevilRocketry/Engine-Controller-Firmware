@@ -68,6 +68,7 @@ $(MOD_DIR)/power/power.c                                             \
 $(MOD_DIR)/flash/flash.c                                             \
 $(MOD_DIR)/loadcell/loadcell.c                                       \
 $(MOD_DIR)/pressure/pressure.c                                       \
+$(MOD_DIR)/rs485/rs485.c                                             \
 $(MOD_DIR)/sensor/sensor.c                                           \
 $(MOD_DIR)/temp/temp.c                                               \
 $(MOD_DIR)/usb/usb.c                                                 \
@@ -153,6 +154,7 @@ C_DEFS =            \
 -DUSE_HAL_DRIVER    \
 -DSTM32H750xx       \
 -DENGINE_CONTROLLER \
+-DUSE_RS485         \
 -DL0002_REV5
 
 
