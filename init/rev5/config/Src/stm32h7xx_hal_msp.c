@@ -375,6 +375,10 @@ if ( huart->Instance == UART4 )
 	GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_LOW;
 	GPIO_InitStruct.Alternate = GPIO_AF8_UART4;
 	HAL_GPIO_Init( GPIOA, &GPIO_InitStruct );
+
+    /* UART4 interrupt Init */
+    HAL_NVIC_SetPriority( UART4_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ  ( UART4_IRQn      );
 	} /* if ( huart->Instance == UART4 )*/
 
 /* USB UART */
@@ -456,6 +460,9 @@ if ( huart->Instance == UART4 )
 	PA0     ------> UART4_TX
 	PA1     ------> UART4_RX */
 	HAL_GPIO_DeInit( GPIOA, GPIO_PIN_0 | GPIO_PIN_1 );
+
+    /* UART4 interrupt DeInit */
+    HAL_NVIC_DisableIRQ( UART4_IRQn );
 	}
 
 /* USB UART */

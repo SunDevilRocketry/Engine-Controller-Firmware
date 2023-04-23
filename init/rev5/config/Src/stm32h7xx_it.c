@@ -17,6 +17,12 @@
 
 
 /*------------------------------------------------------------------------------
+ Global Variables 
+------------------------------------------------------------------------------*/
+extern UART_HandleTypeDef huart4; /* Wireless/RS485 UART */
+
+
+/*------------------------------------------------------------------------------
  Cortex Processor Interruption and Exception Handlers          
 ------------------------------------------------------------------------------*/
 
@@ -187,7 +193,7 @@ void SysTick_Handler
     )
 {
 HAL_IncTick();
-}
+} /* SysTick_Handler */
 
 /******************************************************************************/
 /* STM32H7xx Peripheral Interrupt Handlers                                    */
@@ -195,6 +201,25 @@ HAL_IncTick();
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32h7xx.s).                    */
 /******************************************************************************/
+
+
+/*******************************************************************************
+*                                                                              *
+* PROCEDURE:                                                                   *
+* 		UART4_IRQHandler                                                       *
+*                                                                              *
+* DESCRIPTION:                                                                 *
+*       Handles interrupts from the Wireless/RS485 UART interface              *
+*                                                                              *
+*******************************************************************************/
+void UART4_IRQHandler
+    (
+    void
+    )
+{
+HAL_UART_IRQHandler( &huart4 );
+} /* UART4_IRQHandler */
+
 
 
 /*******************************************************************************
