@@ -55,6 +55,14 @@ UART_HandleTypeDef huart4; /* Wireless interface UART handle */
 
 
 /*------------------------------------------------------------------------------
+ Global Variables  
+------------------------------------------------------------------------------*/
+
+/* Finite State Machine */
+FSM_STATE fsm_state = FSM_INIT_STATE;        
+
+
+/*------------------------------------------------------------------------------
  Application entry point                                                      
 ------------------------------------------------------------------------------*/
 int main
@@ -76,9 +84,6 @@ THERMO_CONFIG thermo_config;    /* Thermocouple configuration settings        */
 /* Module return codes */
 FLASH_STATUS  flash_status;     /* Status of flash operations                 */
 THERMO_STATUS thermo_status;    /* Thermocouple status code                   */
-
-/* Hotfire state */
-FSM_STATE     fsm_state;        /* Finite State Machine state variable        */
 
 
 /*------------------------------------------------------------------------------

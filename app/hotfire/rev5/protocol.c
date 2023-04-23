@@ -45,6 +45,11 @@ static void send_ack
 	void
 	);
 
+/*------------------------------------------------------------------------------
+ Global Variables 
+------------------------------------------------------------------------------*/
+extern FSM_STATE fsm_state; /* State of engine hotfire */
+
 
 /*------------------------------------------------------------------------------
  Public Functions 
@@ -68,20 +73,24 @@ void protocol_command_handler
 /*------------------------------------------------------------------------------
  Local Variables  
 ------------------------------------------------------------------------------*/
-uint8_t subcommand;                           /* SDEC subcommand              */
-uint8_t sol_state;                            /* State of solenoids           */
-uint8_t sensor_data[ sizeof( SENSOR_DATA ) ]; /* Data from engine sensors     */
-RS485_STATUS rs485_status;                    /* RS485 return codes           */
-VALVE_STATUS valve_status;                    /* Valve module return codes    */
+uint8_t       subcommand;                     /* SDEC subcommand              */
+uint8_t       sol_state;                      /* State of solenoids           */
+SENSOR_DATA   sensor_data;                    /* Data from engine sensors     */
+uint8_t       sensor_data_bytes[ sizeof( SENSOR_DATA ) ]; 
+RS485_STATUS  rs485_status;                   /* RS485 return codes           */
+VALVE_STATUS  valve_status;                   /* Valve module return codes    */
+SENSOR_STATUS sensor_status;                  /* Sensor module return codes   */
 
 
 /*------------------------------------------------------------------------------
  Initializations 
 ------------------------------------------------------------------------------*/
-rs485_status = RS485_OK;
-valve_status = VALVE_OK;
-sol_state    = 0;
-memset( &sensor_data[0], 0, sizeof( sensor_data ) );
+rs485_status  = RS485_OK;
+valve_status  = VALVE_OK;
+sensor_status = SENSOR_OK;
+sol_state     = 0;
+memset( &sensor_data         , 0, sizeof( sensor_data       ) );
+memset( &sensor_data_bytes[0], 0, sizeof( sensor_data_bytes ) );
 
 
 /*------------------------------------------------------------------------------
@@ -153,6 +162,25 @@ switch( command )
     --------------------------------------------------------------------------*/
     case VALVE_OP:
         {
+        /* Get subcommand */
+        rs485_status = rs485_receive( &subcommand         , 
+                                      sizeof( subcommand ), 
+                                      RS485_DEFAULT_TIMEOUT );
+        if ( rs485_status != RS485_OK )
+            {
+            led_set_color( LED_YELLOW );
+            break;
+            }
+        
+        /* Send ACK signal */
+        if ( subcommand != SOL_GETSTATE_CODE )
+            {
+            send_ack();
+            }
+
+        /* Pass on command and subcommand to valve controller */ 
+        valve_transmit( &command   , sizeof( command ), HAL_DEFAULT_TIMEOUT );
+        valve_transmit( &subcommand, sizeof( command ), HAL_DEFAULT_TIMEOUT );
         break;
         } /* VALVE_OP */
 
@@ -161,6 +189,11 @@ switch( command )
     --------------------------------------------------------------------------*/
     case ABORT_OP:
         {
+        /* Send ACK signal */
+        send_ack();
+
+        /* Initiate Abort */
+        fsm_state = FSM_ABORT_STATE;
         break;
         } /* ABORT_OP */
 
@@ -169,6 +202,19 @@ switch( command )
     --------------------------------------------------------------------------*/
     case TELREQ_OP:
         {
+        /* Get sensor data */
+        sensor_status = sensor_dump( &sensor_data );
+        if ( sensor_status != SENSOR_OK )
+            {
+            led_set_color( LED_YELLOW );
+            break;
+            }
+        memcpy( &sensor_data_bytes[0], &sensor_data, sizeof( SENSOR_DATA ) );
+
+        /* Transmit the sensor data */
+        rs485_transmit( &sensor_data_bytes[0], 
+                        sizeof( SENSOR_DATA ), 
+                        RS485_DEFAULT_TIMEOUT*sizeof( SENSOR_DATA ));
         break;
         } /* TELREQ_OP */
 
@@ -177,6 +223,11 @@ switch( command )
     --------------------------------------------------------------------------*/
     case PFPURGE_OP:
         {
+        /* Send ACK signal */
+        send_ack();
+
+        /* Initiate Purge*/
+        fsm_state = FSM_PRE_FIRE_PURGE_STATE;
         break;
         } /* PFPURGE_OP */
     
@@ -185,6 +236,11 @@ switch( command )
     --------------------------------------------------------------------------*/
     case CHILL_OP:
         {
+        /* Send ACK signal */
+        send_ack();
+
+        /* Initiate Fill and Chill Sequence */
+        fsm_state = FSM_FILL_CHILL_STATE;
         break;
         } /* CHILL_OP */
 
@@ -193,6 +249,11 @@ switch( command )
     --------------------------------------------------------------------------*/
     case STANDBY_OP:
         {
+        /* Send ACK signal */
+        send_ack();
+
+        /* Initiate Standby mode */
+        fsm_state = FSM_STANDBY_STATE;
         break;
         } /* STANDBY_OP */
 
@@ -201,6 +262,12 @@ switch( command )
     --------------------------------------------------------------------------*/
     case FIRE_OP:
         {
+        /* Send ACK signal */
+        send_ack();
+
+        /* Initiate Standby mode */
+        fsm_state = FSM_FIRE_STATE;
+        break;
         } /* FIRE_OP */
 
     /*--------------------------------------------------------------------------
@@ -208,6 +275,11 @@ switch( command )
     --------------------------------------------------------------------------*/
     case STOPPURGE_OP:
         {
+        /* Send ACK signal */
+        send_ack();
+
+        /* Stop the engine purge */
+        // TODO: Implement
         break;
         } /* STOPPURGE_OP */
 
