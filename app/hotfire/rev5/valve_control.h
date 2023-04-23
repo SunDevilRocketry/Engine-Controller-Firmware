@@ -98,6 +98,12 @@ VC_STATUS vc_reset_solenoids
     void
     );
 
+/* Crack open a main valve */
+VC_STATUS vc_crack_main_valves
+    (
+    MAIN_VALVE main_valves
+    );
+
 /* Open a main valve */
 VC_STATUS vc_open_main_valves
     (

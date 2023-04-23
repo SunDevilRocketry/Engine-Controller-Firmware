@@ -286,6 +286,98 @@ return VC_OK;
 /*******************************************************************************
 *                                                                              *
 * PROCEDURE:                                                                   *
+* 		vc_crack_main_valves                                                   *
+*                                                                              *
+* DESCRIPTION:                                                                 *
+*       Crack open a main valve                                                *
+*                                                                              *
+*******************************************************************************/
+VC_STATUS vc_crack_main_valves
+    (
+    MAIN_VALVE main_valves
+    )
+{
+/*------------------------------------------------------------------------------
+ Local Variables  
+------------------------------------------------------------------------------*/
+uint8_t      valve_subcommand;   /* Main valve subcommand/number */
+uint8_t      valve_tx_buffer[2]; /* Buffer for transmitting data */
+VALVE_STATUS valve_status;       /* Return codes from valve API  */
+
+
+/*------------------------------------------------------------------------------
+ Initializations 
+------------------------------------------------------------------------------*/
+valve_subcommand   = VALVE_CRACK_CODE; 
+valve_status       = VALVE_OK;
+valve_tx_buffer[0] = VALVE_OP;
+valve_tx_buffer[1] = 0;
+
+
+/*------------------------------------------------------------------------------
+ Implementation 
+------------------------------------------------------------------------------*/
+/* Setup subcommand and transmit data */
+switch ( main_valves )
+    {
+    /* Open the main LOX valve */
+    case MAIN_VALVE_LOX_MAIN:
+        {
+        valve_tx_buffer[1] = valve_subcommand;
+        valve_status = valve_transmit( &valve_tx_buffer[0], 
+                                       sizeof( valve_tx_buffer ), 
+                                       VALVE_TIMEOUT );
+        if ( valve_status != VALVE_OK )
+            {
+            return VC_UART_ERROR;
+            }
+        break;
+        }
+
+    /* Open the main fuel valve */
+    case MAIN_VALVE_FUEL_MAIN:
+        {
+        valve_tx_buffer[1] = valve_subcommand + 1;
+        valve_status = valve_transmit( &valve_tx_buffer[0]      , 
+                                       sizeof( valve_tx_buffer ), 
+                                       VALVE_TIMEOUT );
+        if ( valve_status != VALVE_OK )
+            {
+            return VC_UART_ERROR;
+            }
+        break;
+        }
+
+    /* Open both main valves */
+    case MAIN_VALVE_BOTH_MAINS:
+        {
+        valve_tx_buffer[1] = valve_subcommand;
+        valve_status = valve_transmit( &valve_tx_buffer[0]      , 
+                                       sizeof( valve_tx_buffer ), 
+                                       VALVE_TIMEOUT );
+        if ( valve_status != VALVE_OK )
+            {
+            return VC_UART_ERROR;
+            }
+        valve_tx_buffer[1] += 1;
+        valve_status = valve_transmit( &valve_tx_buffer[0], 
+                                       sizeof( valve_tx_buffer ), 
+                                       VALVE_TIMEOUT );
+        if ( valve_status != VALVE_OK )
+            {
+            return VC_UART_ERROR;
+            }
+        break;
+        }
+
+    } /* switch ( main_valves ) */
+return VC_OK;
+} /* vc_crack_main_valves */
+
+
+/*******************************************************************************
+*                                                                              *
+* PROCEDURE:                                                                   *
 * 		vc_close_main_valves                                                   *
 *                                                                              *
 * DESCRIPTION:                                                                 *

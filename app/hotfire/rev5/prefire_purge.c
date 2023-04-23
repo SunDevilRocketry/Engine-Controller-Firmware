@@ -19,6 +19,13 @@
  Project Includes                                                              
 ------------------------------------------------------------------------------*/
 #include "main.h"
+#include "valve_control.h"
+
+
+/*------------------------------------------------------------------------------
+ Global Variables 
+------------------------------------------------------------------------------*/
+extern FSM_STATE fsm_state; /* Hotfire State */
 
 
 /*------------------------------------------------------------------------------
@@ -40,6 +47,17 @@ FSM_STATE run_pre_fire_purge_state
     void
     )
 {
+/* Close vent solenoids */
+vc_close_solenoids( SOLENOID_LOX_VENT | SOLENOID_FUEL_VENT );
+
+/* Crack Main valves */
+vc_crack_main_valves( MAIN_VALVE_BOTH_MAINS );
+
+/* Open pressurization valves */
+vc_open_solenoids( SOLENOID_LOX_PRESS | SOLENOID_FUEL_PRESS );
+
+/* Wait for fill and chill command */
+while ( fsm_state != FSM_FILL_CHILL_STATE ){}
 return FSM_FILL_CHILL_STATE;
 } /* run_pre_fire_purge_state */
 
