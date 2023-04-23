@@ -27,6 +27,7 @@
 
 /* Module level */
 #include "commands.h"
+#include "led.h"
 #include "rs485.h"
 #include "sensor.h"
 #include "solenoid.h"
@@ -68,15 +69,18 @@ void protocol_command_handler
  Local Variables  
 ------------------------------------------------------------------------------*/
 uint8_t subcommand;                           /* SDEC subcommand              */
-uint8_t board_code;                           /* Ping code of connected board */
+uint8_t sol_state;                            /* State of solenoids           */
 uint8_t sensor_data[ sizeof( SENSOR_DATA ) ]; /* Data from engine sensors     */
 RS485_STATUS rs485_status;                    /* RS485 return codes           */
+VALVE_STATUS valve_status;                    /* Valve module return codes    */
 
 
 /*------------------------------------------------------------------------------
  Initializations 
 ------------------------------------------------------------------------------*/
 rs485_status = RS485_OK;
+valve_status = VALVE_OK;
+sol_state    = 0;
 memset( &sensor_data[0], 0, sizeof( sensor_data ) );
 
 
@@ -90,6 +94,7 @@ switch( command )
     --------------------------------------------------------------------------*/
     case PING_OP:
         {
+        ping();
         break;
         } /* PING_OP */
 
@@ -98,6 +103,7 @@ switch( command )
     --------------------------------------------------------------------------*/
     case CONNECT_OP:
         {
+        ping();
         break;
         } /* CONNECT_OP */
     
@@ -106,6 +112,39 @@ switch( command )
     --------------------------------------------------------------------------*/
     case SOL_OP:
         {
+        /* Get subcommand */
+        rs485_status = rs485_receive( &subcommand         , 
+                                      sizeof( subcommand ), 
+                                      RS485_DEFAULT_TIMEOUT );
+        if ( rs485_status != RS485_OK )
+            {
+            led_set_color( LED_YELLOW );
+            break;
+            }
+        
+        /* Send ACK signal */
+        if ( subcommand != SOL_GETSTATE_CODE )
+            {
+            send_ack();
+            }
+
+        /* Pass on command and subcommand to valve controller */ 
+        valve_transmit( &command   , sizeof( command ), HAL_DEFAULT_TIMEOUT );
+        valve_transmit( &subcommand, sizeof( command ), HAL_DEFAULT_TIMEOUT );
+
+        /* Pass on valve state if sol getstate command */
+        if ( subcommand == SOL_GETSTATE_CODE )
+            {
+            valve_status = valve_receive( &sol_state, 
+                                          sizeof( sol_state ), 
+                                          HAL_DEFAULT_TIMEOUT );
+            if ( valve_status != VALVE_OK )
+                {
+                led_set_color( LED_YELLOW );
+                break;
+                }
+            rs485_transmit( &sol_state, sizeof( sol_state ), HAL_DEFAULT_TIMEOUT );
+            }
         break;
         } /* SOL_OP */
 
