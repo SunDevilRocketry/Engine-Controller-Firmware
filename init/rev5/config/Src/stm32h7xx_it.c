@@ -13,7 +13,9 @@
  Standard Includes                                                              
 ------------------------------------------------------------------------------*/
 #include "main.h"
-#include "protocol.h"
+#ifdef HOTFIRE
+    #include "protocol.h"
+#endif
 #include "rs485.h"
 #include "stm32h7xx_it.h"
 
@@ -205,7 +207,7 @@ HAL_IncTick();
 /* please refer to the startup file (startup_stm32h7xx.s).                    */
 /******************************************************************************/
 
-
+#ifdef HOTFIRE
 /*******************************************************************************
 *                                                                              *
 * PROCEDURE:                                                                   *
@@ -229,6 +231,7 @@ HAL_UART_IRQHandler( &huart4 );
 /* Continue listening when done */
 rs485_receive_IT( &gs_command, sizeof( gs_command) );
 } /* UART4_IRQHandler */
+#endif
 
 
 
