@@ -26,6 +26,7 @@
 #include "sdr_pin_defines_L0002.h"
 #include "sdr_error.h"
 #include "valve_control.h"
+#include "terminal.h"
 
 /* Low-level modules */
 #include "commands.h"
@@ -83,12 +84,17 @@ HFLASH_BUFFER flash_handle;                    /* Flash API buffer handle     */
 uint8_t       flash_buffer[ DEF_BUFFER_SIZE ]; /* Flash data buffer */
 
 /* Thermocouple */
-THERMO_CONFIG thermo_config;    /* Thermocouple configuration settings        */
+THERMO_CONFIG   thermo_config;    /* Thermocouple configuration settings        */
+
+/* Terminal */
+uint8_t         terminal_cmd;     /* Terminal command */
 
 /* Module return codes */
-FLASH_STATUS  flash_status;     /* Status of flash operations                 */
-THERMO_STATUS thermo_status;    /* Thermocouple status code                   */
-RS485_STATUS  rs485_status;     /* RS485 Module return codes                  */
+FLASH_STATUS    flash_status;     /* Status of flash operations                 */
+THERMO_STATUS   thermo_status;    /* Thermocouple status code                   */
+RS485_STATUS    rs485_status;     /* RS485 Module return codes                  */
+TERMINAL_STATUS terminal_status;  /* Return codes from SDEC terminal            */
+USB_STATUS      usb_status;       /* Return codes from usb module               */
 
 
 /*------------------------------------------------------------------------------
@@ -131,9 +137,13 @@ thermo_config.burst_mode           = THERMO_BURST_MODE_1;
 thermo_config.shutdown_mode        = THERMO_NORMAL_MODE;
 thermo_config.status               = 0;
 
+/* SDEC terminal */
+terminal_cmd                       = 0;
+
 /* Module return codes */
 flash_status                       = FLASH_OK;
 thermo_status                      = THERMO_OK;
+terminal_status                    = TERMINAL_OK;
 
 
 /*------------------------------------------------------------------------------
@@ -164,6 +174,23 @@ led_set_color( LED_GREEN );
 /*------------------------------------------------------------------------------
  USB Data Acquisition Mode 
 ------------------------------------------------------------------------------*/
+while ( usb_detect() )
+	{
+	/* Get sdec command from USB port */
+	usb_status = usb_receive( &terminal_cmd, 
+							  sizeof( terminal_cmd ), 
+							  HAL_DEFAULT_TIMEOUT );
+
+	/* Parse command input if HAL_UART_Receive doesn't timeout */
+	if ( ( usb_status == USB_OK ) && ( terminal_cmd != 0 ) )
+		{
+		terminal_status = terminal_exec_cmd( terminal_cmd );
+		if ( terminal_status != TERMINAL_OK )
+			{
+			Error_Handler( ERROR_TERMINAL_ERROR );
+			}
+		} /* if ( usb_status == USB_OK ) */
+	}
 
 
 /*------------------------------------------------------------------------------

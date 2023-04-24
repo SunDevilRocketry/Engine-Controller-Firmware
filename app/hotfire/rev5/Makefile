@@ -59,6 +59,7 @@ abort_hotfire.c                                                      \
 valve_control.c                                                      \
 protocol.c                                                           \
 data_logger.c                                                        \
+terminal.c                                                           \
 $(INIT_DIR)/init.c                                                   \
 $(UTIL_DIR)/sdr_error.c                                              \
 $(MOD_DIR)/commands/commands.c                                       \

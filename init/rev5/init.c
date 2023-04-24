@@ -745,6 +745,8 @@ GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
 GPIO_InitStruct.Pull = GPIO_NOPULL;
 HAL_GPIO_Init( THERMO_ALERT_GPIO_PORT, &GPIO_InitStruct );
 
+/*--------------------------------- USB PINS --------------------------------*/
+
 } /* GPIO_Init */
 
 
