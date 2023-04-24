@@ -41,6 +41,14 @@ extern "C" {
 	#define HAL_SENSOR_TIMEOUT     ( 0xFFFFFFFF ) 
 #endif /* SDR_DEBUG */
 
+/* Sequence Timing */
+#define TANK_PRESS_DELAY           ( 8000  ) /* 8s for stable tank pressure   */
+#define LOX_CRACK_DURATION         ( 20000 ) /* 20s LOX bleed time            */
+#define ENGINE_BURN_DURATION       ( 5000  ) /* 5s engine burn duration       */
+#define ENGINE_IGNITION_DELAY      ( 4000  ) /* 4s delay between ignition and 
+                                                opening main valves           */
+#define POSTFIRE_PURGE_DURATION    ( 8000  ) /* 8s engine purge               */
+
 
 /*------------------------------------------------------------------------------
  Typedefs 

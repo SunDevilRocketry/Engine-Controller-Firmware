@@ -14,6 +14,7 @@
  Standard Includes                                                              
 ------------------------------------------------------------------------------*/
 #include <string.h>
+#include <stdbool.h>
 
 
 /*------------------------------------------------------------------------------
@@ -48,7 +49,9 @@ static void send_ack
 /*------------------------------------------------------------------------------
  Global Variables 
 ------------------------------------------------------------------------------*/
-extern FSM_STATE fsm_state; /* State of engine hotfire */
+extern FSM_STATE fsm_state;         /* State of engine hotfire    */
+extern bool      stop_hotfire_flag; /* Manual hotfire termination */
+extern bool      stop_purge_flag;   /* Manual purge termination   */
 
 
 /*------------------------------------------------------------------------------
@@ -279,7 +282,7 @@ switch( command )
         send_ack();
 
         /* Stop the engine purge */
-        // TODO: Implement
+        stop_purge_flag = true;
         break;
         } /* STOPPURGE_OP */
 
@@ -291,7 +294,20 @@ switch( command )
         /* Send the finite state machine state back to the ground station */
         rs485_transmit( &fsm_state, sizeof( fsm_state ), RS485_DEFAULT_TIMEOUT );
         break;
-        }
+        } /* HOTFIRE_GETSTATE_OP */
+
+    /*--------------------------------------------------------------------------
+     STOPHOTFIRE Command 
+    --------------------------------------------------------------------------*/
+    case STOP_HOTFIRE_OP:
+        {
+        /* Send ACK signal */
+        send_ack();
+
+        /* Set the stop hotfire flag */
+        stop_hotfire_flag = true;
+        break;
+        } /* STOP_HOTFIRE_OP */
 
     /*--------------------------------------------------------------------------
      Unrecognized Command 
