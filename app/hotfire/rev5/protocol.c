@@ -49,10 +49,11 @@ static void send_ack
 /*------------------------------------------------------------------------------
  Global Variables 
 ------------------------------------------------------------------------------*/
-extern volatile FSM_STATE fsm_state;         /* State of engine hotfire    */
-extern volatile bool      stop_hotfire_flag; /* Manual hotfire termination */
-extern volatile bool      stop_purge_flag;   /* Manual purge termination   */
-extern volatile bool      lox_purge_flag;    /* LOX tank purge             */
+extern volatile FSM_STATE fsm_state;           /* State of engine hotfire     */
+extern volatile bool      stop_hotfire_flag;   /* Manual hotfire termination  */
+extern volatile bool      stop_purge_flag;     /* Manual purge termination    */
+extern volatile bool      lox_purge_flag;      /* LOX tank purge              */
+extern volatile bool      kbottle_closed_flag; /* Kbottle is closed           */
 
 
 /*------------------------------------------------------------------------------
@@ -322,6 +323,19 @@ switch( command )
         lox_purge_flag = true;
         break;
         } /* LOX_PURGE_OP */
+    
+    /*--------------------------------------------------------------------------
+     KBOTTLE Command 
+    --------------------------------------------------------------------------*/
+    case KBOTTLE_CLOSED_OP:
+        {
+        /* Send ACK signal */
+        send_ack();
+
+        /* Set the kbottle closed flag */
+        kbottle_closed_flag = true;
+        break;
+        } /* KBOTTLE_CLOSED_OP */
 
     /*--------------------------------------------------------------------------
      Unrecognized Command 
