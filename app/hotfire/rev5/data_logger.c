@@ -185,5 +185,50 @@ return HAL_GetTick() - data_logger_start_time;
 
 
 /*******************************************************************************
+*                                                                              *
+* PROCEDURE:                                                                   *
+* 		data_logger_erase_flash                                                *
+*                                                                              *
+* DESCRIPTION:                                                                 *
+*       Erases the flash chip and sets up pointers                             *
+*                                                                              *
+*******************************************************************************/
+DATA_LOG_STATUS data_logger_erase_flash
+    (
+    void
+    )
+{
+/*------------------------------------------------------------------------------
+ Local variables 
+------------------------------------------------------------------------------*/
+FLASH_STATUS  flash_status;                 /* Flash API return codes         */
+HFLASH_BUFFER flash_handle;                 /* Flash API struct               */
+
+
+/*------------------------------------------------------------------------------
+ Initializations 
+------------------------------------------------------------------------------*/
+flash_status = FLASH_OK;
+memset( &flash_handle, 0, sizeof( HFLASH_BUFFER ) );
+
+
+/*------------------------------------------------------------------------------
+ Implementation
+------------------------------------------------------------------------------*/
+
+/* Issue the full-chip erase command */
+flash_status = flash_erase( &flash_handle );
+if ( flash_status != FLASH_OK )
+    {
+    return DATA_LOG_FLASH_ERROR;
+    }
+
+/* Wait until the flash chip is fully erased */
+while ( !flash_is_flash_busy() ){}
+return DATA_LOG_OK;
+} /* data_logger_erase_flash */
+
+
+/*******************************************************************************
 * END OF FILE                                                                  *
 *******************************************************************************/

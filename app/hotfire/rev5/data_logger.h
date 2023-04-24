@@ -73,6 +73,11 @@ uint32_t data_logger_get_time
     void
     );
 
+/* Erases the flash chip and sets up pointers */
+DATA_LOG_STATUS data_logger_erase_flash
+    (
+    void
+    );
 
 #ifdef __cplusplus
 }
