@@ -284,6 +284,16 @@ switch( command )
         } /* STOPPURGE_OP */
 
     /*--------------------------------------------------------------------------
+     GETSTATE Command 
+    --------------------------------------------------------------------------*/
+    case HOTFIRE_GETSTATE_OP:
+        {
+        /* Send the finite state machine state back to the ground station */
+        rs485_transmit( &fsm_state, sizeof( fsm_state ), RS485_DEFAULT_TIMEOUT );
+        break;
+        }
+
+    /*--------------------------------------------------------------------------
      Unrecognized Command 
     ------------------------------------------------------------------*/
     default:
