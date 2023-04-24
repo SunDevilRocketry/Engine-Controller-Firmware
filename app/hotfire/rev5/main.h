@@ -48,7 +48,8 @@ extern "C" {
 #define ENGINE_IGNITION_DELAY      ( 4000  ) /* 4s delay between ignition and 
                                                 opening main valves           */
 #define POSTFIRE_PURGE_DURATION    ( 8000  ) /* 8s engine purge               */
-#define VENT_TIMEOUT               ( 10000 ) /* 10s engine vent               */
+#define VENT_TIMEOUT               ( 90000 ) /* 1.5 min engine vent           */
+#define SAFE_TIMEOUT               ( 90000 ) /* 1.5 min safeing timeout       */ 
 #define LOX_PURGE_DURATION         ( 8000  ) /* 8s engine purge               */
 
 
@@ -125,7 +126,7 @@ FSM_STATE run_manual_state
 	);
 
 /* Hotfire abort */
-FSM_STATE run_abort_state
+void run_abort_state
 	(
 	void
 	);

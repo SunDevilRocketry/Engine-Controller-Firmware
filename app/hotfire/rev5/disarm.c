@@ -21,6 +21,7 @@
 ------------------------------------------------------------------------------*/
 #include "main.h"
 #include "valve_control.h"
+#include "pressure.h"
 #include "sensor.h"
 
 
@@ -54,10 +55,13 @@ FSM_STATE run_disarm_state
 ------------------------------------------------------------------------------*/
 uint32_t    vent_start_time; /* Time at which vent starts                     */
 uint32_t    vent_time;       /* Time engine has been venting                  */
+uint32_t    safe_start_time; /* Time engine safing begins                     */
+uint32_t    safe_time;       /* Time since safing begins                      */
 float       lox_tank_press;  /* LOX tank pressure                             */
 float       fuel_tank_press; /* Fuel tank pressure                            */
 SENSOR_DATA sensor_data;     /* Data from engine sensors                      */
 bool        is_press_atm;    /* True when tank pressures are sufficiently low */
+float       pt_pressure;     /* PT pressure converted from adc readout        */
 
 
 /*------------------------------------------------------------------------------
@@ -65,6 +69,8 @@ bool        is_press_atm;    /* True when tank pressures are sufficiently low */
 ------------------------------------------------------------------------------*/
 vent_start_time = 0;
 vent_time       = 0;
+safe_start_time = 0;
+safe_time       = 0;
 lox_tank_press  = 0;
 fuel_tank_press = 0;
 is_press_atm    = false;
@@ -119,7 +125,35 @@ vc_close_main_valves( MAIN_VALVE_BOTH_MAINS );
 vc_close_solenoids( SOLENOID_LOX_PRESS | SOLENOID_FUEL_PRESS );
 HAL_Delay( TANK_PRESS_DELAY );
 
-/* Check engine pressures        */
+/* Wait for safe engine pressures */
+safe_start_time = HAL_GetTick();
+safe_time       = HAL_GetTick() - safe_start_time;
+is_press_atm    = false;
+while ( ( !is_press_atm ) && ( safe_time <= SAFE_TIMEOUT ) )
+    {
+    safe_time = HAL_GetTick() - safe_start_time;
+    sensor_dump( &sensor_data );
+    for ( uint8_t i = 0; i < NUM_PTS; ++i )
+        {
+        pt_pressure = sensor_conv_pressure( sensor_data.pt_pressures[ i ], i );
+        if ( pt_pressure >= 50.0 )
+            {
+            is_press_atm = false;
+            break;
+            }
+        else if ( i == ( NUM_PTS - 1) )
+            {
+            is_press_atm = true;
+            }
+        }
+    }
+
+/* Check for timeout */
+if ( safe_time >= SAFE_TIMEOUT )
+    {
+    return FSM_MANUAL_STATE;
+    }
+
 /* Send safe to approach command */
 
 /* Open all the solenoids */

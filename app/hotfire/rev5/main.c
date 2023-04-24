@@ -278,7 +278,7 @@ while (1)
 		/* ABORT state */
 		case FSM_ABORT_STATE:
 			{
-			fsm_state = run_abort_state();
+			run_abort_state();
 			break;
 			}
 		
