@@ -49,10 +49,10 @@ static void send_ack
 /*------------------------------------------------------------------------------
  Global Variables 
 ------------------------------------------------------------------------------*/
-extern FSM_STATE fsm_state;         /* State of engine hotfire    */
-extern bool      stop_hotfire_flag; /* Manual hotfire termination */
-extern bool      stop_purge_flag;   /* Manual purge termination   */
-extern bool      lox_purge_flag;    /* LOX tank purge             */
+extern volatile FSM_STATE fsm_state;         /* State of engine hotfire    */
+extern volatile bool      stop_hotfire_flag; /* Manual hotfire termination */
+extern volatile bool      stop_purge_flag;   /* Manual purge termination   */
+extern volatile bool      lox_purge_flag;    /* LOX tank purge             */
 
 
 /*------------------------------------------------------------------------------
@@ -293,7 +293,7 @@ switch( command )
     case HOTFIRE_GETSTATE_OP:
         {
         /* Send the finite state machine state back to the ground station */
-        rs485_transmit( &fsm_state, sizeof( fsm_state ), RS485_DEFAULT_TIMEOUT );
+        rs485_transmit( (void*) &fsm_state, sizeof( fsm_state ), RS485_DEFAULT_TIMEOUT );
         break;
         } /* HOTFIRE_GETSTATE_OP */
 
@@ -325,7 +325,7 @@ switch( command )
 
     /*--------------------------------------------------------------------------
      Unrecognized Command 
-    ------------------------------------------------------------------*/
+    --------------------------------------------------------------------------*/
     default:
         {
         /* Unsupported command code flash the red LED */

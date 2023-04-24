@@ -28,7 +28,8 @@
 /*------------------------------------------------------------------------------
  Global Variables 
 ------------------------------------------------------------------------------*/
-extern bool lox_purge_flag;
+extern volatile bool lox_purge_flag;      /* Initiate LOX purge */
+extern volatile bool kbottle_closed_flag; /* KBottle is closed  */
 
 
 /*------------------------------------------------------------------------------
@@ -155,6 +156,9 @@ if ( safe_time >= SAFE_TIMEOUT )
     }
 
 /* Send safe to approach command */
+
+/* Wait for K-bottle is closed command */
+while ( !kbottle_closed_flag ){}
 
 /* Open all the solenoids */
 vc_open_solenoids( SOLENOID_LOX_PRESS | SOLENOID_FUEL_PRESS |

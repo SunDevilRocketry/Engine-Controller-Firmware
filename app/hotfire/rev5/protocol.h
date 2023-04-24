@@ -40,6 +40,7 @@ extern "C" {
 #define HOTFIRE_GETSTATE_OP     ( 0x99 )
 #define STOP_HOTFIRE_OP         ( 0x9A )
 #define LOX_PURGE_OP            ( 0x9B )
+#define KBOTTLE_CLOSED_OP       ( 0x9C )
 
 
 /*------------------------------------------------------------------------------
