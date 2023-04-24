@@ -62,6 +62,7 @@ FSM_STATE fsm_state         = FSM_INIT_STATE;   /* Finite State Machine state */
 uint8_t   gs_command        = 0;                /* Ground Station commands    */
 bool      stop_hotfire_flag = false;            /* Manual hotfire termination */
 bool      stop_purge_flag   = false;            /* Manual purge termination   */
+bool      lox_purge_flag    = false;            /* LOX tank purge             */
 
 
 /*------------------------------------------------------------------------------

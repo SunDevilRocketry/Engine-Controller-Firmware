@@ -52,6 +52,7 @@ static void send_ack
 extern FSM_STATE fsm_state;         /* State of engine hotfire    */
 extern bool      stop_hotfire_flag; /* Manual hotfire termination */
 extern bool      stop_purge_flag;   /* Manual purge termination   */
+extern bool      lox_purge_flag;    /* LOX tank purge             */
 
 
 /*------------------------------------------------------------------------------
@@ -308,6 +309,19 @@ switch( command )
         stop_hotfire_flag = true;
         break;
         } /* STOP_HOTFIRE_OP */
+
+    /*--------------------------------------------------------------------------
+     LOXPURGE Command 
+    --------------------------------------------------------------------------*/
+    case LOX_PURGE_OP:
+        {
+        /* Send ACK signal */
+        send_ack();
+
+        /* Set the lox purge flag */
+        lox_purge_flag = true;
+        break;
+        } /* LOX_PURGE_OP */
 
     /*--------------------------------------------------------------------------
      Unrecognized Command 

@@ -48,6 +48,8 @@ extern "C" {
 #define ENGINE_IGNITION_DELAY      ( 4000  ) /* 4s delay between ignition and 
                                                 opening main valves           */
 #define POSTFIRE_PURGE_DURATION    ( 8000  ) /* 8s engine purge               */
+#define VENT_TIMEOUT               ( 10000 ) /* 10s engine vent               */
+#define LOX_PURGE_DURATION         ( 8000  ) /* 8s engine purge               */
 
 
 /*------------------------------------------------------------------------------
