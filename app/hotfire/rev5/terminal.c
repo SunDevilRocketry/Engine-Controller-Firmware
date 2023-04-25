@@ -73,6 +73,7 @@ TERMINAL_STATUS terminal_exec_cmd
 ------------------------------------------------------------------------------*/
 uint8_t       subcommand;       /* subcommand code                            */
 uint8_t       pwr_source;       /* Power source code                          */
+uint8_t       response;         /* Response to PC                             */
 
 /* Flash */
 HFLASH_BUFFER flash_handle;                    /* Flash API buffer handle     */
@@ -120,7 +121,11 @@ switch( command )
     ------------------------------------------------------------------*/
     case PING_OP:
         {
-        ping();
+        response = PING_RESPONSE_CODE;
+        HAL_UART_Transmit( &( USB_HUART ), 
+                           &response, 
+                           sizeof( response ), 
+                           HAL_DEFAULT_TIMEOUT );
         break;
         } /* PING_OP */
 
@@ -129,7 +134,11 @@ switch( command )
     ------------------------------------------------------------------*/
     case CONNECT_OP:
         {
-        ping();
+        response = PING_RESPONSE_CODE;
+        HAL_UART_Transmit( &( USB_HUART ), 
+                           &response, 
+                           sizeof( response ), 
+                           HAL_DEFAULT_TIMEOUT );
         break;
         } /* CONNECT_OP */
 
