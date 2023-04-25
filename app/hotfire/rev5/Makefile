@@ -156,6 +156,7 @@ C_DEFS =            \
 -DSTM32H750xx       \
 -DENGINE_CONTROLLER \
 -DUSE_RS485         \
+-DHOTFIRE           \
 -DL0002_REV5
 
 

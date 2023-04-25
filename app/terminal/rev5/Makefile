@@ -142,6 +142,7 @@ C_DEFS =            \
 -DTERMINAL          \
 -DENGINE_CONTROLLER \
 -DL0002_REV5
+#-DUSE_RS485         
 
 
 # AS includes
