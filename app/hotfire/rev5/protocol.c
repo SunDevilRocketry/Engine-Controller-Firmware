@@ -54,6 +54,7 @@ extern volatile bool      stop_hotfire_flag;   /* Manual hotfire termination  */
 extern volatile bool      stop_purge_flag;     /* Manual purge termination    */
 extern volatile bool      lox_purge_flag;      /* LOX tank purge              */
 extern volatile bool      kbottle_closed_flag; /* Kbottle is closed           */
+extern volatile bool      tanks_safe_flag;     /* Safe tank pressures         */
 
 
 /*------------------------------------------------------------------------------
@@ -78,13 +79,14 @@ void protocol_command_handler
 /*------------------------------------------------------------------------------
  Local Variables  
 ------------------------------------------------------------------------------*/
-uint8_t       subcommand;                     /* SDEC subcommand              */
-uint8_t       sol_state;                      /* State of solenoids           */
-SENSOR_DATA   sensor_data;                    /* Data from engine sensors     */
-uint8_t       sensor_data_bytes[ sizeof( SENSOR_DATA ) ]; 
-RS485_STATUS  rs485_status;                   /* RS485 return codes           */
-VALVE_STATUS  valve_status;                   /* Valve module return codes    */
-SENSOR_STATUS sensor_status;                  /* Sensor module return codes   */
+uint8_t          subcommand;                  /* SDEC subcommand              */
+uint8_t          sol_state;                   /* State of solenoids           */
+SENSOR_DATA      sensor_data;                 /* Data from engine sensors     */
+uint8_t          sensor_data_bytes[ sizeof( SENSOR_DATA ) ]; 
+RS485_STATUS     rs485_status;                /* RS485 return codes           */
+VALVE_STATUS     valve_status;                /* Valve module return codes    */
+SENSOR_STATUS    sensor_status;               /* Sensor module return codes   */
+TANK_SAFE_STATES tanks_state;                 /* State of tank pressures      */
 
 
 /*------------------------------------------------------------------------------
@@ -336,6 +338,26 @@ switch( command )
         kbottle_closed_flag = true;
         break;
         } /* KBOTTLE_CLOSED_OP */
+
+    /*--------------------------------------------------------------------------
+     TANKSTAT Command 
+    --------------------------------------------------------------------------*/
+    case TANKSTAT_OP:
+        {
+        /* Check flags */
+        if ( tanks_safe_flag )
+            {
+            tanks_state = TANKS_SAFE;
+            }
+        else
+            {
+            tanks_state = TANKS_UNSAFE;
+            }
+        
+        /* Send response */
+        rs485_transmit( &tanks_state, sizeof( tanks_state ), RS485_DEFAULT_TIMEOUT );
+        break;
+        }
 
     /*--------------------------------------------------------------------------
      Unrecognized Command 

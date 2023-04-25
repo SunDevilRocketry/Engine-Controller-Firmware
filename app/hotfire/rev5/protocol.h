@@ -41,6 +41,7 @@ extern "C" {
 #define STOP_HOTFIRE_OP         ( 0x9A )
 #define LOX_PURGE_OP            ( 0x9B )
 #define KBOTTLE_CLOSED_OP       ( 0x9C )
+#define TANKSTAT_OP             ( 0x9D )
 
 
 /*------------------------------------------------------------------------------
@@ -94,6 +95,13 @@ typedef struct _PROTOCOL_FRAME
     uint8_t opcode;
     uint8_t control[2];
     } PROTOCOL_FRAME; 
+
+/* Tank Safe States */
+typedef enum _TANK_SAFE_STATES
+    {
+    TANKS_SAFE = 1, 
+    TANKS_UNSAFE
+    } TANK_SAFE_STATES;
 
 
 /*------------------------------------------------------------------------------

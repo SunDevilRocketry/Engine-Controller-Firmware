@@ -51,6 +51,7 @@ extern "C" {
 #define VENT_TIMEOUT               ( 90000 ) /* 1.5 min engine vent           */
 #define SAFE_TIMEOUT               ( 90000 ) /* 1.5 min safeing timeout       */ 
 #define LOX_PURGE_DURATION         ( 8000  ) /* 8s engine purge               */
+#define FILL_CHILL_TANK_DELAY      ( 1000  ) /* 1s delay for stable tanks     */
 
 
 /*------------------------------------------------------------------------------

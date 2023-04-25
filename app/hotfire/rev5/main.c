@@ -65,6 +65,7 @@ volatile bool stop_hotfire_flag   = false;      /* Manual hotfire termination */
 volatile bool stop_purge_flag     = false;      /* Manual purge termination   */
 volatile bool lox_purge_flag      = false;      /* LOX tank purge             */
 volatile bool kbottle_closed_flag = false;      /* KBottle is closed          */
+volatile bool tanks_safe_flag     = false;      /* Tanks are safe             */
 
 
 /*------------------------------------------------------------------------------

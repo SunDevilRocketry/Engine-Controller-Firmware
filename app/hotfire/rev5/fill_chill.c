@@ -13,6 +13,7 @@
  Standard Includes                                                              
 ------------------------------------------------------------------------------*/
 #include <string.h>
+#include <stdbool.h>
 
 
 /*------------------------------------------------------------------------------
@@ -26,7 +27,8 @@
 /*------------------------------------------------------------------------------
  Global Variables 
 ------------------------------------------------------------------------------*/
-extern volatile FSM_STATE fsm_state; /* Hotfire State */
+extern volatile FSM_STATE fsm_state;       /* Hotfire State       */
+extern volatile bool      tanks_safe_flag; /* Safe tank pressures */
 
 
 /*------------------------------------------------------------------------------
@@ -79,12 +81,16 @@ lox_tank_press  = sensor_conv_pressure( sensor_data.pt_pressures[ PT_LOX_PRESS_I
                                          PT_LOX_PRESS_INDEX );
 fuel_tank_press = sensor_conv_pressure( sensor_data.pt_pressures[ PT_FUEL_PRESS_INDEX ], 
                                          PT_FUEL_PRESS_INDEX );
+HAL_Delay( FILL_CHILL_TANK_DELAY );
 if ( ( lox_tank_press > 600 ) || ( fuel_tank_press > 600 ) )
     {
-    // TODO: Send Error Indication to ground station 
     /* Enter manual control mode */
     return FSM_MANUAL_STATE;
     }
+
+/* Let the ground station know the tanks are okay */
+tanks_safe_flag = true;
+
 
 /* Fill the tanks */
 while ( fsm_state != FSM_STANDBY_STATE )
@@ -96,7 +102,12 @@ while ( fsm_state != FSM_STANDBY_STATE )
                                             PT_FUEL_PRESS_INDEX );
     if ( ( lox_tank_press > 600 ) || ( fuel_tank_press > 600 ) )
         {
-        // TODO: Send Warning Indication to ground station 
+        /* Send Warning Indication to ground station */
+        tanks_safe_flag = false;
+        }
+    else
+        {
+        tanks_safe_flag = true;
         }
     }
 
