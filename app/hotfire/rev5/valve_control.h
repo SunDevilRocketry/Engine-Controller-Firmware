@@ -40,7 +40,7 @@ extern "C" {
 #define VALVE_CONTROLLER_REV3_ID     ( 0x07 )
 
 /* Delay to allow valves to calibrate */
-#define VALVE_CALIBRATION_TIME       ( 5000 ) /* 5 sec */
+#define VALVE_CALIBRATION_TIME       ( 1000 ) /* 1 sec */
 
 
 /*------------------------------------------------------------------------------
@@ -59,12 +59,12 @@ typedef enum _VC_STATUS
 /* Solenoid names */
 typedef enum _SOLENOID
     {
-    SOLENOID_LOX_PRESS  = 0xb00000001, /* LOX Pressurization solenoid  (NC) */ 
-    SOLENOID_FUEL_PRESS = 0xb00000010, /* Fuel Pressurization solenoid (NC) */
-    SOLENOID_LOX_VENT   = 0xb00000100, /* LOX vent solenoid            (NO) */
-    SOLENOID_FUEL_VENT  = 0xb00001000, /* Fuel vent solenoid           (NO) */
-    SOLENOID_LOX_PURGE  = 0xb00010000, /* Purge solenoid, LOX side     (NO) */
-    SOLENOID_FUEL_PURGE = 0xb00100000  /* Purge solenoid, Fuel side    (NO) */
+    SOLENOID_LOX_PRESS  = 0b00000001, /* LOX Pressurization solenoid  (NC) */ 
+    SOLENOID_FUEL_PRESS = 0b00000010, /* Fuel Pressurization solenoid (NC) */
+    SOLENOID_LOX_VENT   = 0b00000100, /* LOX vent solenoid            (NO) */
+    SOLENOID_FUEL_VENT  = 0b00001000, /* Fuel vent solenoid           (NO) */
+    SOLENOID_LOX_PURGE  = 0b00010000, /* Purge solenoid, LOX side     (NO) */
+    SOLENOID_FUEL_PURGE = 0b00100000  /* Purge solenoid, Fuel side    (NO) */
     } SOLENOID;
 
 /* Main valve names */

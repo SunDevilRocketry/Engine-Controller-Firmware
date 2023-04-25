@@ -70,7 +70,7 @@ for ( uint8_t i = 0; i < NUM_SOLENOIDS; ++i )
     if ( solenoids & ( 1 << i ) )
         {
         /* Set valve number and subcommand */
-        sol_tx_buffer[1] = sol_subcommand | i;
+        sol_tx_buffer[1] = sol_subcommand | ( i + 1 );
 
         /* Send data to valve controller */ 
         valve_status = valve_transmit( &sol_tx_buffer[0]      , 
@@ -127,7 +127,7 @@ for ( uint8_t i = 0; i < NUM_SOLENOIDS; ++i )
     if ( solenoids & ( 1 << i ) )
         {
         /* Set valve number and subcommand */
-        sol_tx_buffer[1] = sol_subcommand | i;
+        sol_tx_buffer[1] = sol_subcommand | ( i + 1 );
 
         /* Send data to valve controller */ 
         valve_status = valve_transmit( &sol_tx_buffer[0]      , 
