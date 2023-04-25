@@ -60,7 +60,7 @@ UART_HandleTypeDef huart4; /* Wireless interface UART handle */
  Global Variables  
 ------------------------------------------------------------------------------*/
 FSM_STATE fsm_state           = FSM_INIT_STATE; /* Finite State Machine state */
-uint8_t   gs_command          = 0;              /* Ground Station commands    */
+volatile uint8_t   gs_command          = 0;              /* Ground Station commands    */
 volatile bool stop_hotfire_flag   = false;      /* Manual hotfire termination */
 volatile bool stop_purge_flag     = false;      /* Manual purge termination   */
 volatile bool lox_purge_flag      = false;      /* LOX tank purge             */

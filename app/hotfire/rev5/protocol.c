@@ -207,6 +207,9 @@ switch( command )
     --------------------------------------------------------------------------*/
     case TELREQ_OP:
         {
+        /* Send ACK signal */
+        send_ack();
+
         /* Get sensor data */
         sensor_status = sensor_dump( &sensor_data );
         if ( sensor_status != SENSOR_OK )

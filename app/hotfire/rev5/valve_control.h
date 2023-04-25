@@ -30,7 +30,7 @@ extern "C" {
 
 /* Timeouts */
 #ifndef SDR_DEBUG
-    #define VALVE_TIMEOUT     ( 1 )
+    #define VALVE_TIMEOUT     ( 10 )
 #else
     #define VALVE_TIMEOUT     ( 0xFFFFFFFF )
 #endif /* #ifndef SDR_DEBUG */

@@ -222,11 +222,11 @@ void UART4_IRQHandler
     void
     )
 {
-/* Process the ground station command */
-protocol_command_handler( gs_command );
-
 /* HAL Error Handling */
 HAL_UART_IRQHandler( &huart4 );
+
+/* Process the ground station command */
+protocol_command_handler( gs_command );
 
 /* Continue listening when done */
 rs485_receive_IT( &gs_command, sizeof( gs_command) );
