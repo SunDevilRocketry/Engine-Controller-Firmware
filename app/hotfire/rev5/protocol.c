@@ -202,14 +202,7 @@ switch( command )
         send_ack();
 
         /* Get sensor data */
-        if ( fsm_state == FSM_FILL_CHILL_STATE )
-            {
-            memcpy( &sensor_data, &( sensor_ping_pong_buffer.sensor_data[ sensor_ping_pong_buffer.current_index ] ), sizeof( SENSOR_DATA ) );
-            }
-        else
-            {
-            sensor_dump( &sensor_data );
-            }
+        sensor_dump( &sensor_data );
         memcpy( &sensor_data_bytes[0], &sensor_data, sizeof( SENSOR_DATA ) );
 
         /* Transmit the sensor data */

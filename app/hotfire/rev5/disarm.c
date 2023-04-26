@@ -117,11 +117,11 @@ while ( ( !is_press_atm ) && ( vent_time <= VENT_TIMEOUT ) )
 tanks_safe_flag = true;
 
 /* Go to manual mode if venting timed out */
-if ( vent_time >= VENT_TIMEOUT )
-    {
+//if ( vent_time >= VENT_TIMEOUT )
+ //   {
     //Error_Handler( ERROR_FSM_INVALID_STATE_ERROR );
     //return FSM_MANUAL_STATE;
-    }
+  //  }
 
 /* LOX tank purge */
 while ( !lox_purge_flag ){}
