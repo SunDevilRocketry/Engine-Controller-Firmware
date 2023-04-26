@@ -377,7 +377,7 @@ if ( huart->Instance == UART4 )
 	HAL_GPIO_Init( GPIOA, &GPIO_InitStruct );
 
     /* UART4 interrupt Init */
-    HAL_NVIC_SetPriority( UART4_IRQn, 0, 0);
+    HAL_NVIC_SetPriority( UART4_IRQn, 15, 0);
     HAL_NVIC_EnableIRQ  ( UART4_IRQn      );
 	} /* if ( huart->Instance == UART4 )*/
 
