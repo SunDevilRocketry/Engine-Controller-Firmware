@@ -20,6 +20,10 @@
 #include "main.h"
 #include "led.h"
 
+/*------------------------------------------------------------------------------
+ Gloabl Variables 
+------------------------------------------------------------------------------*/
+volatile extern FSM_STATE fsm_state;
 
 /*------------------------------------------------------------------------------
  Public Functions 
@@ -40,11 +44,11 @@ FSM_STATE run_manual_state
     void
     )
 {
-while ( 1 )
+led_set_color( LED_CYAN );
+while ( fsm_state == FSM_MANUAL_STATE )
     {
-    led_set_color( LED_CYAN );
     }
-return FSM_READY_STATE;
+return fsm_state;
 } /* run_manual_state */
 
 

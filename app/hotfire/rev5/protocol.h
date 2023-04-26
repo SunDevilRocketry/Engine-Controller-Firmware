@@ -42,6 +42,7 @@ extern "C" {
 #define LOX_PURGE_OP            ( 0x9B )
 #define KBOTTLE_CLOSED_OP       ( 0x9C )
 #define TANKSTAT_OP             ( 0x9D )
+#define MANUAL_OP               ( 0x9E )
 
 /* Response codes */
 #define TELREQ_BUSY_CODE        ( 0x99 )

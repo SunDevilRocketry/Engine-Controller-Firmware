@@ -138,12 +138,6 @@ switch( command )
             break;
             }
         
-        /* Send ACK signal */
-        if ( subcommand != SOL_GETSTATE_CODE )
-            {
-            send_ack();
-            }
-
         /* Pass on command and subcommand to valve controller */ 
         valve_transmit( &command   , sizeof( command ), HAL_DEFAULT_TIMEOUT );
         valve_transmit( &subcommand, sizeof( command ), HAL_DEFAULT_TIMEOUT );
@@ -177,12 +171,6 @@ switch( command )
             {
             led_set_color( LED_YELLOW );
             break;
-            }
-        
-        /* Send ACK signal */
-        if ( subcommand != SOL_GETSTATE_CODE )
-            {
-            send_ack();
             }
 
         /* Pass on command and subcommand to valve controller */ 
@@ -364,6 +352,19 @@ switch( command )
         rs485_transmit( &tanks_state, sizeof( tanks_state ), RS485_DEFAULT_TIMEOUT );
         break;
         }
+
+    /*--------------------------------------------------------------------------
+     MANUAL Command 
+    --------------------------------------------------------------------------*/
+    case MANUAL_OP:
+        {
+        /* Send ACK signal */
+        send_ack();
+
+        /* Set the kbottle closed flag */
+        fsm_state = FSM_MANUAL_STATE;
+        break;
+        } /* KBOTTLE_CLOSED_OP */
 
     /*--------------------------------------------------------------------------
      Unrecognized Command 
