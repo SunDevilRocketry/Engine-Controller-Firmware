@@ -56,6 +56,14 @@ vc_crack_main_valves( MAIN_VALVE_BOTH_MAINS );
 /* Open pressurization valves */
 vc_open_solenoids( SOLENOID_LOX_PRESS | SOLENOID_FUEL_PRESS );
 
+/* Purge Duration */
+HAL_Delay( PREFIRE_PURGE_DURATION );
+
+/* Stop the purge */
+vc_close_solenoids( SOLENOID_LOX_PRESS | SOLENOID_FUEL_PRESS );
+vc_close_main_valves( MAIN_VALVE_BOTH_MAINS );
+vc_open_solenoids( SOLENOID_LOX_VENT | SOLENOID_FUEL_VENT );
+
 /* Wait for fill and chill command */
 while ( fsm_state != FSM_FILL_CHILL_STATE ){}
 return FSM_FILL_CHILL_STATE;

@@ -97,7 +97,7 @@ while ( fsm_state != FSM_STANDBY_STATE )
     {
     sensor_dump( &sensor_data );
     lox_tank_press  = sensor_conv_pressure( sensor_data.pt_pressures[ PT_LOX_PRESS_INDEX ], 
-                                            PT_LOX_PRESS_INDEX );
+                                          PT_LOX_PRESS_INDEX );
     fuel_tank_press = sensor_conv_pressure( sensor_data.pt_pressures[ PT_FUEL_PRESS_INDEX ], 
                                             PT_FUEL_PRESS_INDEX );
     if ( ( lox_tank_press > 600 ) || ( fuel_tank_press > 600 ) )

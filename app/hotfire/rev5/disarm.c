@@ -23,6 +23,7 @@
 #include "valve_control.h"
 #include "pressure.h"
 #include "sensor.h"
+#include "sdr_error.h"
 
 
 /*------------------------------------------------------------------------------
@@ -30,6 +31,7 @@
 ------------------------------------------------------------------------------*/
 extern volatile bool lox_purge_flag;      /* Initiate LOX purge */
 extern volatile bool kbottle_closed_flag; /* KBottle is closed  */
+extern volatile bool tanks_safe_flag;     /* Engine is safe to approach */
 
 
 /*------------------------------------------------------------------------------
@@ -89,6 +91,7 @@ vc_open_solenoids( SOLENOID_LOX_VENT | SOLENOID_FUEL_VENT );
 vc_close_solenoids( SOLENOID_LOX_PURGE | SOLENOID_FUEL_PURGE );
 
 /* Wait for pressure to vent off */
+tanks_safe_flag = false;
 vent_start_time = HAL_GetTick();
 vent_time       = HAL_GetTick() - vent_start_time;
 sensor_dump( &sensor_data );
@@ -96,20 +99,22 @@ lox_tank_press  = sensor_conv_pressure( sensor_data.pt_pressures[ PT_LOX_PRESS_I
                                          PT_LOX_PRESS_INDEX );
 fuel_tank_press = sensor_conv_pressure( sensor_data.pt_pressures[ PT_FUEL_PRESS_INDEX ], 
                                          PT_FUEL_PRESS_INDEX );
-is_press_atm    = ( lox_tank_press <= 50.0 ) && ( fuel_tank_press <= 50.0 );
+is_press_atm    = ( lox_tank_press <= 100.0 ) && ( fuel_tank_press <= 100.0 );
 while ( ( !is_press_atm ) && ( vent_time <= VENT_TIMEOUT ) )
     {
     lox_tank_press  = sensor_conv_pressure( sensor_data.pt_pressures[ PT_LOX_PRESS_INDEX ], 
                                             PT_LOX_PRESS_INDEX );
     fuel_tank_press = sensor_conv_pressure( sensor_data.pt_pressures[ PT_FUEL_PRESS_INDEX ], 
                                             PT_FUEL_PRESS_INDEX );
-    is_press_atm    = ( lox_tank_press <= 50.0 ) && ( fuel_tank_press <= 50.0 );
+    is_press_atm    = ( lox_tank_press <= 100.0 ) && ( fuel_tank_press <= 100.0 );
     vent_time = HAL_GetTick() - vent_start_time; 
     }
+tanks_safe_flag = true;
 
 /* Go to manual mode if venting timed out */
 if ( vent_time >= VENT_TIMEOUT )
     {
+    Error_Handler( ERROR_FSM_INVALID_STATE_ERROR );
     return FSM_MANUAL_STATE;
     }
 
@@ -156,6 +161,7 @@ if ( safe_time >= SAFE_TIMEOUT )
     }
 
 /* Send safe to approach command */
+tanks_safe_flag = true;
 
 /* Wait for K-bottle is closed command */
 while ( !kbottle_closed_flag ){}
