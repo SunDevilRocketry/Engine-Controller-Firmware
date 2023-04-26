@@ -55,7 +55,6 @@ FSM_STATE run_fire_state
 /*------------------------------------------------------------------------------
  Local Variables  
 ------------------------------------------------------------------------------*/
-IGN_STATUS          ign_status;        /* Return codes from ignition API */
 uint32_t            burn_time;         /* Time engine has been burning   */
 DATA_LOG_DATA_FRAME sensor_data;       /* Data from engine sensors       */
 
@@ -63,7 +62,6 @@ DATA_LOG_DATA_FRAME sensor_data;       /* Data from engine sensors       */
 /*------------------------------------------------------------------------------
  Initializations 
 ------------------------------------------------------------------------------*/
-ign_status       = IGN_OK;
 memset( &sensor_data, 0, sizeof( sensor_data ) );
 
 
@@ -91,12 +89,7 @@ vc_close_main_valves( MAIN_VALVE_LOX_MAIN );
 HAL_Delay( LOX_POSTCRACK_DELAY );
 
 /* Ignite the engine */
-ign_status = ign_ignite();
-//if ( ign_status != IGN_OK )
- //   {
-    /* Abort */
-  //  return FSM_ABORT_STATE;
-   // }
+ign_ignite();
 HAL_Delay( ENGINE_IGNITION_DELAY );
 
 /* Open the main valves */
@@ -120,8 +113,8 @@ while ( burn_time < ENGINE_BURN_DURATION )
         }
     
     /* Log Data */
-//    data_logger_get_data( &sensor_data );
- //   data_logger_log_data( sensor_data  );
+    data_logger_get_data( &sensor_data );
+    data_logger_log_data( sensor_data  );
 
 
     /* Update timer */
