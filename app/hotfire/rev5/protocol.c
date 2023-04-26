@@ -55,6 +55,8 @@ extern volatile bool      stop_purge_flag;     /* Manual purge termination    */
 extern volatile bool      lox_purge_flag;      /* LOX tank purge              */
 extern volatile bool      kbottle_closed_flag; /* Kbottle is closed           */
 extern volatile bool      tanks_safe_flag;     /* Safe tank pressures         */
+extern volatile bool      telreq_wait_flag;    /* Wait flag for telreq cmds   */
+extern SENSOR_DATA_PING_PONG sensor_ping_pong_buffer;
 
 
 /*------------------------------------------------------------------------------
@@ -85,7 +87,6 @@ SENSOR_DATA      sensor_data;                 /* Data from engine sensors     */
 uint8_t          sensor_data_bytes[ sizeof( SENSOR_DATA ) ]; 
 RS485_STATUS     rs485_status;                /* RS485 return codes           */
 VALVE_STATUS     valve_status;                /* Valve module return codes    */
-SENSOR_STATUS    sensor_status;               /* Sensor module return codes   */
 TANK_SAFE_STATES tanks_state;                 /* State of tank pressures      */
 
 
@@ -94,7 +95,6 @@ TANK_SAFE_STATES tanks_state;                 /* State of tank pressures      */
 ------------------------------------------------------------------------------*/
 rs485_status  = RS485_OK;
 valve_status  = VALVE_OK;
-sensor_status = SENSOR_OK;
 sol_state     = 0;
 memset( &sensor_data         , 0, sizeof( sensor_data       ) );
 memset( &sensor_data_bytes[0], 0, sizeof( sensor_data_bytes ) );
@@ -200,6 +200,7 @@ switch( command )
         send_ack();
 
         /* Initiate Abort */
+        run_abort_state();
         fsm_state = FSM_ABORT_STATE;
         break;
         } /* ABORT_OP */
@@ -209,12 +210,17 @@ switch( command )
     --------------------------------------------------------------------------*/
     case TELREQ_OP:
         {
+        /* Send ACK */
+        send_ack();
+
         /* Get sensor data */
-        sensor_status = sensor_dump( &sensor_data );
-        if ( sensor_status != SENSOR_OK )
+        if ( fsm_state == FSM_FILL_CHILL_STATE )
             {
-            led_set_color( LED_YELLOW );
-            break;
+            memcpy( &sensor_data, &( sensor_ping_pong_buffer.sensor_data[ sensor_ping_pong_buffer.current_index ] ), sizeof( SENSOR_DATA ) );
+            }
+        else
+            {
+            sensor_dump( &sensor_data );
             }
         memcpy( &sensor_data_bytes[0], &sensor_data, sizeof( SENSOR_DATA ) );
 

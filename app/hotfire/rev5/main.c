@@ -66,6 +66,10 @@ volatile bool stop_purge_flag     = false;      /* Manual purge termination   */
 volatile bool lox_purge_flag      = false;      /* LOX tank purge             */
 volatile bool kbottle_closed_flag = false;      /* KBottle is closed          */
 volatile bool tanks_safe_flag     = false;      /* Tanks are safe             */
+volatile bool telreq_wait_flag    = false;      /* Controller busy            */
+
+/* Sensor data */
+SENSOR_DATA_PING_PONG sensor_ping_pong_buffer = {0};
 
 
 /*------------------------------------------------------------------------------

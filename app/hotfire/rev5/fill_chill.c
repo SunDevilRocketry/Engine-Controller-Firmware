@@ -20,6 +20,7 @@
  Project Includes                                                              
 ------------------------------------------------------------------------------*/
 #include "main.h"
+#include "pressure.h"
 #include "sensor.h"
 #include "valve_control.h"
 
@@ -27,8 +28,10 @@
 /*------------------------------------------------------------------------------
  Global Variables 
 ------------------------------------------------------------------------------*/
-extern volatile FSM_STATE fsm_state;       /* Hotfire State       */
-extern volatile bool      tanks_safe_flag; /* Safe tank pressures */
+extern volatile FSM_STATE fsm_state;        /* Hotfire State       */
+extern volatile bool      tanks_safe_flag;  /* Safe tank pressures */
+extern volatile bool      telreq_wait_flag; /* Wait to get telemetry */
+extern SENSOR_DATA_PING_PONG sensor_ping_pong_buffer;
 
 
 /*------------------------------------------------------------------------------
@@ -77,10 +80,12 @@ vc_open_solenoids( SOLENOID_LOX_VENT | SOLENOID_FUEL_VENT );
 
 /* Check Tank Pressures */
 sensor_dump( &sensor_data );
+memcpy( &( sensor_ping_pong_buffer.sensor_data[0] ), &sensor_data, sizeof( SENSOR_DATA ) ) ;
+sensor_ping_pong_buffer.current_index = 0;
 lox_tank_press  = sensor_conv_pressure( sensor_data.pt_pressures[ PT_LOX_PRESS_INDEX ], 
-                                         PT_LOX_PRESS_INDEX );
+                                        PT_LOX_PRESS_INDEX );
 fuel_tank_press = sensor_conv_pressure( sensor_data.pt_pressures[ PT_FUEL_PRESS_INDEX ], 
-                                         PT_FUEL_PRESS_INDEX );
+                                        PT_FUEL_PRESS_INDEX );
 HAL_Delay( FILL_CHILL_TANK_DELAY );
 if ( ( lox_tank_press > 600 ) || ( fuel_tank_press > 600 ) )
     {
@@ -96,6 +101,25 @@ tanks_safe_flag = true;
 while ( fsm_state != FSM_STANDBY_STATE )
     {
     sensor_dump( &sensor_data );
+    memcpy( &( sensor_ping_pong_buffer.sensor_data[0] ), &sensor_data, sizeof( SENSOR_DATA ) );
+    sensor_ping_pong_buffer.current_index = 0;
+    lox_tank_press  = sensor_conv_pressure( sensor_data.pt_pressures[ PT_LOX_PRESS_INDEX ], 
+                                          PT_LOX_PRESS_INDEX );
+    fuel_tank_press = sensor_conv_pressure( sensor_data.pt_pressures[ PT_FUEL_PRESS_INDEX ], 
+                                            PT_FUEL_PRESS_INDEX );
+    if ( ( lox_tank_press > 600 ) || ( fuel_tank_press > 600 ) )
+        {
+        /* Send Warning Indication to ground station */
+        tanks_safe_flag = false;
+        }
+    else
+        {
+        tanks_safe_flag = true;
+        }
+
+    sensor_dump( &sensor_data );
+    memcpy( &( sensor_ping_pong_buffer.sensor_data[1] ), &sensor_data, sizeof( SENSOR_DATA ) );
+    sensor_ping_pong_buffer.current_index = 1;
     lox_tank_press  = sensor_conv_pressure( sensor_data.pt_pressures[ PT_LOX_PRESS_INDEX ], 
                                           PT_LOX_PRESS_INDEX );
     fuel_tank_press = sensor_conv_pressure( sensor_data.pt_pressures[ PT_FUEL_PRESS_INDEX ], 

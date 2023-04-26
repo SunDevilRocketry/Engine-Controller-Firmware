@@ -21,6 +21,7 @@ extern "C" {
  Includes                                                                    
 ------------------------------------------------------------------------------*/
 #include "stm32h7xx_hal.h"
+#include "sensor.h"
 
 
 /*------------------------------------------------------------------------------
@@ -53,6 +54,8 @@ extern "C" {
 #define SAFE_TIMEOUT               ( 90000 ) /* 1.5 min safeing timeout       */ 
 #define LOX_PURGE_DURATION         ( 8000  ) /* 8s engine purge               */
 #define FILL_CHILL_TANK_DELAY      ( 1000  ) /* 1s delay for stable tanks     */
+#define LOX_POSTCRACK_DELAY        ( 5000  ) /* 5s delay after LOX bleed      */ 
+#define VENT_PRESS_DELAY           ( 2000  ) /* 2s delay vent-to-press sol    */
 
 
 /*------------------------------------------------------------------------------
@@ -74,6 +77,12 @@ typedef enum _FSM_STATE
 	FSM_ABORT_STATE           /* Abort state              */
 	} FSM_STATE;
 
+/* Sensor Data Ping-pong buffer */
+typedef struct _SENSOR_DATA_PING_PONG
+	{
+	SENSOR_DATA sensor_data[2];
+	uint8_t     current_index;
+	} SENSOR_DATA_PING_PONG;
 
 /*------------------------------------------------------------------------------
  State Run Functions 

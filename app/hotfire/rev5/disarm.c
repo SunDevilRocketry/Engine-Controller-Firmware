@@ -32,6 +32,7 @@
 extern volatile bool lox_purge_flag;      /* Initiate LOX purge */
 extern volatile bool kbottle_closed_flag; /* KBottle is closed  */
 extern volatile bool tanks_safe_flag;     /* Engine is safe to approach */
+extern volatile bool stop_purge_flag;     /* Start disarming the engine */
 
 
 /*------------------------------------------------------------------------------
@@ -90,6 +91,10 @@ vc_open_solenoids( SOLENOID_LOX_VENT | SOLENOID_FUEL_VENT );
 /* Close purge solenoids         */
 vc_close_solenoids( SOLENOID_LOX_PURGE | SOLENOID_FUEL_PURGE );
 
+
+/* Wait for disarm command */
+while ( !stop_purge_flag ){}
+
 /* Wait for pressure to vent off */
 tanks_safe_flag = false;
 vent_start_time = HAL_GetTick();
@@ -114,20 +119,22 @@ tanks_safe_flag = true;
 /* Go to manual mode if venting timed out */
 if ( vent_time >= VENT_TIMEOUT )
     {
-    Error_Handler( ERROR_FSM_INVALID_STATE_ERROR );
-    return FSM_MANUAL_STATE;
+    //Error_Handler( ERROR_FSM_INVALID_STATE_ERROR );
+    //return FSM_MANUAL_STATE;
     }
 
 /* LOX tank purge */
 while ( !lox_purge_flag ){}
 vc_close_solenoids( SOLENOID_LOX_VENT );
+HAL_Delay( VENT_PRESS_DELAY );
 vc_open_solenoids( SOLENOID_LOX_PRESS );
 vc_crack_main_valves( MAIN_VALVE_LOX_MAIN );
 HAL_Delay( LOX_PURGE_DURATION );
 
 /* Transition to safe state for manual closing of K-bottle */
-vc_close_solenoids( SOLENOID_LOX_VENT | SOLENOID_FUEL_VENT );
+vc_open_solenoids( SOLENOID_LOX_VENT | SOLENOID_FUEL_VENT );
 vc_close_main_valves( MAIN_VALVE_BOTH_MAINS );
+HAL_Delay( VENT_PRESS_DELAY );
 vc_close_solenoids( SOLENOID_LOX_PRESS | SOLENOID_FUEL_PRESS );
 HAL_Delay( TANK_PRESS_DELAY );
 
@@ -142,7 +149,7 @@ while ( ( !is_press_atm ) && ( safe_time <= SAFE_TIMEOUT ) )
     for ( uint8_t i = 0; i < NUM_PTS; ++i )
         {
         pt_pressure = sensor_conv_pressure( sensor_data.pt_pressures[ i ], i );
-        if ( pt_pressure >= 50.0 )
+        if ( pt_pressure >= 100.0 )
             {
             is_press_atm = false;
             break;

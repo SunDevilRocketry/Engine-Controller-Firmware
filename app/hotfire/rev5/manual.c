@@ -18,6 +18,7 @@
  Project Includes                                                              
 ------------------------------------------------------------------------------*/
 #include "main.h"
+#include "led.h"
 
 
 /*------------------------------------------------------------------------------
@@ -39,6 +40,10 @@ FSM_STATE run_manual_state
     void
     )
 {
+while ( 1 )
+    {
+    led_set_color( LED_CYAN );
+    }
 return FSM_READY_STATE;
 } /* run_manual_state */
 

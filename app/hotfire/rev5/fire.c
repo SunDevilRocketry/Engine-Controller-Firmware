@@ -58,17 +58,12 @@ FSM_STATE run_fire_state
 IGN_STATUS          ign_status;        /* Return codes from ignition API */
 uint32_t            burn_time;         /* Time engine has been burning   */
 DATA_LOG_DATA_FRAME sensor_data;       /* Data from engine sensors       */
-uint32_t            purge_start_time;  /* Start time of engine purge     */
-uint32_t            purge_time;        /* Time since purge start         */
 
 
 /*------------------------------------------------------------------------------
  Initializations 
 ------------------------------------------------------------------------------*/
 ign_status       = IGN_OK;
-burn_time        = 0;
-purge_time       = 0;
-purge_start_time = 0;
 memset( &sensor_data, 0, sizeof( sensor_data ) );
 
 
@@ -79,6 +74,7 @@ memset( &sensor_data, 0, sizeof( sensor_data ) );
 
 /* Close the vent solenoids */
 vc_close_solenoids( SOLENOID_LOX_VENT | SOLENOID_FUEL_VENT );
+HAL_Delay( VENT_PRESS_DELAY );
 
 /* Pressurize the LOX tank */
 vc_open_solenoids( SOLENOID_LOX_PRESS );
@@ -91,14 +87,16 @@ HAL_Delay( TANK_PRESS_DELAY );
 /* Crack the main LOX valve */
 vc_crack_main_valves( MAIN_VALVE_LOX_MAIN );
 HAL_Delay( LOX_CRACK_DURATION );
+vc_close_main_valves( MAIN_VALVE_LOX_MAIN );
+HAL_Delay( LOX_POSTCRACK_DELAY );
 
 /* Ignite the engine */
 ign_status = ign_ignite();
-if ( ign_status != IGN_OK )
-    {
+//if ( ign_status != IGN_OK )
+ //   {
     /* Abort */
-    return FSM_ABORT_STATE;
-    }
+  //  return FSM_ABORT_STATE;
+   // }
 HAL_Delay( ENGINE_IGNITION_DELAY );
 
 /* Open the main valves */
@@ -122,8 +120,8 @@ while ( burn_time < ENGINE_BURN_DURATION )
         }
     
     /* Log Data */
-    data_logger_get_data( &sensor_data );
-    data_logger_log_data( sensor_data  );
+//    data_logger_get_data( &sensor_data );
+ //   data_logger_log_data( sensor_data  );
 
 
     /* Update timer */
@@ -140,12 +138,7 @@ vc_close_solenoids( SOLENOID_LOX_PRESS | SOLENOID_FUEL_PRESS );
 vc_open_solenoids( SOLENOID_LOX_PURGE | SOLENOID_FUEL_PURGE );
 
 /* Wait for stop purge command or timeout */
-purge_start_time = HAL_GetTick();
-purge_time       = HAL_GetTick() - purge_start_time;
-while ( ( !stop_purge_flag ) && ( purge_time < POSTFIRE_PURGE_DURATION ) )
-    {
-    purge_time = HAL_GetTick() - purge_start_time;
-    }
+HAL_Delay( POSTFIRE_PURGE_DURATION );
 
 /* Transition to disarm state */
 return FSM_DISARM_STATE;

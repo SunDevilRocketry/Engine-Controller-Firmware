@@ -19,6 +19,7 @@
  Project Includes                                                              
 ------------------------------------------------------------------------------*/
 #include "main.h"
+#include "led.h"
 
 
 /*------------------------------------------------------------------------------
@@ -40,6 +41,10 @@ FSM_STATE run_post_fire_state
     void
     )
 {
+led_set_color( LED_WHITE );
+while ( 1 )
+    {
+    }
 return FSM_READY_STATE;
 } /* run_post_fire_state */
 

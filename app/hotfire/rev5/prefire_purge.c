@@ -49,6 +49,7 @@ FSM_STATE run_pre_fire_purge_state
 {
 /* Close vent solenoids */
 vc_close_solenoids( SOLENOID_LOX_VENT | SOLENOID_FUEL_VENT );
+HAL_Delay( VENT_PRESS_DELAY );
 
 /* Crack Main valves */
 vc_crack_main_valves( MAIN_VALVE_BOTH_MAINS );
@@ -62,6 +63,7 @@ HAL_Delay( PREFIRE_PURGE_DURATION );
 /* Stop the purge */
 vc_close_solenoids( SOLENOID_LOX_PRESS | SOLENOID_FUEL_PRESS );
 vc_close_main_valves( MAIN_VALVE_BOTH_MAINS );
+HAL_Delay( VENT_PRESS_DELAY );
 vc_open_solenoids( SOLENOID_LOX_VENT | SOLENOID_FUEL_VENT );
 
 /* Wait for fill and chill command */

@@ -43,6 +43,9 @@ extern "C" {
 #define KBOTTLE_CLOSED_OP       ( 0x9C )
 #define TANKSTAT_OP             ( 0x9D )
 
+/* Response codes */
+#define TELREQ_BUSY_CODE        ( 0x99 )
+
 
 /*------------------------------------------------------------------------------
  Typedefs 
