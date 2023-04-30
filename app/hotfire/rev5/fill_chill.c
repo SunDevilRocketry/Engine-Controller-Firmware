@@ -88,7 +88,7 @@ HAL_Delay( FILL_CHILL_TANK_DELAY );
 if ( ( lox_tank_press > 600 ) || ( fuel_tank_press > 600 ) )
     {
     /* Enter manual control mode */
-    return FSM_MANUAL_STATE;
+    //return FSM_MANUAL_STATE;
     }
 
 /* Let the ground station know the tanks are okay */
