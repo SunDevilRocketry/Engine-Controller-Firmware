@@ -18,6 +18,7 @@
 /*------------------------------------------------------------------------------
  Project Includes                                                              
 ------------------------------------------------------------------------------*/
+#include "stm32h7xx_hal.h"
 #include "valve_control.h"
 #include "commands.h"
 #include "solenoid.h"
@@ -621,6 +622,76 @@ else
     }
 
 } /* vc_connect */
+
+
+/*******************************************************************************
+*                                                                              *
+* PROCEDURE:                                                                   *
+* 		vc_getstate                                                            *
+*                                                                              *
+* DESCRIPTION:                                                                 *
+*       Gets the state of the engine engine valves (Open/Closed)               *
+*                                                                              *
+*******************************************************************************/
+VC_STATUS vc_getstate
+    (
+    VALVE_STATES* valve_state_ptr /* Pointer to output variable */
+    )
+{
+/*------------------------------------------------------------------------------
+ Local Variables  
+------------------------------------------------------------------------------*/
+SOL_STATE         solenoid_states;   /* States of solenoids       */
+MAIN_VALVE_STATES main_valve_states; /* States of the main valves */
+uint8_t           command;           /* SDEC sol/valve command    */
+uint8_t           subcommand;        /* SDEC sol/valve subcommand */
+VALVE_STATUS      valve_status;      /* Valve module return codes */
+
+
+/*------------------------------------------------------------------------------
+ Initializations 
+------------------------------------------------------------------------------*/
+solenoid_states   = 0;
+main_valve_states = 0;
+*valve_state_ptr  = 0;
+command           = SOL_OP;             /* Check solenoids first */
+subcommand        = SOL_GETSTATE_CODE;
+valve_status      = VALVE_OK;
+
+
+/*------------------------------------------------------------------------------
+ Initializations 
+------------------------------------------------------------------------------*/
+
+/* Get the solenoids states   */
+valve_transmit( &command   , sizeof( command    ), VALVE_TIMEOUT );
+valve_transmit( &subcommand, sizeof( subcommand ), VALVE_TIMEOUT );
+valve_status = valve_receive( &solenoid_states, 
+                              sizeof( solenoid_states ), 
+                              VALVE_TIMEOUT );
+if ( valve_status != VALVE_OK )
+    {
+    return VC_UART_ERROR;
+    }
+
+/* Get the main valves states */
+command    = VALVE_OP;
+subcommand = VALVE_GETSTATE_CODE;
+valve_transmit( &command   , sizeof( command    ), VALVE_TIMEOUT );
+valve_transmit( &subcommand, sizeof( subcommand ), VALVE_TIMEOUT );
+valve_status = valve_receive( &main_valve_states, 
+                              sizeof( main_valve_states ), 
+                              VALVE_TIMEOUT );
+if ( valve_status != VALVE_OK )
+    {
+    return VC_UART_ERROR;
+    }
+
+/* Export the valve states */
+*valve_state_ptr |= solenoid_states;
+*valve_state_ptr |= main_valve_states;
+return VC_OK;
+} /* vc_getstate */
 
 
 /*******************************************************************************

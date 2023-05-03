@@ -75,6 +75,17 @@ typedef enum _MAIN_VALVE
     MAIN_VALVE_BOTH_MAINS /* Both the LOX and Fuel main valves */
     } MAIN_VALVE;
 
+/* Valve state -> Valves open/closed */
+/* bit 7: Main Fuel Valve 
+   bit 6: Main LOX Valve
+   bit 5: Fuel Purge Line Solenoid 
+   bit 4: LOX Purge Line Solenoid 
+   bit 3: Fuel Venting Solenoid 
+   bit 2: LOX Venting Solenoid 
+   bit 1: Fuel Pressurization Solenoid 
+   bit 0: LOX Pressurization Solenoid */
+typedef uint8_t VALVE_STATES;
+
 
 /*------------------------------------------------------------------------------
  Public Function Prototypes 
@@ -132,6 +143,12 @@ VC_STATUS vc_enable_main_valves
 VC_STATUS vc_connect
     (
     void
+    );
+
+/* Gets the state of the engine engine valves (Open/Closed) */
+VC_STATUS vc_getstate
+    (
+    VALVE_STATES* valve_state_ptr /* Pointer to output variable */
     );
 
 

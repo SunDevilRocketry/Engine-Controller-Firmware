@@ -88,6 +88,7 @@ uint8_t          sensor_data_bytes[ sizeof( SENSOR_DATA ) ];
 RS485_STATUS     rs485_status;                /* RS485 return codes           */
 VALVE_STATUS     valve_status;                /* Valve module return codes    */
 TANK_SAFE_STATES tanks_state;                 /* State of tank pressures      */
+VALVE_STATES     valve_states;                /* Open/close state of valves   */
 
 
 /*------------------------------------------------------------------------------
@@ -95,6 +96,7 @@ TANK_SAFE_STATES tanks_state;                 /* State of tank pressures      */
 ------------------------------------------------------------------------------*/
 rs485_status  = RS485_OK;
 valve_status  = VALVE_OK;
+valve_states  = 0;
 sol_state     = 0;
 memset( &sensor_data         , 0, sizeof( sensor_data       ) );
 memset( &sensor_data_bytes[0], 0, sizeof( sensor_data_bytes ) );
@@ -205,10 +207,16 @@ switch( command )
         sensor_dump( &sensor_data );
         memcpy( &sensor_data_bytes[0], &sensor_data, sizeof( SENSOR_DATA ) );
 
-        /* Transmit the sensor data */
+        /* Get the state of the valves */
+        vc_getstate( &valve_states );
+
+        /* Transmit the sensor and valve data */
         rs485_transmit( &sensor_data_bytes[0], 
                         sizeof( SENSOR_DATA ), 
                         RS485_DEFAULT_TIMEOUT*sizeof( SENSOR_DATA ));
+        rs485_transmit( &valve_states         , 
+                        sizeof( valve_states ), 
+                        RS485_DEFAULT_TIMEOUT );
         break;
         } /* TELREQ_OP */
 
