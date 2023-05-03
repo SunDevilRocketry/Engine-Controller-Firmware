@@ -71,22 +71,23 @@ TERMINAL_STATUS terminal_exec_cmd
 /*------------------------------------------------------------------------------
  Local Variables                                                                
 ------------------------------------------------------------------------------*/
-uint8_t       subcommand;       /* subcommand code                            */
-uint8_t       pwr_source;       /* Power source code                          */
-uint8_t       response;         /* Response to PC                             */
+uint8_t           subcommand;       /* subcommand code                        */
+uint8_t           pwr_source;       /* Power source code                      */
+uint8_t           response;         /* Response to PC                         */
 
 /* Flash */
-HFLASH_BUFFER flash_handle;                    /* Flash API buffer handle     */
-uint8_t       flash_buffer[ DEF_BUFFER_SIZE ]; /* Flash data buffer */
+HFLASH_BUFFER     flash_handle;                    /* Flash API buffer handle */
+uint8_t           flash_buffer[ DEF_BUFFER_SIZE ]; /* Flash data buffer       */
 
 /* Solenoids */
-SOL_STATE     sol_state;        /* State of solenoids */
+SOL_STATE         sol_state;         /* State of solenoids        */
+MAIN_VALVE_STATES main_valve_states; /* States of the main valves */
 
 /* Module return codes */
-FLASH_STATUS  flash_status;     /* Status of flash operations                 */
-IGN_STATUS    ign_status;       /* Ignition status code                       */
-USB_STATUS    usb_status;       /* Status of USB operations                   */
-VALVE_STATUS  valve_status;     /* Valve API return codes                     */
+FLASH_STATUS      flash_status;     /* Status of flash operations             */
+IGN_STATUS        ign_status;       /* Ignition status code                   */
+USB_STATUS        usb_status;       /* Status of USB operations               */
+VALVE_STATUS      valve_status;     /* Valve API return codes                 */
 
 
 /*------------------------------------------------------------------------------
@@ -104,6 +105,7 @@ flash_handle.bpl_write_protect     = FLASH_BPL_READ_WRITE;
 
 /* Solenoids */
 sol_state                          = 0;
+main_valve_states                  = 0;
 
 /* Module return codes */
 flash_status                       = FLASH_OK;
@@ -188,7 +190,7 @@ switch( command )
         } /* POWER_OP */
 
     /*-----------------------------------------------------------------
-        FLASH Command	
+     FLASH Command	
     ------------------------------------------------------------------*/
     case FLASH_OP:
         {
@@ -217,7 +219,7 @@ switch( command )
         } /* FLASH_OP */
 
     /*-----------------------------------------------------------------
-        SENSOR Command	
+     SENSOR Command	
     ------------------------------------------------------------------*/
     case SENSOR_OP:
         {
@@ -241,7 +243,7 @@ switch( command )
         } /* SENSOR_OP */
 
     /*-----------------------------------------------------------------
-        VALVE Command	
+     VALVE Command	
     ------------------------------------------------------------------*/
     case VALVE_OP:
         {
@@ -269,11 +271,27 @@ switch( command )
             {
             Error_Handler( ERROR_VALVE_CMD_ERROR );
             }
+
+        /* Pass on state if valve getstate command */
+        if ( subcommand == VALVE_GETSTATE_CODE )
+            {
+            valve_status = valve_receive( &main_valve_states, 
+                                            sizeof( main_valve_states ), 
+                                            HAL_DEFAULT_TIMEOUT );
+            if ( valve_status != VALVE_OK )
+                {
+                Error_Handler( ERROR_VALVE_CMD_ERROR );
+                }
+            
+            usb_transmit( &main_valve_states, 
+                            sizeof( main_valve_states ), 
+                            HAL_DEFAULT_TIMEOUT );
+            }
         break;
         } /* VALVE_OP */
 
     /*-----------------------------------------------------------------
-        SOL Command 
+     SOL Command 
     ------------------------------------------------------------------*/
     case SOL_OP:
         {

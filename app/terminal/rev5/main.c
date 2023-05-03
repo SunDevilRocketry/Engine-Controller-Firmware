@@ -66,27 +66,28 @@ int main
 /*------------------------------------------------------------------------------
  Local Variables                                                                  
 ------------------------------------------------------------------------------*/
-uint8_t       command;          /* SDEC command                               */
-uint8_t       subcommand;       /* subcommand code                            */
-uint8_t       pwr_source;       /* Power source code                          */
+uint8_t           command;          /* SDEC command                           */
+uint8_t           subcommand;       /* subcommand code                        */
+uint8_t           pwr_source;       /* Power source code                      */
 
 /* Flash */
-HFLASH_BUFFER flash_handle;                    /* Flash API buffer handle     */
-uint8_t       flash_buffer[ DEF_BUFFER_SIZE ]; /* Flash data buffer */
+HFLASH_BUFFER     flash_handle;                    /* Flash API buffer handle */
+uint8_t           flash_buffer[ DEF_BUFFER_SIZE ]; /* Flash data buffer       */
 
 /* Thermocouple */
-THERMO_CONFIG thermo_config;    /* Thermocouple configuration settings        */
+THERMO_CONFIG     thermo_config;    /* Thermocouple configuration settings    */
 
-/* Solenoids */
-SOL_STATE     sol_state;        /* State of solenoids */
+/* Solenoids/Main valves */
+SOL_STATE         sol_state;         /* State of solenoids                    */
+MAIN_VALVE_STATES main_valve_states; /* States of main valves                 */
 
 /* Module return codes */
-FLASH_STATUS  flash_status;     /* Status of flash operations                 */
-IGN_STATUS    ign_status;       /* Ignition status code                       */
-RS485_STATUS  rs485_status;     /* Status codes from RS485 module             */
-THERMO_STATUS thermo_status;    /* Thermocouple status code                   */
-USB_STATUS    usb_status;       /* Status of USB operations                   */
-VALVE_STATUS  valve_status;     /* Valve API return codes                     */
+FLASH_STATUS      flash_status;     /* Status of flash operations             */
+IGN_STATUS        ign_status;       /* Ignition status code                   */
+RS485_STATUS      rs485_status;     /* Status codes from RS485 module         */
+THERMO_STATUS     thermo_status;    /* Thermocouple status code               */
+USB_STATUS        usb_status;       /* Status of USB operations               */
+VALVE_STATUS      valve_status;     /* Valve API return codes                 */
 
 
 /*------------------------------------------------------------------------------
@@ -131,6 +132,7 @@ thermo_config.status               = 0;
 
 /* Solenoids */
 sol_state                          = 0;
+main_valve_states                  = 0;
 
 /* Module return codes */
 flash_status                       = FLASH_OK;
@@ -330,6 +332,22 @@ while (1)
 				if ( valve_status != VALVE_OK )
 					{
 					Error_Handler( ERROR_VALVE_CMD_ERROR );
+					}
+
+				/* Pass on state if valve getstate command */
+				if ( subcommand == VALVE_GETSTATE_CODE )
+					{
+					valve_status = valve_receive( &main_valve_states, 
+					                              sizeof( main_valve_states ), 
+												  HAL_DEFAULT_TIMEOUT );
+					if ( valve_status != VALVE_OK )
+						{
+						Error_Handler( ERROR_VALVE_CMD_ERROR );
+						}
+					
+					usb_transmit( &main_valve_states, 
+					              sizeof( main_valve_states ), 
+								  HAL_DEFAULT_TIMEOUT );
 					}
 				break;
 				} /* VALVE_OP */
