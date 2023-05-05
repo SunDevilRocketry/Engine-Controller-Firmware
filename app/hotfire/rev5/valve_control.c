@@ -614,13 +614,21 @@ if ( valve_status != VALVE_OK )
 else if ( response != VALVE_CONTROLLER_REV2_ID &&
           response != VALVE_CONTROLLER_REV3_ID )
     {
-    return VC_CANNOT_CONNECT;
+    /* Try one more time */
+    HAL_Delay( 100 );
+    valve_transmit( &command, sizeof( command ), VALVE_TIMEOUT );
+    valve_status = valve_receive( &response, sizeof( response ), VALVE_TIMEOUT );
+    if ( valve_status != VALVE_OK )
+        {
+        return VALVE_UART_ERROR;
+        }
+    else if ( response != VALVE_CONTROLLER_REV2_ID &&
+              response != VALVE_CONTROLLER_REV3_ID )
+        {
+        return VC_CANNOT_CONNECT;
+        }
     }
-else
-    {
-    return VC_OK;
-    }
-
+return VC_OK;
 } /* vc_connect */
 
 

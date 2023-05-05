@@ -164,7 +164,7 @@ while ( ( !is_press_atm ) && ( safe_time <= SAFE_TIMEOUT ) )
 /* Check for timeout */
 if ( safe_time >= SAFE_TIMEOUT )
     {
-    return FSM_MANUAL_STATE;
+//    return FSM_MANUAL_STATE;
     }
 
 /* Send safe to approach command */
