@@ -405,6 +405,10 @@ else if ( huart->Instance == USART1 )
 	GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_LOW;
 	GPIO_InitStruct.Alternate = GPIO_AF7_USART1;
 	HAL_GPIO_Init( GPIOA, &GPIO_InitStruct );
+
+	/* USART1 interrupt Init */
+    HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(USART1_IRQn);
 	} /* if ( huart->instance == USART1 ) */
 
 /* Valve control UART */
@@ -475,6 +479,7 @@ if ( huart->Instance == USART1 )
 	PA9     ------> USART1_TX
 	PA10     ------> USART1_RX */
 	HAL_GPIO_DeInit( GPIOA, GPIO_PIN_9 | GPIO_PIN_10 );
+	HAL_NVIC_DisableIRQ(USART1_IRQn);
 	} /* if ( huart->Instance == USART1 ) */
 
 /* Valve Control UART */

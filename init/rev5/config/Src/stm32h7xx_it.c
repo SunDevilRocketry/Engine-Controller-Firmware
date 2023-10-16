@@ -24,6 +24,7 @@
  Global Variables 
 ------------------------------------------------------------------------------*/
 extern UART_HandleTypeDef huart4;     /* Wireless/RS485 UART     */
+extern UART_HandleTypeDef huart1;     /* USB USART */
 extern uint8_t            gs_command; /* Ground station commands */
 
 
@@ -206,6 +207,25 @@ HAL_IncTick();
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32h7xx.s).                    */
 /******************************************************************************/
+
+
+/*******************************************************************************
+*                                                                              *
+* PROCEDURE:                                                                   *
+* 		USART1_IRQHandler                                                       *
+*                                                                              *
+* DESCRIPTION:                                                                 *
+*       Handles interrupts from the USB UART interface                          *
+*                                                                              *
+*******************************************************************************/
+void USART1_IRQHandler(void)
+{
+    /* HAL Error Handling */
+    HAL_UART_IRQHandler(&huart1);
+    
+    //TODO: Implement usb command handler
+
+}
 
 #ifdef HOTFIRE
 /*******************************************************************************
