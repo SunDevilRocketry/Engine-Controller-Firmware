@@ -17,6 +17,7 @@
     #include "protocol.h"
 #endif
 #include "rs485.h"
+#include "usb.h"
 #include "stm32h7xx_it.h"
 
 
@@ -224,7 +225,9 @@ void USART1_IRQHandler(void)
     HAL_UART_IRQHandler(&huart1);
     
     //TODO: Implement usb command handler
+    protocol_command_handler( gs_command );
 
+    usb_receive_IT( (void*) &gs_command, sizeof( gs_command ) );
 }
 
 #ifdef HOTFIRE

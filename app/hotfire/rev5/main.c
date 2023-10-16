@@ -231,10 +231,16 @@ if ( vc_reset_solenoids() != VC_OK )
 fsm_state = FSM_READY_STATE;
 
 /* Start listening for commands from the ground station */
-rs485_status = rs485_receive_IT( (void*) &gs_command, sizeof( gs_command ) );
-if ( rs485_status != RS485_OK )
+// rs485_status = rs485_receive_IT( (void*) &gs_command, sizeof( gs_command ) );
+// if ( rs485_status != RS485_OK )
+// 	{
+// 	Error_Handler( ERROR_RS485_UART_ERROR );
+// 	}
+
+usb_status = usb_receive_IT( (void*) &gs_command, sizeof( gs_command ) );
+if ( usb_status != USB_OK )
 	{
-	Error_Handler( ERROR_RS485_UART_ERROR );
+	Error_Handler( ERROR_USB_UART_ERROR );
 	}
 
 

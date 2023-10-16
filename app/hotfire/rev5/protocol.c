@@ -34,6 +34,7 @@
 #include "solenoid.h"
 #include "valve.h"
 #include "wireless.h"
+#include "usb.h"
 
 
 /*------------------------------------------------------------------------------
@@ -86,6 +87,7 @@ uint8_t          sol_state;                   /* State of solenoids           */
 SENSOR_DATA      sensor_data;                 /* Data from engine sensors     */
 uint8_t          sensor_data_bytes[ sizeof( SENSOR_DATA ) ]; 
 RS485_STATUS     rs485_status;                /* RS485 return codes           */
+USB_STATUS     usb_status;                /* RS485 return codes           */
 VALVE_STATUS     valve_status;                /* Valve module return codes    */
 TANK_SAFE_STATES tanks_state;                 /* State of tank pressures      */
 VALVE_STATES     valve_states;                /* Open/close state of valves   */
@@ -96,6 +98,7 @@ VALVE_STATES     valve_states;                /* Open/close state of valves   */
 ------------------------------------------------------------------------------*/
 rs485_status  = RS485_OK;
 valve_status  = VALVE_OK;
+usb_status    = USB_OK;
 valve_states  = 0;
 sol_state     = 0;
 memset( &sensor_data         , 0, sizeof( sensor_data       ) );
@@ -131,10 +134,10 @@ switch( command )
     case SOL_OP:
         {
         /* Get subcommand */
-        rs485_status = rs485_receive( &subcommand         , 
+        usb_status = usb_receive( &subcommand         , 
                                       sizeof( subcommand ), 
                                       RS485_DEFAULT_TIMEOUT );
-        if ( rs485_status != RS485_OK )
+        if ( usb_status != USB_OK )
             {
             led_set_color( LED_YELLOW );
             break;
@@ -166,10 +169,10 @@ switch( command )
     case VALVE_OP:
         {
         /* Get subcommand */
-        rs485_status = rs485_receive( &subcommand         , 
+        usb_status = usb_receive( &subcommand         , 
                                       sizeof( subcommand ), 
                                       RS485_DEFAULT_TIMEOUT );
-        if ( rs485_status != RS485_OK )
+        if ( usb_status != USB_OK )
             {
             led_set_color( LED_YELLOW );
             break;
@@ -211,10 +214,10 @@ switch( command )
         vc_getstate( &valve_states );
 
         /* Transmit the sensor and valve data */
-        rs485_transmit( &sensor_data_bytes[0], 
+        usb_transmit( &sensor_data_bytes[0], 
                         sizeof( SENSOR_DATA ), 
                         RS485_DEFAULT_TIMEOUT*sizeof( SENSOR_DATA ));
-        rs485_transmit( &valve_states         , 
+        usb_transmit( &valve_states         , 
                         sizeof( valve_states ), 
                         RS485_DEFAULT_TIMEOUT );
         break;
@@ -291,7 +294,7 @@ switch( command )
     case HOTFIRE_GETSTATE_OP:
         {
         /* Send the finite state machine state back to the ground station */
-        rs485_transmit( (void*) &fsm_state, sizeof( fsm_state ), RS485_DEFAULT_TIMEOUT );
+        usb_transmit( (void*) &fsm_state, sizeof( fsm_state ), RS485_DEFAULT_TIMEOUT );
         break;
         } /* HOTFIRE_GETSTATE_OP */
 
@@ -350,7 +353,7 @@ switch( command )
             }
         
         /* Send response */
-        rs485_transmit( &tanks_state, sizeof( tanks_state ), RS485_DEFAULT_TIMEOUT );
+        usb_transmit( &tanks_state, sizeof( tanks_state ), RS485_DEFAULT_TIMEOUT );
         break;
         }
 
@@ -530,7 +533,7 @@ static void send_ack
 
 { 
 uint8_t response = ACK_OP; 
-rs485_transmit( &response, sizeof( response ), RS485_DEFAULT_TIMEOUT );
+usb_transmit( &response, sizeof( response ), RS485_DEFAULT_TIMEOUT );
 } /* send_no_ack */
 
 
