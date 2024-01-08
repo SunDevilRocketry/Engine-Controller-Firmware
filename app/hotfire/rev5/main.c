@@ -176,26 +176,26 @@ if ( thermo_status != THERMO_OK )
 led_set_color( LED_GREEN );
 
 
-/*------------------------------------------------------------------------------
- USB Data Acquisition Mode 
-------------------------------------------------------------------------------*/
-while ( usb_detect() )
-	{
-	/* Get sdec command from USB port */
-	usb_status = usb_receive( &terminal_cmd, 
-							  sizeof( terminal_cmd ), 
-							  HAL_DEFAULT_TIMEOUT );
+// /*------------------------------------------------------------------------------
+//  USB Data Acquisition Mode 
+// ------------------------------------------------------------------------------*/
+// while ( usb_detect() )
+// 	{
+// 	/* Get sdec command from USB port */
+// 	usb_status = usb_receive( &terminal_cmd, 
+// 							  sizeof( terminal_cmd ), 
+// 							  HAL_DEFAULT_TIMEOUT );
 
-	/* Parse command input if HAL_UART_Receive doesn't timeout */
-	if ( ( usb_status == USB_OK ) && ( terminal_cmd != 0 ) )
-		{
-		terminal_status = terminal_exec_cmd( terminal_cmd );
-		if ( terminal_status != TERMINAL_OK )
-			{
-			Error_Handler( ERROR_TERMINAL_ERROR );
-			}
-		} /* if ( usb_status == USB_OK ) */
-	}
+// 	/* Parse command input if HAL_UART_Receive doesn't timeout */
+// 	if ( ( usb_status == USB_OK ) && ( terminal_cmd != 0 ) )
+// 		{
+// 		terminal_status = terminal_exec_cmd( terminal_cmd );
+// 		if ( terminal_status != TERMINAL_OK )
+// 			{
+// 			Error_Handler( ERROR_TERMINAL_ERROR );
+// 			}
+// 		} /* if ( usb_status == USB_OK ) */
+// 	}
 
 
 /*------------------------------------------------------------------------------
@@ -208,17 +208,17 @@ if ( vc_connect() != VC_OK )
 	Error_Handler( ERROR_VC_OFFLINE_ERROR );
 	}
 
-/* Enable the main valve stepper motor drivers */
-if ( vc_enable_main_valves() != VC_OK )
-	{
-	Error_Handler( ERROR_VC_INIT_ERROR );
-	}
+// /* Enable the main valve stepper motor drivers */
+// if ( vc_enable_main_valves() != VC_OK )
+// 	{
+// 	Error_Handler( ERROR_VC_INIT_ERROR );
+// 	}
 
-/* Calibrate the main propellant valves        */
-if ( vc_calibrate_main_valves() != VC_OK )
-	{
-	Error_Handler( ERROR_VC_INIT_ERROR );
-	}
+// /* Calibrate the main propellant valves        */
+// if ( vc_calibrate_main_valves() != VC_OK )
+// 	{
+// 	Error_Handler( ERROR_VC_INIT_ERROR );
+// 	}
 HAL_Delay( VALVE_CALIBRATION_TIME ); /* Wait for calibration to finish */
 
 /* Reset solenoid positions                    */
