@@ -116,6 +116,7 @@ switch( command )
     case PING_OP:
         {
         ping();
+        led_set_color( LED_WHITE );
         break;
         } /* PING_OP */
 
@@ -125,6 +126,7 @@ switch( command )
     case CONNECT_OP:
         {
         ping();
+        led_set_color( LED_WHITE );
         break;
         } /* CONNECT_OP */
     
