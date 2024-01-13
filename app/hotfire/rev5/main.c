@@ -214,11 +214,12 @@ if ( vc_enable_main_valves() != VC_OK )
 	Error_Handler( ERROR_VC_INIT_ERROR );
 	}
 
-// /* Calibrate the main propellant valves        */
-// if ( vc_calibrate_main_valves() != VC_OK )
-// 	{
-// 	Error_Handler( ERROR_VC_INIT_ERROR );
-// 	}
+/* Calibrate the main propellant valves        */
+if ( vc_calibrate_main_valves() != VC_OK )
+	{
+	Error_Handler( ERROR_VC_INIT_ERROR );
+	}
+
 HAL_Delay( VALVE_CALIBRATION_TIME ); /* Wait for calibration to finish */
 
 /* Reset solenoid positions                    */
