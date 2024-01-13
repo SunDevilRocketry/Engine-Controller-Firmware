@@ -176,9 +176,9 @@ if ( thermo_status != THERMO_OK )
 led_set_color( LED_GREEN );
 
 
-// /*------------------------------------------------------------------------------
-//  USB Data Acquisition Mode 
-// ------------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------------
+ USB Data Acquisition Mode 
+------------------------------------------------------------------------------*/
 // while ( usb_detect() )
 // 	{
 // 	/* Get sdec command from USB port */
@@ -204,15 +204,15 @@ led_set_color( LED_GREEN );
 
 /* Connect to the valve controller             */
 if ( vc_connect() != VC_OK )
-	{
+{
 	Error_Handler( ERROR_VC_OFFLINE_ERROR );
-	}
+}
 
-// /* Enable the main valve stepper motor drivers */
-// if ( vc_enable_main_valves() != VC_OK )
-// 	{
-// 	Error_Handler( ERROR_VC_INIT_ERROR );
-// 	}
+/* Enable the main valve stepper motor drivers */
+if ( vc_enable_main_valves() != VC_OK )
+	{
+	Error_Handler( ERROR_VC_INIT_ERROR );
+	}
 
 // /* Calibrate the main propellant valves        */
 // if ( vc_calibrate_main_valves() != VC_OK )
