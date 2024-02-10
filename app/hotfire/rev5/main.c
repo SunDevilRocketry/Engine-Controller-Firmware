@@ -110,6 +110,12 @@ HAL_Init                (); /* Reset peripherals, initialize flash interface
 SystemClock_Config      (); /* System clock                                   */
 PeriphCommonClock_Config(); /* Shared peripheral clocks                       */
 GPIO_Init               (); /* GPIO                                           */
+
+
+led_set_color( LED_CYAN ); /* Indicate MCU is powered on */
+HAL_Delay( 1500 );         /* Wait for peripherals to power on */
+
+
 USB_UART_Init           (); /* USB UART                                       */
 Valve_UART_Init         (); /* Valve control UART                             */
 Wireless_UART_Init      (); /* Wireless interface UART                        */
@@ -154,6 +160,8 @@ terminal_status                    = TERMINAL_OK;
 /*------------------------------------------------------------------------------
  External Hardware Initializations 
 ------------------------------------------------------------------------------*/
+
+
 
 /* Flash Chip */
 flash_status = flash_init( &flash_handle );
