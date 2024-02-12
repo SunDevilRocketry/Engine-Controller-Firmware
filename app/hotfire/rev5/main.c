@@ -202,31 +202,31 @@ led_set_color( LED_GREEN );
  Initialization stage 
 ------------------------------------------------------------------------------*/
 
-/* Connect to the valve controller             */
-if ( vc_connect() != VC_OK )
-{
-	Error_Handler( ERROR_VC_OFFLINE_ERROR );
-}
+// /* Connect to the valve controller             */
+// if ( vc_connect() != VC_OK )
+// {
+// 	Error_Handler( ERROR_VC_OFFLINE_ERROR );
+// }
 
-/* Enable the main valve stepper motor drivers */
-if ( vc_enable_main_valves() != VC_OK )
-	{
-	Error_Handler( ERROR_VC_INIT_ERROR );
-	}
+// /* Enable the main valve stepper motor drivers */
+// if ( vc_enable_main_valves() != VC_OK )
+// 	{
+// 	Error_Handler( ERROR_VC_INIT_ERROR );
+// 	}
 
-/* Calibrate the main propellant valves        */
-if ( vc_calibrate_main_valves() != VC_OK )
-	{
-	Error_Handler( ERROR_VC_INIT_ERROR );
-	}
+// /* Calibrate the main propellant valves        */
+// if ( vc_calibrate_main_valves() != VC_OK )
+// 	{
+// 	Error_Handler( ERROR_VC_INIT_ERROR );
+// 	}
 
-HAL_Delay( VALVE_CALIBRATION_TIME ); /* Wait for calibration to finish */
+// HAL_Delay( VALVE_CALIBRATION_TIME ); /* Wait for calibration to finish */
 
-/* Reset solenoid positions                    */
-if ( vc_reset_solenoids() != VC_OK )
-	{
-	Error_Handler( ERROR_VC_INIT_ERROR );
-	}
+// /* Reset solenoid positions                    */
+// if ( vc_reset_solenoids() != VC_OK )
+// 	{
+// 	Error_Handler( ERROR_VC_INIT_ERROR );
+// 	}
 
 /* Enter the READY state                */
 fsm_state = FSM_READY_STATE;
