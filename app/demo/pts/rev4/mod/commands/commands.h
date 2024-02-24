@@ -26,7 +26,7 @@ extern "C" {
 #define POWER_OP     0x21 /* power command opcode   */
 #define FLASH_OP     0x22 /* flash command opcode   */
 #define SENSOR_OP    0x03 /* Sensor command opcode  */
-
+#define RESET_OP	 0x04 /* Reset command opcode   */
 /*------------------------------------------------------------------------------
  Function Prototypes 
 ------------------------------------------------------------------------------*/

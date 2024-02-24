@@ -88,7 +88,7 @@ FLASH_STATUS      flash_status;     /* Status of flash operations             */
 IGN_STATUS        ign_status;       /* Ignition status code                   */
 USB_STATUS        usb_status;       /* Status of USB operations               */
 VALVE_STATUS      valve_status;     /* Valve API return codes                 */
-
+RESET_STATUS      reset_status;     /* Reset status of code                   */
 
 /*------------------------------------------------------------------------------
  Initializations 
@@ -339,8 +339,22 @@ switch( command )
                 }
             }
         break;
-        } /* SOL_OP */
+        } /* Reset_OP */
 
+    /*-----------------------------------------------------------------
+     RESET Command	
+    ------------------------------------------------------------------*/
+    case RESET_OP:
+        {
+        /* Transmit status code to PC */
+        usb_transmit( &reset_status, 
+                        sizeof( reset_status ), 
+                        HAL_DEFAULT_TIMEOUT );
+       
+        NVIC_SystemReset();
+
+        break;
+        } /* RESET_OP */
 
     /*------------------------ Unrecognized Command ---------------------------*/
     default:
