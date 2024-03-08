@@ -39,7 +39,8 @@ extern volatile FSM_STATE fsm_state; /* Hotfire State */
 * 		run_standby_state                                                      *
 *                                                                              *
 * DESCRIPTION:                                                                 *
-*       Awaits engine fire signal                                              *
+*       Awaits engine fire signal
+        Do nothing                                          *
 *                                                                              *
 *******************************************************************************/
 FSM_STATE run_standby_state 

@@ -35,10 +35,11 @@
 * DESCRIPTION:                                                                 *
 *       Abort the engine hotfire           
 
-        Facility Shutdown Stage:
-            NO POWER to Solenoid 1
+        Abort Command:
             NO POWER to Solenoid 2
             NO POWER to Solenoid 3
+            POWER to Solenoid 1 for 8 seconds
+            NO POWER to Solenoid 1
                                     *
 *                                                                              *
 *******************************************************************************/

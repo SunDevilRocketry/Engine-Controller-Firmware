@@ -26,7 +26,7 @@
  Global Variables 
 ------------------------------------------------------------------------------*/
 extern volatile FSM_STATE fsm_state; /* Hotfire State */
-
+const int PRE_FIRE_PURGE_DURATION = 5000; /* 5 seconds */
 
 /*------------------------------------------------------------------------------
  Public Functions 
@@ -53,24 +53,18 @@ FSM_STATE run_pre_fire_purge_state
     void
     )
 {
-/* Close vent solenoids */
-vc_close_solenoids( SOLENOID_LOX_VENT | SOLENOID_FUEL_VENT );
-HAL_Delay( VENT_PRESS_DELAY );
+// Power to Solenoid 3
+vc_open_solenoids( SOLENOID_FUEL_PURGE_3 );
 
-/* Crack Main valves */
-vc_crack_main_valves( MAIN_VALVE_BOTH_MAINS );
+// No power to Solenoid 2
+vc_close_solenoids( SOLENOID_LOX_PURGE_2 );
 
-/* Open pressurization valves */
-vc_open_solenoids( SOLENOID_LOX_PRESS | SOLENOID_FUEL_PRESS );
+// Power to Solenoid 1 for 5 seconds
+vc_open_solenoids( SOLENOID_FUEL_VENT_1 );
+HAL_Delay( PRE_FIRE_PURGE_DURATION );
 
-/* Purge Duration */
-HAL_Delay( PREFIRE_PURGE_DURATION );
-
-/* Stop the purge */
-vc_close_solenoids( SOLENOID_LOX_PRESS | SOLENOID_FUEL_PRESS );
-vc_close_main_valves( MAIN_VALVE_BOTH_MAINS );
-HAL_Delay( VENT_PRESS_DELAY );
-vc_open_solenoids( SOLENOID_LOX_VENT | SOLENOID_FUEL_VENT );
+// No power to Solenoid 1
+vc_close_solenoids( SOLENOID_FUEL_VENT_1 );
 
 /* Wait for fill and chill command */
 while ( fsm_state != FSM_FILL_CHILL_STATE ){}

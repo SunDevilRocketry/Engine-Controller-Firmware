@@ -52,15 +52,11 @@ FSM_STATE run_ready_state
     void
     )
 {
-/* Open Vent Solenoids */
-vc_open_solenoids( SOLENOID_LOX_VENT | SOLENOID_FUEL_VENT );
+// Power to Solenoid 3
+vc_open_solenoids( SOLENOID_FUEL_PURGE_3 );
 
-/* Close pressurization/purge solenoids */
-vc_close_solenoids( SOLENOID_LOX_PRESS | SOLENOID_FUEL_PRESS |
-                    SOLENOID_LOX_PURGE | SOLENOID_FUEL_PURGE );
-
-/* Close the main valves */
-vc_close_main_valves( MAIN_VALVE_BOTH_MAINS );
+// No power to Solenoid 2 and 1
+vc_close_solenoids( SOLENOID_FUEL_VENT_1 | SOLENOID_LOX_PURGE_2);
 
 /* Wait the for pre-fire purge command */
 while ( fsm_state != FSM_PRE_FIRE_PURGE_STATE ){}
