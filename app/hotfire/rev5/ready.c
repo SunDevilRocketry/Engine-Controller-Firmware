@@ -38,7 +38,13 @@ extern volatile FSM_STATE fsm_state; /* Hotfire state */
 * 		run_ready_state                                                        *
 *                                                                              *
 * DESCRIPTION:                                                                 *
-*       Awaits connection from ground station                                  *
+*       Awaits connection from ground station              
+
+        Ready Stage:
+            POWER to Solenoid 3
+            NO POWER to Solenoid 2
+            NO POWER to Solenoid 1
+            (MANUALLY) CLOSE GN2 Vent Ball Valve                    *
 *                                                                              *
 *******************************************************************************/
 FSM_STATE run_ready_state

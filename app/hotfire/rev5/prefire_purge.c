@@ -39,7 +39,13 @@ extern volatile FSM_STATE fsm_state; /* Hotfire State */
 * 		run_pre_fire_purge_state                                               *
 *                                                                              *
 * DESCRIPTION:                                                                 *
-*       Performs a pre-hotfire engine purge                                    *
+*       Performs a pre-hotfire engine purge             
+        
+        Pre-fire Purge Stage:
+            POWER Solenoid 3
+            NO POWER to Solenoid 2
+            POWER to Solenoid 1 for 5 seconds
+            NO POWER to Solenoid 1                       *
 *                                                                              *
 *******************************************************************************/
 FSM_STATE run_pre_fire_purge_state 

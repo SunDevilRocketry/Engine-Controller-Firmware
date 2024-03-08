@@ -46,7 +46,15 @@ extern volatile bool stop_purge_flag;     /* Start disarming the engine */
 * 		run_disarm_state                                                       *
 *                                                                              *
 * DESCRIPTION:                                                                 *
-*       Transitions the engine to a safe state                                 *
+*       Transitions the engine to a safe state    
+
+        Disarm Stage:
+            (MANUALLY) CLOSE GN2 and GNO2 Cylinders
+            (MANUALLY) OPEN Manual Vent
+            POWER to Solenoid 2
+            NO POWER to Solenoid 3
+            POWER to Solenoid 1
+                                     *
 *                                                                              *
 *******************************************************************************/
 FSM_STATE run_disarm_state 

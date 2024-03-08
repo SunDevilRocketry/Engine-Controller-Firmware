@@ -33,7 +33,13 @@
 * 		run_abort_state                                                        *
 *                                                                              *
 * DESCRIPTION:                                                                 *
-*       Abort the engine hotfire                                               *
+*       Abort the engine hotfire           
+
+        Facility Shutdown Stage:
+            NO POWER to Solenoid 1
+            NO POWER to Solenoid 2
+            NO POWER to Solenoid 3
+                                    *
 *                                                                              *
 *******************************************************************************/
 void run_abort_state 

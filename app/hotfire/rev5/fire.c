@@ -44,7 +44,15 @@ extern bool      stop_purge_flag;   /* Manual purge termination    */
 * 		run_fire_state                                                         *
 *                                                                              *
 * DESCRIPTION:                                                                 *
-*       Fire the engine and log sensor data                                    *
+*       Fire the engine and log sensor data
+
+        Fire Stage:
+            POWER to ignitor from flight computer
+            POWER to Solenoid 2 for 5 seconds
+            NO POWER to Solenoid 2
+            NO POWER to Solenoid 3
+            POWER to Solenoid 1
+            NO POWER to Solenoid 1                                   *
 *                                                                              *
 *******************************************************************************/
 FSM_STATE run_fire_state 
