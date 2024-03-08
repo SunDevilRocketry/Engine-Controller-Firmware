@@ -59,21 +59,13 @@ typedef enum _VC_STATUS
 /* Solenoid names */
 typedef enum _SOLENOID
     {
-    SOLENOID_LOX_PRESS  = 0b00000001, /* LOX Pressurization solenoid  (NC) */ 
-    SOLENOID_FUEL_PRESS = 0b00000010, /* Fuel Pressurization solenoid (NC) */
-    SOLENOID_LOX_VENT   = 0b00000100, /* LOX vent solenoid            (NO) */
-    SOLENOID_FUEL_VENT  = 0b00001000, /* Fuel vent solenoid           (NO) */
-    SOLENOID_LOX_PURGE  = 0b00010000, /* Purge solenoid, LOX side     (NO) */
-    SOLENOID_FUEL_PURGE = 0b00100000  /* Purge solenoid, Fuel side    (NO) */
+    // SOLENOID_LOX_PRESS_1  = 0b00000001, /* LOX Pressurization solenoid  (NC) */ 
+    // SOLENOID_FUEL_PRESS_2 = 0b00000010, /* Fuel Pressurization solenoid (NC) */
+    // SOLENOID_LOX_VENT_3   = 0b00000100, /* LOX vent solenoid            (NO) */
+    SOLENOID_FUEL_VENT_1  = 0b00001000, /* Fuel vent solenoid           (NO) */
+    SOLENOID_LOX_PURGE_2  = 0b00010000, /* Purge solenoid, LOX side     (NO) */
+    SOLENOID_FUEL_PURGE_3 = 0b00100000  /* Purge solenoid, Fuel side    (NO) */
     } SOLENOID;
-
-/* Main valve names */
-typedef enum _MAIN_VALVE
-    {
-    MAIN_VALVE_LOX_MAIN , /* LOX main valve                    */ 
-    MAIN_VALVE_FUEL_MAIN, /* Fuel main valve                   */
-    MAIN_VALVE_BOTH_MAINS /* Both the LOX and Fuel main valves */
-    } MAIN_VALVE;
 
 /* Valve state -> Valves open/closed */
 /* bit 7: Main Fuel Valve 
