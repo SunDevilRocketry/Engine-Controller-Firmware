@@ -53,17 +53,17 @@ FSM_STATE run_pre_fire_purge_state
     void
     )
 {
-// Power to Solenoid 3
+/* Power to Solenoid 3 */ 
 vc_open_solenoids( SOLENOID_FUEL_PURGE_3 );
 
-// No power to Solenoid 2
+/* No Power to Solenoid 2 */
 vc_close_solenoids( SOLENOID_LOX_PURGE_2 );
 
-// Power to Solenoid 1 for 5 seconds
+/* Power to Solenoid 1 for 5 seconds */
 vc_open_solenoids( SOLENOID_FUEL_VENT_1 );
 HAL_Delay( PRE_FIRE_PURGE_DURATION );
 
-// No power to Solenoid 1
+/* No power to Solenoid 1 */
 vc_close_solenoids( SOLENOID_FUEL_VENT_1 );
 
 /* Wait for fill and chill command */

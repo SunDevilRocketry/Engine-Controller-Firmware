@@ -1,10 +1,10 @@
 /*******************************************************************************
 *
 * FILE: 
-* 		ready.c
+* 		abort_hotfire.c
 *
 * DESCRIPTION: 
-* 	    Waits for connection signal from ground station control 
+* 	    Aborts the hotfire in case of emergency 
 *
 *******************************************************************************/
 
@@ -19,12 +19,7 @@
 ------------------------------------------------------------------------------*/
 #include "main.h"
 #include "valve_control.h"
-
-
-/*------------------------------------------------------------------------------
- Global Variables 
-------------------------------------------------------------------------------*/
-extern volatile FSM_STATE fsm_state; /* Hotfire state */
+#include "led.h"
 
 
 /*------------------------------------------------------------------------------
@@ -35,33 +30,31 @@ extern volatile FSM_STATE fsm_state; /* Hotfire state */
 /*******************************************************************************
 *                                                                              *
 * PROCEDURE:                                                                   *
-* 		run_ready_state                                                        *
+* 		shutdown                                                        *
 *                                                                              *
 * DESCRIPTION:                                                                 *
-*       Awaits connection from ground station              
-
-        Ready Stage:
-            POWER to Solenoid 3
-            NO POWER to Solenoid 2
+*       Perform Facility Shutdown Stage         
+        Facility Shutdown Stage:
             NO POWER to Solenoid 1
-            (MANUALLY) CLOSE GN2 Vent Ball Valve                    *
+            NO POWER to Solenoid 2
+            NO POWER to Solenoid 3
+                                    *
 *                                                                              *
 *******************************************************************************/
-FSM_STATE run_ready_state
+void shutdown 
     (
     void
     )
 {
-/* Power to Solenoid 3 */ 
-vc_open_solenoids( SOLENOID_FUEL_PURGE_3 );
+// TODO: Implement shutdown
 
-/* No power to Solenoid 2 and 1 */ 
-vc_close_solenoids( SOLENOID_FUEL_VENT_1 | SOLENOID_LOX_PURGE_2);
-
-/* Wait the for pre-fire purge command */
-while ( fsm_state != FSM_PRE_FIRE_PURGE_STATE ){}
-return FSM_PRE_FIRE_PURGE_STATE;
-} /* run_ready_state */
+/* Shutdown LED indicator */
+led_set_color( LED_BLUE );
+while ( 1 ) 
+    {
+     /* Idle */
+    };
+} /* run_abort_state */
 
 
 /*******************************************************************************
