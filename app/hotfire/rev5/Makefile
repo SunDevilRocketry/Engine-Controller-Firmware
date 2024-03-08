@@ -49,13 +49,12 @@ C_SOURCES =                                                          \
 main.c                                                               \
 ready.c                                                              \
 prefire_purge.c                                                      \
-fill_chill.c                                                         \
 standby.c                                                            \
 fire.c                                                               \
 disarm.c                                                             \
-post_fire.c                                                          \
 manual.c                                                             \
 abort_hotfire.c                                                      \
+shutdown.c														     \
 valve_control.c                                                      \
 protocol.c                                                           \
 data_logger.c                                                        \

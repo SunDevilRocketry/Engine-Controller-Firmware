@@ -41,9 +41,9 @@ extern volatile FSM_STATE fsm_state; /* Hotfire state */
 *       Awaits connection from ground station              
 
         Ready Stage:
-            POWER to Solenoid 3
-            NO POWER to Solenoid 2
-            NO POWER to Solenoid 1
+            CLOSE Solenoid 3
+            CLOSE Solenoid 2
+            CLOSE Solenoid 1
             (MANUALLY) CLOSE GN2 Vent Ball Valve                    *
 *                                                                              *
 *******************************************************************************/
@@ -52,10 +52,10 @@ FSM_STATE run_ready_state
     void
     )
 {
-/* Power to Solenoid 3 */ 
-vc_open_solenoids( SOLENOID_FUEL_PURGE_3 );
+/*  CLOSE Solenoid 3 */ 
+vc_close_solenoids( SOLENOID_FUEL_PRESS_3 );
 
-/* No power to Solenoid 2 and 1 */ 
+/* Close Solenoid 2 and 1 */ 
 vc_close_solenoids( SOLENOID_FUEL_VENT_1 | SOLENOID_LOX_PURGE_2);
 
 /* Wait the for pre-fire purge command */

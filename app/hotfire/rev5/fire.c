@@ -47,12 +47,12 @@ extern bool      stop_purge_flag;   /* Manual purge termination    */
 *       Fire the engine and log sensor data
 
         Fire Stage:
-            POWER to ignitor from flight computer
-            POWER to Solenoid 2 for 5 seconds
-            NO POWER to Solenoid 2
-            NO POWER to Solenoid 3
-            POWER to Solenoid 1
-            NO POWER to Solenoid 1                                   *
+            IGNITION CHARGE from engine controller
+            OPEN Solenoid 2 for 5 seconds
+            CLOSE Solenoid 2
+            OPEN Solenoid 3
+            OPEN Solenoid 1 for 5 seconds
+            CLOSE Solenoid 1                                 *
 *                                                                              *
 *******************************************************************************/
 FSM_STATE run_fire_state 
@@ -80,7 +80,7 @@ memset( &sensor_data, 0, sizeof( sensor_data ) );
 ign_ignite();
 HAL_Delay( ENGINE_IGNITION_DELAY );
 
-/* Power to Solenoid 2 for 5 seconds */
+/* Oepn Solenoid 2 for 5 seconds */
 vc_open_solenoids( SOLENOID_LOX_PURGE_2 );
 
 /* Engine Burn */
@@ -109,14 +109,16 @@ while ( burn_time < ENGINE_BURN_DURATION )
     burn_time = data_logger_get_time();
     }
 
-/* No power to Solenoid 2 and 3 */
-vc_close_solenoids( SOLENOID_LOX_PURGE_2 | SOLENOID_FUEL_PURGE_3);
+/* Close Solenoid 2 */
+vc_close_solenoids( SOLENOID_LOX_PURGE_2 );
 
-/* Power to Solenoid 1 */
-vc_open_solenoids( SOLENOID_FUEL_VENT_1 );
+/* Open Solenoid 3 and 1 for 5 seconds */
+vc_open_solenoids( SOLENOID_FUEL_VENT_1 | SOLENOID_FUEL_PRESS_3 );
+HAL_Delay( 5000 ); 
 
-/* No Power to Solenoid 1 */
-vc_close_solenoids( SOLENOID_FUEL_VENT_1 );
+/* Close Solenoid 1 */
+vc_close_solenoids( SOLENOID_FUEL_VENT_1 )
+
 
 /* Transition to disarm state */
 return FSM_DISARM_STATE;

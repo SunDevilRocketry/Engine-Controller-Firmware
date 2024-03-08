@@ -42,10 +42,10 @@ const int PRE_FIRE_PURGE_DURATION = 5000; /* 5 seconds */
 *       Performs a pre-hotfire engine purge             
         
         Pre-fire Purge Stage:
-            POWER Solenoid 3
-            NO POWER to Solenoid 2
-            POWER to Solenoid 1 for 5 seconds
-            NO POWER to Solenoid 1                       *
+            CLOSE Solenoid 3
+            CLOSE Solenoid 2
+            OPEN Solenoid 1 for 5 seconds
+            CLOSE Solenoid 1           *
 *                                                                              *
 *******************************************************************************/
 FSM_STATE run_pre_fire_purge_state 
@@ -53,22 +53,19 @@ FSM_STATE run_pre_fire_purge_state
     void
     )
 {
-/* Power to Solenoid 3 */ 
-vc_open_solenoids( SOLENOID_FUEL_PURGE_3 );
+/* Close Solenoid 3 and 2 */ 
+vc_close_solenoids( SOLENOID_FUEL_PRESS_3 | SOLENOID_LOX_PURGE_2 );
 
-/* No Power to Solenoid 2 */
-vc_close_solenoids( SOLENOID_LOX_PURGE_2 );
-
-/* Power to Solenoid 1 for 5 seconds */
+/* Open Solenoid 1 for 5 seconds */
 vc_open_solenoids( SOLENOID_FUEL_VENT_1 );
 HAL_Delay( PRE_FIRE_PURGE_DURATION );
 
-/* No power to Solenoid 1 */
+/* Close Solenoid 1 */
 vc_close_solenoids( SOLENOID_FUEL_VENT_1 );
 
 /* Wait for fill and chill command */
-while ( fsm_state != FSM_FILL_CHILL_STATE ){}
-return FSM_FILL_CHILL_STATE;
+while ( fsm_state != FSM_FIRE_STATE ){}
+return FSM_FIRE_STATE;
 } /* run_pre_fire_purge_state */
 
 

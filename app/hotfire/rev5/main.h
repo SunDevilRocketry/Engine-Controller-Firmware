@@ -68,11 +68,9 @@ typedef enum _FSM_STATE
 	FSM_INIT_STATE          , /* Initialization state (1) */
 	FSM_READY_STATE         , /* Ready State          (2) */
 	FSM_PRE_FIRE_PURGE_STATE, /* Pre-Fire Purge state (3) */
-	FSM_FILL_CHILL_STATE    , /* Fill-Chill state     (4) */
 	FSM_STANDBY_STATE       , /* Standby state        (5) */
 	FSM_FIRE_STATE          , /* Fire state           (6) */
 	FSM_DISARM_STATE        , /* Disarm state         (7) */
-	FSM_POST_FIRE_STATE     , /* Post-Fire state      (8) */
 	FSM_MANUAL_STATE        , /* Manual control mode      */
 	FSM_ABORT_STATE           /* Abort state              */
 	} FSM_STATE;

@@ -60,11 +60,11 @@ typedef enum _VC_STATUS
 typedef enum _SOLENOID
     {
     // SOLENOID_LOX_PRESS_1  = 0b00000001, /* LOX Pressurization solenoid  (NC) */ 
-    // SOLENOID_FUEL_PRESS_2 = 0b00000010, /* Fuel Pressurization solenoid (NC) */
+    SOLENOID_FUEL_PRESS_3 = 0b00000010, /* Fuel Pressurization solenoid (NC) */
     // SOLENOID_LOX_VENT_3   = 0b00000100, /* LOX vent solenoid            (NO) */
     SOLENOID_FUEL_VENT_1  = 0b00001000, /* Fuel vent solenoid           (NO) */
     SOLENOID_LOX_PURGE_2  = 0b00010000, /* Purge solenoid, LOX side     (NO) */
-    SOLENOID_FUEL_PURGE_3 = 0b00100000  /* Purge solenoid, Fuel side    (NO) */
+    // SOLENOID_FUEL_PURGE_3 = 0b00100000  /* Purge solenoid, Fuel side    (NO) */
     } SOLENOID;
 
 /* Valve state -> Valves open/closed */
@@ -97,36 +97,6 @@ VC_STATUS vc_close_solenoids
 
 /* Reset solenoids */
 VC_STATUS vc_reset_solenoids
-    (
-    void
-    );
-
-/* Crack open a main valve */
-VC_STATUS vc_crack_main_valves
-    (
-    MAIN_VALVE main_valves
-    );
-
-/* Open a main valve */
-VC_STATUS vc_open_main_valves
-    (
-    MAIN_VALVE main_valves
-    );
-
-/* Close a main valve */
-VC_STATUS vc_close_main_valves
-    (
-    MAIN_VALVE main_valve
-    );
-
-/* Calibrate the main valves */
-VC_STATUS vc_calibrate_main_valves
-    (
-    void
-    );
-
-/* Enable the stepper motor drivers for the main valves */
-VC_STATUS vc_enable_main_valves
     (
     void
     );

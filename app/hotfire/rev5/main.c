@@ -216,19 +216,6 @@ if ( vc_connect() != VC_OK )
 	Error_Handler( ERROR_VC_OFFLINE_ERROR );
 	}
 
-/* Enable the main valve stepper motor drivers */
-if ( vc_enable_main_valves() != VC_OK )
-	{
-	Error_Handler( ERROR_VC_INIT_ERROR );
-	}
-
-/* Calibrate the main propellant valves        */
-if ( vc_calibrate_main_valves() != VC_OK )
-	{
-	Error_Handler( ERROR_VC_INIT_ERROR );
-	}
-HAL_Delay( VALVE_CALIBRATION_TIME ); /* Wait for calibration to finish */
-
 /* Reset solenoid positions                    */
 if ( vc_reset_solenoids() != VC_OK )
 	{
@@ -250,8 +237,8 @@ if ( rs485_status != RS485_OK )
  Hotfire Sequencing 
 ------------------------------------------------------------------------------*/
 
-/* Nominal Sequence: READY > PRE-FIRE PURGE > FILL-CHILL > STANDBY >
-                     FIRE  > DISARM         > POST-FLIGHT 
+/* Nominal Sequence: READY > PRE-FIRE PURGE > STANDBY >
+                     FIRE  > DISARM
    Failure Contingencies : FILL_CHILL > MANUAL
                            FIRE       > ABORT 
 						   DISARM     > MANUAL */
@@ -274,13 +261,6 @@ while (1)
 			break;
 			}
 		
-		/* FILL-CHILL state */
-		case FSM_FILL_CHILL_STATE:
-			{
-			fsm_state = run_fill_chill_state();
-			break;
-			}
-
 		/* STANDBY state */
 		case FSM_STANDBY_STATE:
 			{
@@ -302,13 +282,6 @@ while (1)
 			break;
 			}
 		
-		/* POST-FIRE state */
-		case FSM_POST_FIRE_STATE:
-			{
-			fsm_state = run_post_fire_state();
-			break;
-			}
-
 		/* Manual control mode */
 		case FSM_MANUAL_STATE:
 			{
