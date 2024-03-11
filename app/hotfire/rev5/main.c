@@ -281,7 +281,13 @@ while (1)
 			fsm_state = run_disarm_state();
 			break;
 			}
-		
+		case FSM_SHUTDOWN_STATE:
+			{
+			fsm_state = run_shutdown_state();
+			break;
+			}
+
+
 		/* Manual control mode */
 		case FSM_MANUAL_STATE:
 			{

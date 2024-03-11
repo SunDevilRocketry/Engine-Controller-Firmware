@@ -70,7 +70,7 @@ FSM_STATE run_disarm_state
 vc_open_solenoids( SOLENOID_FUEL_VENT_1 | SOLENOID_LOX_PURGE_2 | SOLENOID_FUEL_PRESS_3 );
 
 /* Transition to Facility Shutdown Stage */
-return FSM_SHUTDOWN;
+return FSM_SHUTDOWN_STATE;
 } /* run_disarm_state */
 
 
