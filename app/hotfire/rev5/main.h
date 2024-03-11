@@ -72,7 +72,8 @@ typedef enum _FSM_STATE
 	FSM_FIRE_STATE          , /* Fire state           (6) */
 	FSM_DISARM_STATE        , /* Disarm state         (7) */
 	FSM_MANUAL_STATE        , /* Manual control mode      */
-	FSM_ABORT_STATE           /* Abort state              */
+	FSM_ABORT_STATE         ,  /* Abort state              */
+	FSM_SHUTDOWN			 /* Shutdown state */
 	} FSM_STATE;
 
 /* Sensor Data Ping-pong buffer */

@@ -58,7 +58,8 @@ typedef enum _FSM_STATE
 	FSM_DISARM_STATE        , /* Disarm state         (7) */
 	FSM_POST_FIRE_STATE     , /* Post-Fire state      (8) */
 	FSM_MANUAL_STATE        , /* Manual control mode      */
-	FSM_ABORT_STATE           /* Abort state              */
+	FSM_ABORT_STATE         ,  /* Abort state              */
+	FSM_SHUTDOWN			 /* Shutdown state */
 	} FSM_STATE;
 
 
@@ -102,8 +103,7 @@ FSM_STATE run_disarm_state
 	void
 	);
 
-/* Post-Fire state */
-FSM_STATE run_post_fire_state
+FSM_STATE run_shutdown_state
 	(
 	void
 	);

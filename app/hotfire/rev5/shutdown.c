@@ -35,18 +35,22 @@
 * DESCRIPTION:                                                                 *
 *       Perform Facility Shutdown Stage         
         Facility Shutdown Stage:
-            NO POWER to Solenoid 1
-            NO POWER to Solenoid 2
-            NO POWER to Solenoid 3
+            CLOSE Solenoid 1
+            CLOSE Solenoid 2
+            OPEN Solenoid 3
                                     *
 *                                                                              *
 *******************************************************************************/
-void shutdown 
+FSM_STATE shutdown 
     (
     void
     )
 {
-// TODO: Implement shutdown
+/* Close Solenoid 1 and 2 */
+vc_close_solenoids( SOLENOID_FUEL_VENT_1 | SOLENOID_LOX_PURGE_2 );
+
+/* P[en Solenoid 3 */
+vc_open_solenoids( SOLENOID_FUEL_PRESS_3 );
 
 /* Shutdown LED indicator */
 led_set_color( LED_BLUE );

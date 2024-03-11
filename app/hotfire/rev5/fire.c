@@ -117,7 +117,7 @@ vc_open_solenoids( SOLENOID_FUEL_VENT_1 | SOLENOID_FUEL_PRESS_3 );
 HAL_Delay( 5000 ); 
 
 /* Close Solenoid 1 */
-vc_close_solenoids( SOLENOID_FUEL_VENT_1 )
+vc_close_solenoids( SOLENOID_FUEL_VENT_1 );
 
 
 /* Transition to disarm state */

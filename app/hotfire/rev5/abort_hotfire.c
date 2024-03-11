@@ -36,10 +36,10 @@
 *       Abort the engine hotfire           
 
         Abort Command:
-            NO POWER to Solenoid 2
-            NO POWER to Solenoid 3
-            POWER to Solenoid 1 for 8 seconds
-            NO POWER to Solenoid 1
+            CLOSE Solenoid 2
+            OPEN Solenoid 3
+            OPEN Solenoid 1 for 8 seconds
+            CLOSE Solenoid 1
                                     *
 *                                                                              *
 *******************************************************************************/
@@ -48,15 +48,20 @@ void run_abort_state
     void
     )
 {
-/* Purge */
-vc_close_main_valves( MAIN_VALVE_BOTH_MAINS );
-vc_close_solenoids( SOLENOID_LOX_PRESS | SOLENOID_FUEL_PRESS );
-vc_open_solenoids( SOLENOID_LOX_VENT | SOLENOID_FUEL_VENT );
-vc_open_solenoids( SOLENOID_LOX_PURGE | SOLENOID_FUEL_PURGE );
-HAL_Delay( POSTFIRE_PURGE_DURATION );
+/* Close Solenoid 2 */
+vc_close_solenoids( SOLENOID_LOX_PURGE_2 );
+
+/* Open Solenoid 3 */
+vc_open_solenoids( SOLENOID_FUEL_PRESS_3 );
+
+/* Open Solenoid 1 for 8 seconds */
+vc_open_solenoids( SOLENOID_FUEL_VENT_1 );
+HAL_Delay( 8000 );
+
+/* Close Solenoid 1 */
+vc_close_solenoids( SOLENOID_FUEL_VENT_1 );
 
 /* Safe State */
-vc_close_solenoids( SOLENOID_LOX_PURGE | SOLENOID_FUEL_PURGE );
 led_set_color( LED_RED );
 while ( 1 ) 
     {

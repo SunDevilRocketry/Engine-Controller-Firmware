@@ -234,19 +234,6 @@ switch( command )
         } /* PFPURGE_OP */
     
     /*--------------------------------------------------------------------------
-     CHILL Command	
-    --------------------------------------------------------------------------*/
-    case CHILL_OP:
-        {
-        /* Send ACK signal */
-        send_ack();
-
-        /* Initiate Fill and Chill Sequence */
-        fsm_state = FSM_FILL_CHILL_STATE;
-        break;
-        } /* CHILL_OP */
-
-    /*--------------------------------------------------------------------------
      STANDBY Command	
     --------------------------------------------------------------------------*/
     case STANDBY_OP:
@@ -271,6 +258,8 @@ switch( command )
         fsm_state = FSM_FIRE_STATE;
         break;
         } /* FIRE_OP */
+
+    
 
     /*--------------------------------------------------------------------------
      STOPPURGE Command 
