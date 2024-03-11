@@ -63,7 +63,7 @@ HAL_Delay( PRE_FIRE_PURGE_DURATION );
 /* Close Solenoid 1 */
 vc_close_solenoids( SOLENOID_FUEL_VENT_1 );
 
-/* Wait for fill and chill command */
+/* Wait for standby command */
 while ( fsm_state != FSM_STANDBY_STATE ){}
 return FSM_STANDBY_STATE;
 } /* run_pre_fire_purge_state */
