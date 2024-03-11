@@ -238,7 +238,7 @@ if ( rs485_status != RS485_OK )
 ------------------------------------------------------------------------------*/
 
 /* Nominal Sequence: READY > PRE-FIRE PURGE > STANDBY >
-                     FIRE  > DISARM
+                     FIRE  > DISARM > SHUTDOWN
    Failure Contingencies : FILL_CHILL > MANUAL
                            FIRE       > ABORT 
 						   DISARM     > MANUAL */

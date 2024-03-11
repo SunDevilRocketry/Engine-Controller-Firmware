@@ -52,11 +52,8 @@ FSM_STATE run_ready_state
     void
     )
 {
-/*  CLOSE Solenoid 3 */ 
-vc_close_solenoids( SOLENOID_FUEL_PRESS_3 );
-
-/* Close Solenoid 2 and 1 */ 
-vc_close_solenoids( SOLENOID_FUEL_VENT_1 | SOLENOID_LOX_PURGE_2);
+/*  CLOSE Solenoid 1,2,3 */ 
+vc_close_solenoids( SOLENOID_FUEL_VENT_1 | SOLENOID_LOX_PURGE_2 | SOLENOID_FUEL_PRESS_3 );
 
 /* Wait the for pre-fire purge command */
 while ( fsm_state != FSM_PRE_FIRE_PURGE_STATE ){}
