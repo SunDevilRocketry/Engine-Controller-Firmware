@@ -73,7 +73,7 @@ if ( hadc->Instance == ADC1 )
 	/* ADC1 GPIO Configuration
 	PC0     ------> ADC1_INP10 
     PC4     ------> ADC1_INP4 */
-	GPIO_InitStruct.Pin  = GPIO_PIN_0 | GPIO_PIN_0;
+	GPIO_InitStruct.Pin  = GPIO_PIN_0 | GPIO_PIN_4;
 	GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init( GPIOC, &GPIO_InitStruct );
