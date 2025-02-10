@@ -35,7 +35,6 @@
 #include "led.h"
 #include "power.h"
 #include "pressure.h"
-#include "rs485.h"
 #include "sensor.h"
 #include "temp.h"
 #include "usb.h"
@@ -97,7 +96,6 @@ uint8_t         terminal_cmd;     /* Terminal command */
 /* Module return codes */
 FLASH_STATUS    flash_status;     /* Status of flash operations                 */
 THERMO_STATUS   thermo_status;    /* Thermocouple status code                   */
-RS485_STATUS    rs485_status;     /* RS485 Module return codes                  */
 TERMINAL_STATUS terminal_status;  /* Return codes from SDEC terminal            */
 USB_STATUS      usb_status;       /* Return codes from usb module               */
 
@@ -184,26 +182,26 @@ if ( thermo_status != THERMO_OK )
 led_set_color( LED_GREEN );
 
 
-/*------------------------------------------------------------------------------
- USB Data Acquisition Mode 
-------------------------------------------------------------------------------*/
-while ( usb_detect() )
-	{
-	/* Get sdec command from USB port */
-	usb_status = usb_receive( &terminal_cmd, 
-							  sizeof( terminal_cmd ), 
-							  HAL_DEFAULT_TIMEOUT );
+// /*------------------------------------------------------------------------------
+//  USB Data Acquisition Mode 
+// ------------------------------------------------------------------------------*/
+// while ( usb_detect() )
+// 	{
+// 	/* Get sdec command from USB port */
+// 	usb_status = usb_receive( &terminal_cmd, 
+// 							  sizeof( terminal_cmd ), 
+// 							  HAL_DEFAULT_TIMEOUT );
 
-	/* Parse command input if HAL_UART_Receive doesn't timeout */
-	if ( ( usb_status == USB_OK ) && ( terminal_cmd != 0 ) )
-		{
-		terminal_status = terminal_exec_cmd( terminal_cmd );
-		if ( terminal_status != TERMINAL_OK )
-			{
-			Error_Handler( ERROR_TERMINAL_ERROR );
-			}
-		} /* if ( usb_status == USB_OK ) */
-	}
+// 	/* Parse command input if HAL_UART_Receive doesn't timeout */
+// 	if ( ( usb_status == USB_OK ) && ( terminal_cmd != 0 ) )
+// 		{
+// 		terminal_status = terminal_exec_cmd( terminal_cmd );
+// 		if ( terminal_status != TERMINAL_OK )
+// 			{
+// 			Error_Handler( ERROR_TERMINAL_ERROR );
+// 			}
+// 		} /* if ( usb_status == USB_OK ) */
+// 	}
 
 
 /*------------------------------------------------------------------------------
@@ -239,10 +237,10 @@ if ( vc_reset_solenoids() != VC_OK )
 fsm_state = FSM_READY_STATE;
 
 /* Start listening for commands from the ground station */
-rs485_status = rs485_receive_IT( (void*) &gs_command, sizeof( gs_command ) );
-if ( rs485_status != RS485_OK )
+usb_status = usb_receive_IT( (void*) &gs_command, sizeof( gs_command ) );
+if ( usb_status != USB_OK )
 	{
-	Error_Handler( ERROR_RS485_UART_ERROR );
+	Error_Handler( ERROR_USB_UART_ERROR );
 	}
 
 

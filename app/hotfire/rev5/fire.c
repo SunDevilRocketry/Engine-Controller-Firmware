@@ -86,14 +86,14 @@ HAL_Delay( TANK_PRESS_DELAY );
 vc_crack_main_valves( MAIN_VALVE_LOX_MAIN );
 HAL_Delay( LOX_CRACK_DURATION );
 vc_close_main_valves( MAIN_VALVE_LOX_MAIN );
-HAL_Delay( LOX_POSTCRACK_DELAY );
+HAL_Delay( LOX_POSTCRACK_DELAY ); // Some lox in the system and we need to boil out LOX in the system
 
 /* Ignite the engine */
 ign_ignite();
 HAL_Delay( ENGINE_IGNITION_DELAY );
 
 /* Open the main valves */
-vc_open_main_valves( MAIN_VALVE_BOTH_MAINS );
+vc_open_main_valves( MAIN_VALVE_BOTH_MAINS ); // Open the valves slowly so the propellants come in the chamber slowly
 
 /* Engine Burn */
 data_logger_init_timer();
