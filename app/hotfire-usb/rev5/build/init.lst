@@ -1,0 +1,2795 @@
+ARM GAS  /tmp/ccAEaq5Q.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"init.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "../../../init/rev5/init.c"
+  19              		.section	.text.SystemClock_Config,"ax",%progbits
+  20              		.align	1
+  21              		.global	SystemClock_Config
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	SystemClock_Config:
+  27              	.LFB333:
+   1:../../../init/rev5/init.c **** /*******************************************************************************
+   2:../../../init/rev5/init.c **** *                                                                              *
+   3:../../../init/rev5/init.c **** * FILE:                                                                        *
+   4:../../../init/rev5/init.c **** * 		init.c                                                                 *
+   5:../../../init/rev5/init.c **** *                                                                              *
+   6:../../../init/rev5/init.c **** * DESCRIPTION:                                                                 *
+   7:../../../init/rev5/init.c **** * 		Contains initialization routines for MCU core and peripherals          *
+   8:../../../init/rev5/init.c **** *                                                                              *
+   9:../../../init/rev5/init.c **** *******************************************************************************/
+  10:../../../init/rev5/init.c **** 
+  11:../../../init/rev5/init.c **** 
+  12:../../../init/rev5/init.c **** /*------------------------------------------------------------------------------
+  13:../../../init/rev5/init.c ****  Standard Includes                                                              
+  14:../../../init/rev5/init.c **** ------------------------------------------------------------------------------*/
+  15:../../../init/rev5/init.c **** 
+  16:../../../init/rev5/init.c **** 
+  17:../../../init/rev5/init.c **** /*------------------------------------------------------------------------------
+  18:../../../init/rev5/init.c ****  Project Includes                                                               
+  19:../../../init/rev5/init.c **** ------------------------------------------------------------------------------*/
+  20:../../../init/rev5/init.c **** #include "sdr_pin_defines_L0002.h"
+  21:../../../init/rev5/init.c **** #include "main.h"
+  22:../../../init/rev5/init.c **** #include "init.h"
+  23:../../../init/rev5/init.c **** #include "sdr_error.h"
+  24:../../../init/rev5/init.c **** 
+  25:../../../init/rev5/init.c **** 
+  26:../../../init/rev5/init.c **** /*------------------------------------------------------------------------------
+  27:../../../init/rev5/init.c ****  Global Variables 
+  28:../../../init/rev5/init.c **** ------------------------------------------------------------------------------*/
+  29:../../../init/rev5/init.c **** extern ADC_HandleTypeDef  hadc1;  /* Pressure transducer ADC handle */
+  30:../../../init/rev5/init.c **** extern ADC_HandleTypeDef  hadc2;  /* Load cell ADC handle           */
+  31:../../../init/rev5/init.c **** extern I2C_HandleTypeDef  hi2c1;  /* Thermocouple I2C handle        */
+ARM GAS  /tmp/ccAEaq5Q.s 			page 2
+
+
+  32:../../../init/rev5/init.c **** extern SPI_HandleTypeDef  hspi2;  /* Flash SPI handle               */
+  33:../../../init/rev5/init.c **** extern UART_HandleTypeDef huart1; /* USB UART handler struct        */
+  34:../../../init/rev5/init.c **** 
+  35:../../../init/rev5/init.c **** 
+  36:../../../init/rev5/init.c **** /*------------------------------------------------------------------------------
+  37:../../../init/rev5/init.c ****  Procedures 
+  38:../../../init/rev5/init.c **** ------------------------------------------------------------------------------*/
+  39:../../../init/rev5/init.c **** 
+  40:../../../init/rev5/init.c **** 
+  41:../../../init/rev5/init.c **** /*******************************************************************************
+  42:../../../init/rev5/init.c **** *                                                                              *
+  43:../../../init/rev5/init.c **** * PROCEDURE:                                                                   *
+  44:../../../init/rev5/init.c **** * 		SystemClock_Config                                                     *
+  45:../../../init/rev5/init.c **** *                                                                              *
+  46:../../../init/rev5/init.c **** * DESCRIPTION:                                                                 *
+  47:../../../init/rev5/init.c **** * 		Initializes the microcontroller clock. Enables peripheral clocks and   *
+  48:../../../init/rev5/init.c **** *       sets prescalers                                                        *
+  49:../../../init/rev5/init.c **** *                                                                              *
+  50:../../../init/rev5/init.c **** *******************************************************************************/
+  51:../../../init/rev5/init.c **** void SystemClock_Config
+  52:../../../init/rev5/init.c **** 	(
+  53:../../../init/rev5/init.c **** 	void
+  54:../../../init/rev5/init.c **** 	)
+  55:../../../init/rev5/init.c **** {
+  28              		.loc 1 55 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 112
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32 0000 00B5     		push	{lr}
+  33              	.LCFI0:
+  34              		.cfi_def_cfa_offset 4
+  35              		.cfi_offset 14, -4
+  36 0002 9DB0     		sub	sp, sp, #116
+  37              	.LCFI1:
+  38              		.cfi_def_cfa_offset 120
+  56:../../../init/rev5/init.c **** /* RCC Initialization Structs */
+  57:../../../init/rev5/init.c **** RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  39              		.loc 1 57 1 view .LVU1
+  40              		.loc 1 57 20 is_stmt 0 view .LVU2
+  41 0004 4C22     		movs	r2, #76
+  42 0006 0021     		movs	r1, #0
+  43 0008 09A8     		add	r0, sp, #36
+  44 000a FFF7FEFF 		bl	memset
+  45              	.LVL0:
+  58:../../../init/rev5/init.c **** RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  46              		.loc 1 58 1 is_stmt 1 view .LVU3
+  47              		.loc 1 58 20 is_stmt 0 view .LVU4
+  48 000e 2022     		movs	r2, #32
+  49 0010 0021     		movs	r1, #0
+  50 0012 01A8     		add	r0, sp, #4
+  51 0014 FFF7FEFF 		bl	memset
+  52              	.LVL1:
+  59:../../../init/rev5/init.c **** 
+  60:../../../init/rev5/init.c **** /* Supply configuration update enable */
+  61:../../../init/rev5/init.c **** HAL_PWREx_ConfigSupply( PWR_LDO_SUPPLY );
+  53              		.loc 1 61 1 is_stmt 1 view .LVU5
+  54 0018 0220     		movs	r0, #2
+ARM GAS  /tmp/ccAEaq5Q.s 			page 3
+
+
+  55 001a FFF7FEFF 		bl	HAL_PWREx_ConfigSupply
+  56              	.LVL2:
+  62:../../../init/rev5/init.c **** 
+  63:../../../init/rev5/init.c **** /* Configure the main internal regulator output voltage */
+  64:../../../init/rev5/init.c **** __HAL_PWR_VOLTAGESCALING_CONFIG( PWR_REGULATOR_VOLTAGE_SCALE0 );
+  57              		.loc 1 64 1 view .LVU6
+  58              	.LBB2:
+  59              		.loc 1 64 1 view .LVU7
+  60 001e 0023     		movs	r3, #0
+  61 0020 0093     		str	r3, [sp]
+  62              		.loc 1 64 1 view .LVU8
+  63              		.loc 1 64 1 view .LVU9
+  64 0022 274B     		ldr	r3, .L8
+  65 0024 9A69     		ldr	r2, [r3, #24]
+  66 0026 42F44042 		orr	r2, r2, #49152
+  67 002a 9A61     		str	r2, [r3, #24]
+  68              		.loc 1 64 1 view .LVU10
+  69 002c 9B69     		ldr	r3, [r3, #24]
+  70 002e 03F44043 		and	r3, r3, #49152
+  71 0032 0093     		str	r3, [sp]
+  72              		.loc 1 64 1 view .LVU11
+  73 0034 234B     		ldr	r3, .L8+4
+  74 0036 DA6A     		ldr	r2, [r3, #44]
+  75 0038 42F00102 		orr	r2, r2, #1
+  76 003c DA62     		str	r2, [r3, #44]
+  77              		.loc 1 64 1 view .LVU12
+  78 003e DB6A     		ldr	r3, [r3, #44]
+  79 0040 03F00103 		and	r3, r3, #1
+  80 0044 0093     		str	r3, [sp]
+  81              		.loc 1 64 1 view .LVU13
+  82 0046 009B     		ldr	r3, [sp]
+  83              	.LBE2:
+  84              		.loc 1 64 1 view .LVU14
+  65:../../../init/rev5/init.c **** 
+  66:../../../init/rev5/init.c **** while( !__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY) ) 
+  85              		.loc 1 66 1 view .LVU15
+  86              	.L2:
+  67:../../../init/rev5/init.c **** 	{
+  68:../../../init/rev5/init.c **** 	/* Wait for PWR_FLAG_VOSRDY flag */
+  69:../../../init/rev5/init.c **** 	}
+  87              		.loc 1 69 2 discriminator 1 view .LVU16
+  66:../../../init/rev5/init.c **** 	{
+  88              		.loc 1 66 8 discriminator 1 view .LVU17
+  66:../../../init/rev5/init.c **** 	{
+  89              		.loc 1 66 9 is_stmt 0 discriminator 1 view .LVU18
+  90 0048 1D4B     		ldr	r3, .L8
+  91 004a 9B69     		ldr	r3, [r3, #24]
+  66:../../../init/rev5/init.c **** 	{
+  92              		.loc 1 66 8 discriminator 1 view .LVU19
+  93 004c 13F4005F 		tst	r3, #8192
+  94 0050 FAD0     		beq	.L2
+  70:../../../init/rev5/init.c **** 
+  71:../../../init/rev5/init.c **** /* Initialize the RCC Oscillators according to the specified parameters
+  72:../../../init/rev5/init.c **** * in the RCC_OscInitTypeDef structure. */
+  73:../../../init/rev5/init.c **** RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  95              		.loc 1 73 1 is_stmt 1 view .LVU20
+  96              		.loc 1 73 34 is_stmt 0 view .LVU21
+ARM GAS  /tmp/ccAEaq5Q.s 			page 4
+
+
+  97 0052 0123     		movs	r3, #1
+  98 0054 0993     		str	r3, [sp, #36]
+  74:../../../init/rev5/init.c **** RCC_OscInitStruct.HSEState       = RCC_HSE_ON;
+  99              		.loc 1 74 1 is_stmt 1 view .LVU22
+ 100              		.loc 1 74 34 is_stmt 0 view .LVU23
+ 101 0056 4FF48033 		mov	r3, #65536
+ 102 005a 0A93     		str	r3, [sp, #40]
+  75:../../../init/rev5/init.c **** RCC_OscInitStruct.PLL.PLLState   = RCC_PLL_ON;
+ 103              		.loc 1 75 1 is_stmt 1 view .LVU24
+ 104              		.loc 1 75 34 is_stmt 0 view .LVU25
+ 105 005c 0223     		movs	r3, #2
+ 106 005e 1293     		str	r3, [sp, #72]
+  76:../../../init/rev5/init.c **** RCC_OscInitStruct.PLL.PLLSource  = RCC_PLLSOURCE_HSE;
+ 107              		.loc 1 76 1 is_stmt 1 view .LVU26
+ 108              		.loc 1 76 34 is_stmt 0 view .LVU27
+ 109 0060 1393     		str	r3, [sp, #76]
+  77:../../../init/rev5/init.c **** RCC_OscInitStruct.PLL.PLLM       = 2;
+ 110              		.loc 1 77 1 is_stmt 1 view .LVU28
+ 111              		.loc 1 77 34 is_stmt 0 view .LVU29
+ 112 0062 1493     		str	r3, [sp, #80]
+  78:../../../init/rev5/init.c **** RCC_OscInitStruct.PLL.PLLN       = 80;
+ 113              		.loc 1 78 1 is_stmt 1 view .LVU30
+ 114              		.loc 1 78 34 is_stmt 0 view .LVU31
+ 115 0064 5022     		movs	r2, #80
+ 116 0066 1592     		str	r2, [sp, #84]
+  79:../../../init/rev5/init.c **** RCC_OscInitStruct.PLL.PLLP       = 2;
+ 117              		.loc 1 79 1 is_stmt 1 view .LVU32
+ 118              		.loc 1 79 34 is_stmt 0 view .LVU33
+ 119 0068 1693     		str	r3, [sp, #88]
+  80:../../../init/rev5/init.c **** RCC_OscInitStruct.PLL.PLLQ       = 2;
+ 120              		.loc 1 80 1 is_stmt 1 view .LVU34
+ 121              		.loc 1 80 34 is_stmt 0 view .LVU35
+ 122 006a 1793     		str	r3, [sp, #92]
+  81:../../../init/rev5/init.c **** RCC_OscInitStruct.PLL.PLLR       = 2;
+ 123              		.loc 1 81 1 is_stmt 1 view .LVU36
+ 124              		.loc 1 81 34 is_stmt 0 view .LVU37
+ 125 006c 1893     		str	r3, [sp, #96]
+  82:../../../init/rev5/init.c **** RCC_OscInitStruct.PLL.PLLRGE     = RCC_PLL1VCIRANGE_3;
+ 126              		.loc 1 82 1 is_stmt 1 view .LVU38
+ 127              		.loc 1 82 34 is_stmt 0 view .LVU39
+ 128 006e 0C23     		movs	r3, #12
+ 129 0070 1993     		str	r3, [sp, #100]
+  83:../../../init/rev5/init.c **** RCC_OscInitStruct.PLL.PLLVCOSEL  = RCC_PLL1VCOWIDE;
+ 130              		.loc 1 83 1 is_stmt 1 view .LVU40
+ 131              		.loc 1 83 34 is_stmt 0 view .LVU41
+ 132 0072 0023     		movs	r3, #0
+ 133 0074 1A93     		str	r3, [sp, #104]
+  84:../../../init/rev5/init.c **** RCC_OscInitStruct.PLL.PLLFRACN   = 0;
+ 134              		.loc 1 84 1 is_stmt 1 view .LVU42
+ 135              		.loc 1 84 34 is_stmt 0 view .LVU43
+ 136 0076 1B93     		str	r3, [sp, #108]
+  85:../../../init/rev5/init.c **** if ( HAL_RCC_OscConfig( &RCC_OscInitStruct ) != HAL_OK )
+ 137              		.loc 1 85 1 is_stmt 1 view .LVU44
+ 138              		.loc 1 85 6 is_stmt 0 view .LVU45
+ 139 0078 09A8     		add	r0, sp, #36
+ 140 007a FFF7FEFF 		bl	HAL_RCC_OscConfig
+ 141              	.LVL3:
+ARM GAS  /tmp/ccAEaq5Q.s 			page 5
+
+
+ 142              		.loc 1 85 4 view .LVU46
+ 143 007e B8B9     		cbnz	r0, .L6
+ 144              	.L3:
+  86:../../../init/rev5/init.c **** 	{
+  87:../../../init/rev5/init.c ****     Error_Handler( ERROR_SYSCLOCK_CONFIG_ERROR );
+  88:../../../init/rev5/init.c **** 	}
+  89:../../../init/rev5/init.c **** else /* RCC Oscillator configuration is okay */
+  90:../../../init/rev5/init.c **** 	{
+  91:../../../init/rev5/init.c **** 	/* Do nothing */
+  92:../../../init/rev5/init.c **** 	}
+ 145              		.loc 1 92 2 is_stmt 1 view .LVU47
+  93:../../../init/rev5/init.c **** 
+  94:../../../init/rev5/init.c **** /* Initializes the CPU, AHB and APB buses clocks */
+  95:../../../init/rev5/init.c **** RCC_ClkInitStruct.ClockType      = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+ 146              		.loc 1 95 1 view .LVU48
+ 147              		.loc 1 95 34 is_stmt 0 view .LVU49
+ 148 0080 3F23     		movs	r3, #63
+ 149 0082 0193     		str	r3, [sp, #4]
+  96:../../../init/rev5/init.c ****                                   |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2
+  97:../../../init/rev5/init.c ****                                   |RCC_CLOCKTYPE_D3PCLK1|RCC_CLOCKTYPE_D1PCLK1;
+  98:../../../init/rev5/init.c **** RCC_ClkInitStruct.SYSCLKSource   = RCC_SYSCLKSOURCE_PLLCLK;
+ 150              		.loc 1 98 1 is_stmt 1 view .LVU50
+ 151              		.loc 1 98 34 is_stmt 0 view .LVU51
+ 152 0084 0323     		movs	r3, #3
+ 153 0086 0293     		str	r3, [sp, #8]
+  99:../../../init/rev5/init.c **** RCC_ClkInitStruct.SYSCLKDivider  = RCC_SYSCLK_DIV1;
+ 154              		.loc 1 99 1 is_stmt 1 view .LVU52
+ 155              		.loc 1 99 34 is_stmt 0 view .LVU53
+ 156 0088 0023     		movs	r3, #0
+ 157 008a 0393     		str	r3, [sp, #12]
+ 100:../../../init/rev5/init.c **** RCC_ClkInitStruct.AHBCLKDivider  = RCC_HCLK_DIV2;
+ 158              		.loc 1 100 1 is_stmt 1 view .LVU54
+ 159              		.loc 1 100 34 is_stmt 0 view .LVU55
+ 160 008c 0823     		movs	r3, #8
+ 161 008e 0493     		str	r3, [sp, #16]
+ 101:../../../init/rev5/init.c **** RCC_ClkInitStruct.APB3CLKDivider = RCC_APB3_DIV2;
+ 162              		.loc 1 101 1 is_stmt 1 view .LVU56
+ 163              		.loc 1 101 34 is_stmt 0 view .LVU57
+ 164 0090 4023     		movs	r3, #64
+ 165 0092 0593     		str	r3, [sp, #20]
+ 102:../../../init/rev5/init.c **** RCC_ClkInitStruct.APB1CLKDivider = RCC_APB1_DIV2;
+ 166              		.loc 1 102 1 is_stmt 1 view .LVU58
+ 167              		.loc 1 102 34 is_stmt 0 view .LVU59
+ 168 0094 0693     		str	r3, [sp, #24]
+ 103:../../../init/rev5/init.c **** RCC_ClkInitStruct.APB2CLKDivider = RCC_APB2_DIV2;
+ 169              		.loc 1 103 1 is_stmt 1 view .LVU60
+ 170              		.loc 1 103 34 is_stmt 0 view .LVU61
+ 171 0096 4FF48062 		mov	r2, #1024
+ 172 009a 0792     		str	r2, [sp, #28]
+ 104:../../../init/rev5/init.c **** RCC_ClkInitStruct.APB4CLKDivider = RCC_APB4_DIV2;
+ 173              		.loc 1 104 1 is_stmt 1 view .LVU62
+ 174              		.loc 1 104 34 is_stmt 0 view .LVU63
+ 175 009c 0893     		str	r3, [sp, #32]
+ 105:../../../init/rev5/init.c **** 
+ 106:../../../init/rev5/init.c **** if ( HAL_RCC_ClockConfig( &RCC_ClkInitStruct, FLASH_LATENCY_4 ) != HAL_OK )
+ 176              		.loc 1 106 1 is_stmt 1 view .LVU64
+ 177              		.loc 1 106 6 is_stmt 0 view .LVU65
+ARM GAS  /tmp/ccAEaq5Q.s 			page 6
+
+
+ 178 009e 0421     		movs	r1, #4
+ 179 00a0 0DEB0100 		add	r0, sp, r1
+ 180 00a4 FFF7FEFF 		bl	HAL_RCC_ClockConfig
+ 181              	.LVL4:
+ 182              		.loc 1 106 4 view .LVU66
+ 183 00a8 30B9     		cbnz	r0, .L7
+ 184              	.L1:
+ 107:../../../init/rev5/init.c **** 	{
+ 108:../../../init/rev5/init.c **** 	Error_Handler( ERROR_SYSCLOCK_CONFIG_ERROR );
+ 109:../../../init/rev5/init.c **** 	}
+ 110:../../../init/rev5/init.c **** else /* RCC Configuration okay */
+ 111:../../../init/rev5/init.c **** 	{
+ 112:../../../init/rev5/init.c **** 	/* Do Nothing */
+ 113:../../../init/rev5/init.c **** 	}
+ 114:../../../init/rev5/init.c **** 
+ 115:../../../init/rev5/init.c **** } /* SystemClock_Config */
+ 185              		.loc 1 115 1 view .LVU67
+ 186 00aa 1DB0     		add	sp, sp, #116
+ 187              	.LCFI2:
+ 188              		.cfi_remember_state
+ 189              		.cfi_def_cfa_offset 4
+ 190              		@ sp needed
+ 191 00ac 5DF804FB 		ldr	pc, [sp], #4
+ 192              	.L6:
+ 193              	.LCFI3:
+ 194              		.cfi_restore_state
+  87:../../../init/rev5/init.c **** 	}
+ 195              		.loc 1 87 5 is_stmt 1 view .LVU68
+ 196 00b0 0B20     		movs	r0, #11
+ 197 00b2 FFF7FEFF 		bl	Error_Handler
+ 198              	.LVL5:
+ 199 00b6 E3E7     		b	.L3
+ 200              	.L7:
+ 108:../../../init/rev5/init.c **** 	}
+ 201              		.loc 1 108 2 view .LVU69
+ 202 00b8 0B20     		movs	r0, #11
+ 203 00ba FFF7FEFF 		bl	Error_Handler
+ 204              	.LVL6:
+ 113:../../../init/rev5/init.c **** 
+ 205              		.loc 1 113 2 view .LVU70
+ 206              		.loc 1 115 1 is_stmt 0 view .LVU71
+ 207 00be F4E7     		b	.L1
+ 208              	.L9:
+ 209              		.align	2
+ 210              	.L8:
+ 211 00c0 00480258 		.word	1476544512
+ 212 00c4 00040058 		.word	1476396032
+ 213              		.cfi_endproc
+ 214              	.LFE333:
+ 216              		.section	.text.PeriphCommonClock_Config,"ax",%progbits
+ 217              		.align	1
+ 218              		.global	PeriphCommonClock_Config
+ 219              		.syntax unified
+ 220              		.thumb
+ 221              		.thumb_func
+ 223              	PeriphCommonClock_Config:
+ 224              	.LFB334:
+ARM GAS  /tmp/ccAEaq5Q.s 			page 7
+
+
+ 116:../../../init/rev5/init.c **** 
+ 117:../../../init/rev5/init.c **** 
+ 118:../../../init/rev5/init.c **** /*******************************************************************************
+ 119:../../../init/rev5/init.c **** *                                                                              *
+ 120:../../../init/rev5/init.c **** * PROCEDURE:                                                                   *
+ 121:../../../init/rev5/init.c **** * 		PeriphCommonClock_Config                                               *
+ 122:../../../init/rev5/init.c **** *                                                                              *
+ 123:../../../init/rev5/init.c **** * DESCRIPTION:                                                                 *
+ 124:../../../init/rev5/init.c **** * 		Initializes the shared peripheral clocks.                              *
+ 125:../../../init/rev5/init.c **** *                                                                              *
+ 126:../../../init/rev5/init.c **** *******************************************************************************/
+ 127:../../../init/rev5/init.c **** void PeriphCommonClock_Config
+ 128:../../../init/rev5/init.c **** 	(
+ 129:../../../init/rev5/init.c **** 	void
+ 130:../../../init/rev5/init.c **** 	)
+ 131:../../../init/rev5/init.c **** {
+ 225              		.loc 1 131 1 is_stmt 1 view -0
+ 226              		.cfi_startproc
+ 227              		@ args = 0, pretend = 0, frame = 192
+ 228              		@ frame_needed = 0, uses_anonymous_args = 0
+ 229 0000 00B5     		push	{lr}
+ 230              	.LCFI4:
+ 231              		.cfi_def_cfa_offset 4
+ 232              		.cfi_offset 14, -4
+ 233 0002 B1B0     		sub	sp, sp, #196
+ 234              	.LCFI5:
+ 235              		.cfi_def_cfa_offset 200
+ 132:../../../init/rev5/init.c **** /* Init Structs */
+ 133:../../../init/rev5/init.c **** RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+ 236              		.loc 1 133 1 view .LVU73
+ 237              		.loc 1 133 26 is_stmt 0 view .LVU74
+ 238 0004 BC22     		movs	r2, #188
+ 239 0006 0021     		movs	r1, #0
+ 240 0008 01A8     		add	r0, sp, #4
+ 241 000a FFF7FEFF 		bl	memset
+ 242              	.LVL7:
+ 134:../../../init/rev5/init.c **** 
+ 135:../../../init/rev5/init.c **** /* Initializes the peripherals clock */
+ 136:../../../init/rev5/init.c **** PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_ADC;
+ 243              		.loc 1 136 1 is_stmt 1 view .LVU75
+ 244              		.loc 1 136 42 is_stmt 0 view .LVU76
+ 245 000e 4FF40023 		mov	r3, #524288
+ 246 0012 0193     		str	r3, [sp, #4]
+ 137:../../../init/rev5/init.c **** PeriphClkInitStruct.PLL2.PLL2M           = 2;
+ 247              		.loc 1 137 1 is_stmt 1 view .LVU77
+ 248              		.loc 1 137 42 is_stmt 0 view .LVU78
+ 249 0014 0223     		movs	r3, #2
+ 250 0016 0293     		str	r3, [sp, #8]
+ 138:../../../init/rev5/init.c **** PeriphClkInitStruct.PLL2.PLL2N           = 16;
+ 251              		.loc 1 138 1 is_stmt 1 view .LVU79
+ 252              		.loc 1 138 42 is_stmt 0 view .LVU80
+ 253 0018 1022     		movs	r2, #16
+ 254 001a 0392     		str	r2, [sp, #12]
+ 139:../../../init/rev5/init.c **** PeriphClkInitStruct.PLL2.PLL2P           = 4;
+ 255              		.loc 1 139 1 is_stmt 1 view .LVU81
+ 256              		.loc 1 139 42 is_stmt 0 view .LVU82
+ 257 001c 0422     		movs	r2, #4
+ARM GAS  /tmp/ccAEaq5Q.s 			page 8
+
+
+ 258 001e 0492     		str	r2, [sp, #16]
+ 140:../../../init/rev5/init.c **** PeriphClkInitStruct.PLL2.PLL2Q           = 2;
+ 259              		.loc 1 140 1 is_stmt 1 view .LVU83
+ 260              		.loc 1 140 42 is_stmt 0 view .LVU84
+ 261 0020 0593     		str	r3, [sp, #20]
+ 141:../../../init/rev5/init.c **** PeriphClkInitStruct.PLL2.PLL2R           = 2;
+ 262              		.loc 1 141 1 is_stmt 1 view .LVU85
+ 263              		.loc 1 141 42 is_stmt 0 view .LVU86
+ 264 0022 0693     		str	r3, [sp, #24]
+ 142:../../../init/rev5/init.c **** PeriphClkInitStruct.PLL2.PLL2RGE         = RCC_PLL2VCIRANGE_3;
+ 265              		.loc 1 142 1 is_stmt 1 view .LVU87
+ 266              		.loc 1 142 42 is_stmt 0 view .LVU88
+ 267 0024 C023     		movs	r3, #192
+ 268 0026 0793     		str	r3, [sp, #28]
+ 143:../../../init/rev5/init.c **** PeriphClkInitStruct.PLL2.PLL2VCOSEL      = RCC_PLL2VCOWIDE;
+ 269              		.loc 1 143 1 is_stmt 1 view .LVU89
+ 144:../../../init/rev5/init.c **** PeriphClkInitStruct.PLL2.PLL2FRACN       = 0;
+ 270              		.loc 1 144 1 view .LVU90
+ 145:../../../init/rev5/init.c **** PeriphClkInitStruct.AdcClockSelection    = RCC_ADCCLKSOURCE_PLL2;
+ 271              		.loc 1 145 1 view .LVU91
+ 146:../../../init/rev5/init.c **** if ( HAL_RCCEx_PeriphCLKConfig( &PeriphClkInitStruct ) != HAL_OK )
+ 272              		.loc 1 146 1 view .LVU92
+ 273              		.loc 1 146 6 is_stmt 0 view .LVU93
+ 274 0028 0DEB0200 		add	r0, sp, r2
+ 275 002c FFF7FEFF 		bl	HAL_RCCEx_PeriphCLKConfig
+ 276              	.LVL8:
+ 277              		.loc 1 146 4 view .LVU94
+ 278 0030 10B9     		cbnz	r0, .L13
+ 279              	.L10:
+ 147:../../../init/rev5/init.c **** 	{
+ 148:../../../init/rev5/init.c **** 	Error_Handler( ERROR_COMMON_CLOCK_CONFIG_ERROR );
+ 149:../../../init/rev5/init.c **** 	}
+ 150:../../../init/rev5/init.c **** } /* PeriphCommonClock_Config */
+ 280              		.loc 1 150 1 view .LVU95
+ 281 0032 31B0     		add	sp, sp, #196
+ 282              	.LCFI6:
+ 283              		.cfi_remember_state
+ 284              		.cfi_def_cfa_offset 4
+ 285              		@ sp needed
+ 286 0034 5DF804FB 		ldr	pc, [sp], #4
+ 287              	.L13:
+ 288              	.LCFI7:
+ 289              		.cfi_restore_state
+ 148:../../../init/rev5/init.c **** 	}
+ 290              		.loc 1 148 2 is_stmt 1 view .LVU96
+ 291 0038 0C20     		movs	r0, #12
+ 292 003a FFF7FEFF 		bl	Error_Handler
+ 293              	.LVL9:
+ 294              		.loc 1 150 1 is_stmt 0 view .LVU97
+ 295 003e F8E7     		b	.L10
+ 296              		.cfi_endproc
+ 297              	.LFE334:
+ 299              		.section	.text.PRESSURE_ADC_Init,"ax",%progbits
+ 300              		.align	1
+ 301              		.global	PRESSURE_ADC_Init
+ 302              		.syntax unified
+ 303              		.thumb
+ARM GAS  /tmp/ccAEaq5Q.s 			page 9
+
+
+ 304              		.thumb_func
+ 306              	PRESSURE_ADC_Init:
+ 307              	.LFB335:
+ 151:../../../init/rev5/init.c **** 
+ 152:../../../init/rev5/init.c **** 
+ 153:../../../init/rev5/init.c **** /*******************************************************************************
+ 154:../../../init/rev5/init.c **** *                                                                              *
+ 155:../../../init/rev5/init.c **** * PROCEDURE:                                                                   *
+ 156:../../../init/rev5/init.c **** * 		PRESSURE_ADC_Init                                                      *
+ 157:../../../init/rev5/init.c **** *                                                                              *
+ 158:../../../init/rev5/init.c **** * DESCRIPTION:                                                                 *
+ 159:../../../init/rev5/init.c **** * 		Initializes the MCU ADC for use with pressure transducers              *
+ 160:../../../init/rev5/init.c **** *                                                                              *
+ 161:../../../init/rev5/init.c **** *******************************************************************************/
+ 162:../../../init/rev5/init.c **** void PRESSURE_ADC_Init
+ 163:../../../init/rev5/init.c **** 	(
+ 164:../../../init/rev5/init.c ****     void
+ 165:../../../init/rev5/init.c ****     )
+ 166:../../../init/rev5/init.c **** {
+ 308              		.loc 1 166 1 is_stmt 1 view -0
+ 309              		.cfi_startproc
+ 310              		@ args = 0, pretend = 0, frame = 40
+ 311              		@ frame_needed = 0, uses_anonymous_args = 0
+ 312 0000 00B5     		push	{lr}
+ 313              	.LCFI8:
+ 314              		.cfi_def_cfa_offset 4
+ 315              		.cfi_offset 14, -4
+ 316 0002 8BB0     		sub	sp, sp, #44
+ 317              	.LCFI9:
+ 318              		.cfi_def_cfa_offset 48
+ 167:../../../init/rev5/init.c **** 
+ 168:../../../init/rev5/init.c **** /* Initialize config structs */
+ 169:../../../init/rev5/init.c **** ADC_MultiModeTypeDef   multimode = {0};
+ 319              		.loc 1 169 1 view .LVU99
+ 320              		.loc 1 169 24 is_stmt 0 view .LVU100
+ 321 0004 0023     		movs	r3, #0
+ 322 0006 0793     		str	r3, [sp, #28]
+ 323 0008 0893     		str	r3, [sp, #32]
+ 324 000a 0993     		str	r3, [sp, #36]
+ 170:../../../init/rev5/init.c **** ADC_ChannelConfTypeDef sConfig   = {0};
+ 325              		.loc 1 170 1 is_stmt 1 view .LVU101
+ 326              		.loc 1 170 24 is_stmt 0 view .LVU102
+ 327 000c 0093     		str	r3, [sp]
+ 328 000e 0193     		str	r3, [sp, #4]
+ 329 0010 0293     		str	r3, [sp, #8]
+ 330 0012 0393     		str	r3, [sp, #12]
+ 331 0014 0493     		str	r3, [sp, #16]
+ 332 0016 0593     		str	r3, [sp, #20]
+ 333 0018 0693     		str	r3, [sp, #24]
+ 171:../../../init/rev5/init.c **** 
+ 172:../../../init/rev5/init.c **** /* Configuration settings */
+ 173:../../../init/rev5/init.c **** hadc1.Instance                      = ADC1;
+ 334              		.loc 1 173 1 is_stmt 1 view .LVU103
+ 335              		.loc 1 173 37 is_stmt 0 view .LVU104
+ 336 001a 2648     		ldr	r0, .L24
+ 337 001c 264A     		ldr	r2, .L24+4
+ 338 001e 0260     		str	r2, [r0]
+ARM GAS  /tmp/ccAEaq5Q.s 			page 10
+
+
+ 174:../../../init/rev5/init.c **** hadc1.Init.ClockPrescaler           = ADC_CLOCK_ASYNC_DIV1;
+ 339              		.loc 1 174 1 is_stmt 1 view .LVU105
+ 340              		.loc 1 174 37 is_stmt 0 view .LVU106
+ 341 0020 4360     		str	r3, [r0, #4]
+ 175:../../../init/rev5/init.c **** hadc1.Init.Resolution               = ADC_RESOLUTION_16B;
+ 342              		.loc 1 175 1 is_stmt 1 view .LVU107
+ 343              		.loc 1 175 37 is_stmt 0 view .LVU108
+ 344 0022 8360     		str	r3, [r0, #8]
+ 176:../../../init/rev5/init.c **** hadc1.Init.ScanConvMode             = ADC_SCAN_ENABLE;
+ 345              		.loc 1 176 1 is_stmt 1 view .LVU109
+ 346              		.loc 1 176 37 is_stmt 0 view .LVU110
+ 347 0024 0122     		movs	r2, #1
+ 348 0026 C260     		str	r2, [r0, #12]
+ 177:../../../init/rev5/init.c **** hadc1.Init.EOCSelection             = ADC_EOC_SINGLE_CONV;
+ 349              		.loc 1 177 1 is_stmt 1 view .LVU111
+ 350              		.loc 1 177 37 is_stmt 0 view .LVU112
+ 351 0028 0421     		movs	r1, #4
+ 352 002a 0161     		str	r1, [r0, #16]
+ 178:../../../init/rev5/init.c **** hadc1.Init.LowPowerAutoWait         = DISABLE;
+ 353              		.loc 1 178 1 is_stmt 1 view .LVU113
+ 354              		.loc 1 178 37 is_stmt 0 view .LVU114
+ 355 002c 0375     		strb	r3, [r0, #20]
+ 179:../../../init/rev5/init.c **** hadc1.Init.ContinuousConvMode       = DISABLE;
+ 356              		.loc 1 179 1 is_stmt 1 view .LVU115
+ 357              		.loc 1 179 37 is_stmt 0 view .LVU116
+ 358 002e 4375     		strb	r3, [r0, #21]
+ 180:../../../init/rev5/init.c **** hadc1.Init.NbrOfConversion          = 1;
+ 359              		.loc 1 180 1 is_stmt 1 view .LVU117
+ 360              		.loc 1 180 37 is_stmt 0 view .LVU118
+ 361 0030 8261     		str	r2, [r0, #24]
+ 181:../../../init/rev5/init.c **** hadc1.Init.DiscontinuousConvMode    = DISABLE;
+ 362              		.loc 1 181 1 is_stmt 1 view .LVU119
+ 363              		.loc 1 181 37 is_stmt 0 view .LVU120
+ 364 0032 0377     		strb	r3, [r0, #28]
+ 182:../../../init/rev5/init.c **** hadc1.Init.ExternalTrigConv         = ADC_SOFTWARE_START;
+ 365              		.loc 1 182 1 is_stmt 1 view .LVU121
+ 366              		.loc 1 182 37 is_stmt 0 view .LVU122
+ 367 0034 4362     		str	r3, [r0, #36]
+ 183:../../../init/rev5/init.c **** hadc1.Init.ExternalTrigConvEdge     = ADC_EXTERNALTRIGCONVEDGE_NONE;
+ 368              		.loc 1 183 1 is_stmt 1 view .LVU123
+ 369              		.loc 1 183 37 is_stmt 0 view .LVU124
+ 370 0036 8362     		str	r3, [r0, #40]
+ 184:../../../init/rev5/init.c **** hadc1.Init.ConversionDataManagement = ADC_CONVERSIONDATA_DR;
+ 371              		.loc 1 184 1 is_stmt 1 view .LVU125
+ 372              		.loc 1 184 37 is_stmt 0 view .LVU126
+ 373 0038 C362     		str	r3, [r0, #44]
+ 185:../../../init/rev5/init.c **** hadc1.Init.Overrun                  = ADC_OVR_DATA_PRESERVED;
+ 374              		.loc 1 185 1 is_stmt 1 view .LVU127
+ 375              		.loc 1 185 37 is_stmt 0 view .LVU128
+ 376 003a 0363     		str	r3, [r0, #48]
+ 186:../../../init/rev5/init.c **** hadc1.Init.LeftBitShift             = ADC_LEFTBITSHIFT_NONE;
+ 377              		.loc 1 186 1 is_stmt 1 view .LVU129
+ 378              		.loc 1 186 37 is_stmt 0 view .LVU130
+ 379 003c 4363     		str	r3, [r0, #52]
+ 187:../../../init/rev5/init.c **** hadc1.Init.OversamplingMode         = DISABLE;
+ 380              		.loc 1 187 1 is_stmt 1 view .LVU131
+ 381              		.loc 1 187 37 is_stmt 0 view .LVU132
+ARM GAS  /tmp/ccAEaq5Q.s 			page 11
+
+
+ 382 003e 80F83830 		strb	r3, [r0, #56]
+ 188:../../../init/rev5/init.c **** 
+ 189:../../../init/rev5/init.c **** /* Call MSPinit function to configure ADC registers */
+ 190:../../../init/rev5/init.c **** if ( HAL_ADC_Init( &hadc1 ) != HAL_OK )
+ 383              		.loc 1 190 1 is_stmt 1 view .LVU133
+ 384              		.loc 1 190 6 is_stmt 0 view .LVU134
+ 385 0042 FFF7FEFF 		bl	HAL_ADC_Init
+ 386              	.LVL10:
+ 387              		.loc 1 190 4 view .LVU135
+ 388 0046 28BB     		cbnz	r0, .L20
+ 389              	.L15:
+ 191:../../../init/rev5/init.c **** 	{
+ 192:../../../init/rev5/init.c **** 	Error_Handler( ERROR_PT_ADC_INIT_ERROR );
+ 193:../../../init/rev5/init.c **** 	}
+ 194:../../../init/rev5/init.c **** else
+ 195:../../../init/rev5/init.c **** 	{
+ 196:../../../init/rev5/init.c ****     /* ADC config okay, do nothing */
+ 197:../../../init/rev5/init.c ****     }
+ 390              		.loc 1 197 5 is_stmt 1 view .LVU136
+ 198:../../../init/rev5/init.c **** 
+ 199:../../../init/rev5/init.c **** /* Configure the ADC multi-mode */
+ 200:../../../init/rev5/init.c **** multimode.Mode = ADC_MODE_INDEPENDENT;
+ 391              		.loc 1 200 1 view .LVU137
+ 392              		.loc 1 200 16 is_stmt 0 view .LVU138
+ 393 0048 0023     		movs	r3, #0
+ 394 004a 0793     		str	r3, [sp, #28]
+ 201:../../../init/rev5/init.c **** if ( HAL_ADCEx_MultiModeConfigChannel( &hadc1, &multimode ) != HAL_OK )
+ 395              		.loc 1 201 1 is_stmt 1 view .LVU139
+ 396              		.loc 1 201 6 is_stmt 0 view .LVU140
+ 397 004c 07A9     		add	r1, sp, #28
+ 398 004e 1948     		ldr	r0, .L24
+ 399 0050 FFF7FEFF 		bl	HAL_ADCEx_MultiModeConfigChannel
+ 400              	.LVL11:
+ 401              		.loc 1 201 4 view .LVU141
+ 402 0054 10BB     		cbnz	r0, .L21
+ 403              	.L16:
+ 202:../../../init/rev5/init.c **** 	{
+ 203:../../../init/rev5/init.c **** 	Error_Handler( ERROR_PT_ADC_INIT_ERROR );
+ 204:../../../init/rev5/init.c **** 	}
+ 205:../../../init/rev5/init.c **** else
+ 206:../../../init/rev5/init.c **** 	{
+ 207:../../../init/rev5/init.c ****     /* multi-mode configuration okay, no nothing */
+ 208:../../../init/rev5/init.c ****     }
+ 404              		.loc 1 208 5 is_stmt 1 view .LVU142
+ 209:../../../init/rev5/init.c **** 
+ 210:../../../init/rev5/init.c **** /* Configure Regular Channel */
+ 211:../../../init/rev5/init.c **** sConfig.Channel                = ADC_CHANNEL_10;
+ 405              		.loc 1 211 1 view .LVU143
+ 406              		.loc 1 211 32 is_stmt 0 view .LVU144
+ 407 0056 194B     		ldr	r3, .L24+8
+ 408 0058 0093     		str	r3, [sp]
+ 212:../../../init/rev5/init.c **** sConfig.Rank                   = ADC_REGULAR_RANK_1;
+ 409              		.loc 1 212 1 is_stmt 1 view .LVU145
+ 410              		.loc 1 212 32 is_stmt 0 view .LVU146
+ 411 005a 0623     		movs	r3, #6
+ 412 005c 0193     		str	r3, [sp, #4]
+ 213:../../../init/rev5/init.c **** sConfig.SamplingTime           = ADC_SAMPLETIME_1CYCLE_5;
+ARM GAS  /tmp/ccAEaq5Q.s 			page 12
+
+
+ 413              		.loc 1 213 1 is_stmt 1 view .LVU147
+ 414              		.loc 1 213 32 is_stmt 0 view .LVU148
+ 415 005e 0023     		movs	r3, #0
+ 416 0060 0293     		str	r3, [sp, #8]
+ 214:../../../init/rev5/init.c **** sConfig.SingleDiff             = ADC_SINGLE_ENDED;
+ 417              		.loc 1 214 1 is_stmt 1 view .LVU149
+ 418              		.loc 1 214 32 is_stmt 0 view .LVU150
+ 419 0062 40F2FF72 		movw	r2, #2047
+ 420 0066 0392     		str	r2, [sp, #12]
+ 215:../../../init/rev5/init.c **** sConfig.OffsetNumber           = ADC_OFFSET_NONE;
+ 421              		.loc 1 215 1 is_stmt 1 view .LVU151
+ 422              		.loc 1 215 32 is_stmt 0 view .LVU152
+ 423 0068 0422     		movs	r2, #4
+ 424 006a 0492     		str	r2, [sp, #16]
+ 216:../../../init/rev5/init.c **** sConfig.Offset                 = 0;
+ 425              		.loc 1 216 1 is_stmt 1 view .LVU153
+ 426              		.loc 1 216 32 is_stmt 0 view .LVU154
+ 427 006c 0593     		str	r3, [sp, #20]
+ 217:../../../init/rev5/init.c **** sConfig.OffsetSignedSaturation = DISABLE;
+ 428              		.loc 1 217 1 is_stmt 1 view .LVU155
+ 429              		.loc 1 217 32 is_stmt 0 view .LVU156
+ 430 006e 8DF81930 		strb	r3, [sp, #25]
+ 218:../../../init/rev5/init.c **** if ( HAL_ADC_ConfigChannel( &hadc1, &sConfig ) != HAL_OK )
+ 431              		.loc 1 218 1 is_stmt 1 view .LVU157
+ 432              		.loc 1 218 6 is_stmt 0 view .LVU158
+ 433 0072 6946     		mov	r1, sp
+ 434 0074 0F48     		ldr	r0, .L24
+ 435 0076 FFF7FEFF 		bl	HAL_ADC_ConfigChannel
+ 436              	.LVL12:
+ 437              		.loc 1 218 4 view .LVU159
+ 438 007a 98B9     		cbnz	r0, .L22
+ 439              	.L17:
+ 219:../../../init/rev5/init.c **** 	{
+ 220:../../../init/rev5/init.c **** 	Error_Handler( ERROR_PT_ADC_INIT_ERROR );
+ 221:../../../init/rev5/init.c **** 	}
+ 222:../../../init/rev5/init.c **** 
+ 223:../../../init/rev5/init.c **** /* Configure Regular Channel */
+ 224:../../../init/rev5/init.c **** sConfig.Channel = ADC_CHANNEL_4;
+ 440              		.loc 1 224 1 is_stmt 1 view .LVU160
+ 441              		.loc 1 224 17 is_stmt 0 view .LVU161
+ 442 007c 104B     		ldr	r3, .L24+12
+ 443 007e 0093     		str	r3, [sp]
+ 225:../../../init/rev5/init.c **** sConfig.Rank    = ADC_REGULAR_RANK_2;
+ 444              		.loc 1 225 1 is_stmt 1 view .LVU162
+ 445              		.loc 1 225 17 is_stmt 0 view .LVU163
+ 446 0080 0C23     		movs	r3, #12
+ 447 0082 0193     		str	r3, [sp, #4]
+ 226:../../../init/rev5/init.c **** if ( HAL_ADC_ConfigChannel( &hadc1, &sConfig ) != HAL_OK )
+ 448              		.loc 1 226 1 is_stmt 1 view .LVU164
+ 449              		.loc 1 226 6 is_stmt 0 view .LVU165
+ 450 0084 6946     		mov	r1, sp
+ 451 0086 0B48     		ldr	r0, .L24
+ 452 0088 FFF7FEFF 		bl	HAL_ADC_ConfigChannel
+ 453              	.LVL13:
+ 454              		.loc 1 226 4 view .LVU166
+ 455 008c 70B9     		cbnz	r0, .L23
+ 456              	.L14:
+ARM GAS  /tmp/ccAEaq5Q.s 			page 13
+
+
+ 227:../../../init/rev5/init.c **** 	{
+ 228:../../../init/rev5/init.c **** 	Error_Handler( ERROR_PT_ADC_INIT_ERROR );
+ 229:../../../init/rev5/init.c **** 	}
+ 230:../../../init/rev5/init.c **** 
+ 231:../../../init/rev5/init.c **** } /* PRESSURE_ADC_Init */
+ 457              		.loc 1 231 1 view .LVU167
+ 458 008e 0BB0     		add	sp, sp, #44
+ 459              	.LCFI10:
+ 460              		.cfi_remember_state
+ 461              		.cfi_def_cfa_offset 4
+ 462              		@ sp needed
+ 463 0090 5DF804FB 		ldr	pc, [sp], #4
+ 464              	.L20:
+ 465              	.LCFI11:
+ 466              		.cfi_restore_state
+ 192:../../../init/rev5/init.c **** 	}
+ 467              		.loc 1 192 2 is_stmt 1 view .LVU168
+ 468 0094 1C20     		movs	r0, #28
+ 469 0096 FFF7FEFF 		bl	Error_Handler
+ 470              	.LVL14:
+ 471 009a D5E7     		b	.L15
+ 472              	.L21:
+ 203:../../../init/rev5/init.c **** 	}
+ 473              		.loc 1 203 2 view .LVU169
+ 474 009c 1C20     		movs	r0, #28
+ 475 009e FFF7FEFF 		bl	Error_Handler
+ 476              	.LVL15:
+ 477 00a2 D8E7     		b	.L16
+ 478              	.L22:
+ 220:../../../init/rev5/init.c **** 	}
+ 479              		.loc 1 220 2 view .LVU170
+ 480 00a4 1C20     		movs	r0, #28
+ 481 00a6 FFF7FEFF 		bl	Error_Handler
+ 482              	.LVL16:
+ 483 00aa E7E7     		b	.L17
+ 484              	.L23:
+ 228:../../../init/rev5/init.c **** 	}
+ 485              		.loc 1 228 2 view .LVU171
+ 486 00ac 1C20     		movs	r0, #28
+ 487 00ae FFF7FEFF 		bl	Error_Handler
+ 488              	.LVL17:
+ 489              		.loc 1 231 1 is_stmt 0 view .LVU172
+ 490 00b2 ECE7     		b	.L14
+ 491              	.L25:
+ 492              		.align	2
+ 493              	.L24:
+ 494 00b4 00000000 		.word	hadc1
+ 495 00b8 00200240 		.word	1073881088
+ 496 00bc 0004002A 		.word	704644096
+ 497 00c0 1000C010 		.word	281018384
+ 498              		.cfi_endproc
+ 499              	.LFE335:
+ 501              		.section	.text.LOADCELL_ADC_Init,"ax",%progbits
+ 502              		.align	1
+ 503              		.global	LOADCELL_ADC_Init
+ 504              		.syntax unified
+ 505              		.thumb
+ARM GAS  /tmp/ccAEaq5Q.s 			page 14
+
+
+ 506              		.thumb_func
+ 508              	LOADCELL_ADC_Init:
+ 509              	.LFB336:
+ 232:../../../init/rev5/init.c **** 
+ 233:../../../init/rev5/init.c **** 
+ 234:../../../init/rev5/init.c **** 
+ 235:../../../init/rev5/init.c **** /*******************************************************************************
+ 236:../../../init/rev5/init.c **** *                                                                              *
+ 237:../../../init/rev5/init.c **** * PROCEDURE:                                                                   *
+ 238:../../../init/rev5/init.c **** * 		LOADCELL_ADC_Init                                                      *
+ 239:../../../init/rev5/init.c **** *                                                                              *
+ 240:../../../init/rev5/init.c **** * DESCRIPTION:                                                                 *
+ 241:../../../init/rev5/init.c **** * 		Initializes the MCU ADC for use with the load cell                     *
+ 242:../../../init/rev5/init.c **** *                                                                              *
+ 243:../../../init/rev5/init.c **** *******************************************************************************/
+ 244:../../../init/rev5/init.c **** void LOADCELL_ADC_Init 
+ 245:../../../init/rev5/init.c **** 	(
+ 246:../../../init/rev5/init.c **** 	void
+ 247:../../../init/rev5/init.c **** 	)
+ 248:../../../init/rev5/init.c **** {
+ 510              		.loc 1 248 1 is_stmt 1 view -0
+ 511              		.cfi_startproc
+ 512              		@ args = 0, pretend = 0, frame = 32
+ 513              		@ frame_needed = 0, uses_anonymous_args = 0
+ 514 0000 00B5     		push	{lr}
+ 515              	.LCFI12:
+ 516              		.cfi_def_cfa_offset 4
+ 517              		.cfi_offset 14, -4
+ 518 0002 89B0     		sub	sp, sp, #36
+ 519              	.LCFI13:
+ 520              		.cfi_def_cfa_offset 40
+ 249:../../../init/rev5/init.c **** /* Init Structs */
+ 250:../../../init/rev5/init.c **** ADC_ChannelConfTypeDef sConfig = {0};
+ 521              		.loc 1 250 1 view .LVU174
+ 522              		.loc 1 250 24 is_stmt 0 view .LVU175
+ 523 0004 0023     		movs	r3, #0
+ 524 0006 0193     		str	r3, [sp, #4]
+ 525 0008 0293     		str	r3, [sp, #8]
+ 526 000a 0393     		str	r3, [sp, #12]
+ 527 000c 0493     		str	r3, [sp, #16]
+ 528 000e 0593     		str	r3, [sp, #20]
+ 529 0010 0693     		str	r3, [sp, #24]
+ 530 0012 0793     		str	r3, [sp, #28]
+ 251:../../../init/rev5/init.c **** 
+ 252:../../../init/rev5/init.c **** /* Common config */
+ 253:../../../init/rev5/init.c **** hadc2.Instance                      = ADC2;
+ 531              		.loc 1 253 1 is_stmt 1 view .LVU176
+ 532              		.loc 1 253 37 is_stmt 0 view .LVU177
+ 533 0014 2148     		ldr	r0, .L34
+ 534 0016 224A     		ldr	r2, .L34+4
+ 535 0018 0260     		str	r2, [r0]
+ 254:../../../init/rev5/init.c **** hadc2.Init.ClockPrescaler           = ADC_CLOCK_ASYNC_DIV1;
+ 536              		.loc 1 254 1 is_stmt 1 view .LVU178
+ 537              		.loc 1 254 37 is_stmt 0 view .LVU179
+ 538 001a 4360     		str	r3, [r0, #4]
+ 255:../../../init/rev5/init.c **** hadc2.Init.Resolution               = ADC_RESOLUTION_16B;
+ 539              		.loc 1 255 1 is_stmt 1 view .LVU180
+ARM GAS  /tmp/ccAEaq5Q.s 			page 15
+
+
+ 540              		.loc 1 255 37 is_stmt 0 view .LVU181
+ 541 001c 8360     		str	r3, [r0, #8]
+ 256:../../../init/rev5/init.c **** hadc2.Init.ScanConvMode             = ADC_SCAN_ENABLE;
+ 542              		.loc 1 256 1 is_stmt 1 view .LVU182
+ 543              		.loc 1 256 37 is_stmt 0 view .LVU183
+ 544 001e 0122     		movs	r2, #1
+ 545 0020 C260     		str	r2, [r0, #12]
+ 257:../../../init/rev5/init.c **** hadc2.Init.EOCSelection             = ADC_EOC_SINGLE_CONV;
+ 546              		.loc 1 257 1 is_stmt 1 view .LVU184
+ 547              		.loc 1 257 37 is_stmt 0 view .LVU185
+ 548 0022 0421     		movs	r1, #4
+ 549 0024 0161     		str	r1, [r0, #16]
+ 258:../../../init/rev5/init.c **** hadc2.Init.LowPowerAutoWait         = DISABLE;
+ 550              		.loc 1 258 1 is_stmt 1 view .LVU186
+ 551              		.loc 1 258 37 is_stmt 0 view .LVU187
+ 552 0026 0375     		strb	r3, [r0, #20]
+ 259:../../../init/rev5/init.c **** hadc2.Init.ContinuousConvMode       = DISABLE;
+ 553              		.loc 1 259 1 is_stmt 1 view .LVU188
+ 554              		.loc 1 259 37 is_stmt 0 view .LVU189
+ 555 0028 4375     		strb	r3, [r0, #21]
+ 260:../../../init/rev5/init.c **** hadc2.Init.NbrOfConversion          = 1;
+ 556              		.loc 1 260 1 is_stmt 1 view .LVU190
+ 557              		.loc 1 260 37 is_stmt 0 view .LVU191
+ 558 002a 8261     		str	r2, [r0, #24]
+ 261:../../../init/rev5/init.c **** hadc1.Init.DiscontinuousConvMode    = DISABLE;
+ 559              		.loc 1 261 1 is_stmt 1 view .LVU192
+ 560              		.loc 1 261 37 is_stmt 0 view .LVU193
+ 561 002c 1D4A     		ldr	r2, .L34+8
+ 562 002e 1377     		strb	r3, [r2, #28]
+ 262:../../../init/rev5/init.c **** hadc2.Init.ExternalTrigConv         = ADC_SOFTWARE_START;
+ 563              		.loc 1 262 1 is_stmt 1 view .LVU194
+ 564              		.loc 1 262 37 is_stmt 0 view .LVU195
+ 565 0030 4362     		str	r3, [r0, #36]
+ 263:../../../init/rev5/init.c **** hadc2.Init.ExternalTrigConvEdge     = ADC_EXTERNALTRIGCONVEDGE_NONE;
+ 566              		.loc 1 263 1 is_stmt 1 view .LVU196
+ 567              		.loc 1 263 37 is_stmt 0 view .LVU197
+ 568 0032 8362     		str	r3, [r0, #40]
+ 264:../../../init/rev5/init.c **** hadc2.Init.ConversionDataManagement = ADC_CONVERSIONDATA_DR;
+ 569              		.loc 1 264 1 is_stmt 1 view .LVU198
+ 570              		.loc 1 264 37 is_stmt 0 view .LVU199
+ 571 0034 C362     		str	r3, [r0, #44]
+ 265:../../../init/rev5/init.c **** hadc2.Init.Overrun                  = ADC_OVR_DATA_PRESERVED;
+ 572              		.loc 1 265 1 is_stmt 1 view .LVU200
+ 573              		.loc 1 265 37 is_stmt 0 view .LVU201
+ 574 0036 0363     		str	r3, [r0, #48]
+ 266:../../../init/rev5/init.c **** hadc2.Init.LeftBitShift             = ADC_LEFTBITSHIFT_NONE;
+ 575              		.loc 1 266 1 is_stmt 1 view .LVU202
+ 576              		.loc 1 266 37 is_stmt 0 view .LVU203
+ 577 0038 4363     		str	r3, [r0, #52]
+ 267:../../../init/rev5/init.c **** hadc2.Init.OversamplingMode         = DISABLE;
+ 578              		.loc 1 267 1 is_stmt 1 view .LVU204
+ 579              		.loc 1 267 37 is_stmt 0 view .LVU205
+ 580 003a 80F83830 		strb	r3, [r0, #56]
+ 268:../../../init/rev5/init.c **** if ( HAL_ADC_Init( &hadc2 ) != HAL_OK )
+ 581              		.loc 1 268 1 is_stmt 1 view .LVU206
+ 582              		.loc 1 268 6 is_stmt 0 view .LVU207
+ 583 003e FFF7FEFF 		bl	HAL_ADC_Init
+ARM GAS  /tmp/ccAEaq5Q.s 			page 16
+
+
+ 584              	.LVL18:
+ 585              		.loc 1 268 4 view .LVU208
+ 586 0042 F8B9     		cbnz	r0, .L31
+ 587              	.L27:
+ 269:../../../init/rev5/init.c **** 	{
+ 270:../../../init/rev5/init.c **** 	Error_Handler( ERROR_LC_ADC_INIT_ERROR );
+ 271:../../../init/rev5/init.c **** 	}
+ 272:../../../init/rev5/init.c **** 
+ 273:../../../init/rev5/init.c **** /* Configure Regular Channel */
+ 274:../../../init/rev5/init.c **** sConfig.Channel                     = ADC_CHANNEL_11;
+ 588              		.loc 1 274 1 is_stmt 1 view .LVU209
+ 589              		.loc 1 274 37 is_stmt 0 view .LVU210
+ 590 0044 184B     		ldr	r3, .L34+12
+ 591 0046 0193     		str	r3, [sp, #4]
+ 275:../../../init/rev5/init.c **** sConfig.Rank                        = ADC_REGULAR_RANK_1;
+ 592              		.loc 1 275 1 is_stmt 1 view .LVU211
+ 593              		.loc 1 275 37 is_stmt 0 view .LVU212
+ 594 0048 0623     		movs	r3, #6
+ 595 004a 0293     		str	r3, [sp, #8]
+ 276:../../../init/rev5/init.c **** sConfig.SamplingTime                = ADC_SAMPLETIME_1CYCLE_5;
+ 596              		.loc 1 276 1 is_stmt 1 view .LVU213
+ 597              		.loc 1 276 37 is_stmt 0 view .LVU214
+ 598 004c 0023     		movs	r3, #0
+ 599 004e 0393     		str	r3, [sp, #12]
+ 277:../../../init/rev5/init.c **** sConfig.SingleDiff                  = ADC_SINGLE_ENDED;
+ 600              		.loc 1 277 1 is_stmt 1 view .LVU215
+ 601              		.loc 1 277 37 is_stmt 0 view .LVU216
+ 602 0050 40F2FF72 		movw	r2, #2047
+ 603 0054 0492     		str	r2, [sp, #16]
+ 278:../../../init/rev5/init.c **** sConfig.OffsetNumber                = ADC_OFFSET_NONE;
+ 604              		.loc 1 278 1 is_stmt 1 view .LVU217
+ 605              		.loc 1 278 37 is_stmt 0 view .LVU218
+ 606 0056 0422     		movs	r2, #4
+ 607 0058 0592     		str	r2, [sp, #20]
+ 279:../../../init/rev5/init.c **** sConfig.Offset                      = 0;
+ 608              		.loc 1 279 1 is_stmt 1 view .LVU219
+ 609              		.loc 1 279 37 is_stmt 0 view .LVU220
+ 610 005a 0693     		str	r3, [sp, #24]
+ 280:../../../init/rev5/init.c **** sConfig.OffsetSignedSaturation      = DISABLE;
+ 611              		.loc 1 280 1 is_stmt 1 view .LVU221
+ 612              		.loc 1 280 37 is_stmt 0 view .LVU222
+ 613 005c 8DF81D30 		strb	r3, [sp, #29]
+ 281:../../../init/rev5/init.c **** if ( HAL_ADC_ConfigChannel( &hadc2, &sConfig ) != HAL_OK )
+ 614              		.loc 1 281 1 is_stmt 1 view .LVU223
+ 615              		.loc 1 281 6 is_stmt 0 view .LVU224
+ 616 0060 0DEB0201 		add	r1, sp, r2
+ 617 0064 0D48     		ldr	r0, .L34
+ 618 0066 FFF7FEFF 		bl	HAL_ADC_ConfigChannel
+ 619              	.LVL19:
+ 620              		.loc 1 281 4 view .LVU225
+ 621 006a 78B9     		cbnz	r0, .L32
+ 622              	.L28:
+ 282:../../../init/rev5/init.c **** 	{
+ 283:../../../init/rev5/init.c **** 	Error_Handler( ERROR_LC_ADC_INIT_ERROR );
+ 284:../../../init/rev5/init.c **** 	}
+ 285:../../../init/rev5/init.c **** 
+ 286:../../../init/rev5/init.c **** /* Configure Regular Channel */
+ARM GAS  /tmp/ccAEaq5Q.s 			page 17
+
+
+ 287:../../../init/rev5/init.c **** sConfig.Channel = ADC_CHANNEL_8;
+ 623              		.loc 1 287 1 is_stmt 1 view .LVU226
+ 624              		.loc 1 287 17 is_stmt 0 view .LVU227
+ 625 006c 0F4B     		ldr	r3, .L34+16
+ 626 006e 0193     		str	r3, [sp, #4]
+ 288:../../../init/rev5/init.c **** sConfig.Rank    = ADC_REGULAR_RANK_2;
+ 627              		.loc 1 288 1 is_stmt 1 view .LVU228
+ 628              		.loc 1 288 17 is_stmt 0 view .LVU229
+ 629 0070 0C23     		movs	r3, #12
+ 630 0072 0293     		str	r3, [sp, #8]
+ 289:../../../init/rev5/init.c **** if ( HAL_ADC_ConfigChannel( &hadc2, &sConfig ) != HAL_OK )
+ 631              		.loc 1 289 1 is_stmt 1 view .LVU230
+ 632              		.loc 1 289 6 is_stmt 0 view .LVU231
+ 633 0074 01A9     		add	r1, sp, #4
+ 634 0076 0948     		ldr	r0, .L34
+ 635 0078 FFF7FEFF 		bl	HAL_ADC_ConfigChannel
+ 636              	.LVL20:
+ 637              		.loc 1 289 4 view .LVU232
+ 638 007c 50B9     		cbnz	r0, .L33
+ 639              	.L26:
+ 290:../../../init/rev5/init.c **** 	{
+ 291:../../../init/rev5/init.c **** 	Error_Handler( ERROR_LC_ADC_INIT_ERROR );
+ 292:../../../init/rev5/init.c **** 	}
+ 293:../../../init/rev5/init.c **** 
+ 294:../../../init/rev5/init.c **** } /* LOADCELL_ADC_Init */
+ 640              		.loc 1 294 1 view .LVU233
+ 641 007e 09B0     		add	sp, sp, #36
+ 642              	.LCFI14:
+ 643              		.cfi_remember_state
+ 644              		.cfi_def_cfa_offset 4
+ 645              		@ sp needed
+ 646 0080 5DF804FB 		ldr	pc, [sp], #4
+ 647              	.L31:
+ 648              	.LCFI15:
+ 649              		.cfi_restore_state
+ 270:../../../init/rev5/init.c **** 	}
+ 650              		.loc 1 270 2 is_stmt 1 view .LVU234
+ 651 0084 1D20     		movs	r0, #29
+ 652 0086 FFF7FEFF 		bl	Error_Handler
+ 653              	.LVL21:
+ 654 008a DBE7     		b	.L27
+ 655              	.L32:
+ 283:../../../init/rev5/init.c **** 	}
+ 656              		.loc 1 283 2 view .LVU235
+ 657 008c 1D20     		movs	r0, #29
+ 658 008e FFF7FEFF 		bl	Error_Handler
+ 659              	.LVL22:
+ 660 0092 EBE7     		b	.L28
+ 661              	.L33:
+ 291:../../../init/rev5/init.c **** 	}
+ 662              		.loc 1 291 2 view .LVU236
+ 663 0094 1D20     		movs	r0, #29
+ 664 0096 FFF7FEFF 		bl	Error_Handler
+ 665              	.LVL23:
+ 666              		.loc 1 294 1 is_stmt 0 view .LVU237
+ 667 009a F0E7     		b	.L26
+ 668              	.L35:
+ARM GAS  /tmp/ccAEaq5Q.s 			page 18
+
+
+ 669              		.align	2
+ 670              	.L34:
+ 671 009c 00000000 		.word	hadc2
+ 672 00a0 00210240 		.word	1073881344
+ 673 00a4 00000000 		.word	hadc1
+ 674 00a8 0008302E 		.word	774899712
+ 675 00ac 00018021 		.word	562036992
+ 676              		.cfi_endproc
+ 677              	.LFE336:
+ 679              		.section	.text.PRESSURE5_ADC_Init,"ax",%progbits
+ 680              		.align	1
+ 681              		.global	PRESSURE5_ADC_Init
+ 682              		.syntax unified
+ 683              		.thumb
+ 684              		.thumb_func
+ 686              	PRESSURE5_ADC_Init:
+ 687              	.LFB337:
+ 295:../../../init/rev5/init.c **** 
+ 296:../../../init/rev5/init.c **** 
+ 297:../../../init/rev5/init.c **** /*******************************************************************************
+ 298:../../../init/rev5/init.c **** *                                                                              *
+ 299:../../../init/rev5/init.c **** * PROCEDURE:                                                                   *
+ 300:../../../init/rev5/init.c **** * 		PRESSURE5_ADC_Init                                                     *
+ 301:../../../init/rev5/init.c **** *                                                                              *
+ 302:../../../init/rev5/init.c **** * DESCRIPTION:                                                                 *
+ 303:../../../init/rev5/init.c **** * 		Initializes the MCU ADC for use with pressure transducer 5             *
+ 304:../../../init/rev5/init.c **** *                                                                              *
+ 305:../../../init/rev5/init.c **** *******************************************************************************/
+ 306:../../../init/rev5/init.c **** void PRESSURE5_ADC_Init
+ 307:../../../init/rev5/init.c **** 	(
+ 308:../../../init/rev5/init.c **** 	void
+ 309:../../../init/rev5/init.c **** 	)
+ 310:../../../init/rev5/init.c **** {
+ 688              		.loc 1 310 1 is_stmt 1 view -0
+ 689              		.cfi_startproc
+ 690              		@ args = 0, pretend = 0, frame = 32
+ 691              		@ frame_needed = 0, uses_anonymous_args = 0
+ 692 0000 00B5     		push	{lr}
+ 693              	.LCFI16:
+ 694              		.cfi_def_cfa_offset 4
+ 695              		.cfi_offset 14, -4
+ 696 0002 89B0     		sub	sp, sp, #36
+ 697              	.LCFI17:
+ 698              		.cfi_def_cfa_offset 40
+ 311:../../../init/rev5/init.c **** /* Initialization Struct */
+ 312:../../../init/rev5/init.c **** ADC_ChannelConfTypeDef sConfig = {0};
+ 699              		.loc 1 312 1 view .LVU239
+ 700              		.loc 1 312 24 is_stmt 0 view .LVU240
+ 701 0004 0023     		movs	r3, #0
+ 702 0006 0193     		str	r3, [sp, #4]
+ 703 0008 0293     		str	r3, [sp, #8]
+ 704 000a 0393     		str	r3, [sp, #12]
+ 705 000c 0493     		str	r3, [sp, #16]
+ 706 000e 0593     		str	r3, [sp, #20]
+ 707 0010 0693     		str	r3, [sp, #24]
+ 708 0012 0793     		str	r3, [sp, #28]
+ 313:../../../init/rev5/init.c **** 
+ARM GAS  /tmp/ccAEaq5Q.s 			page 19
+
+
+ 314:../../../init/rev5/init.c **** /* Common config */
+ 315:../../../init/rev5/init.c **** hadc3.Instance                      = ADC3;
+ 709              		.loc 1 315 1 is_stmt 1 view .LVU241
+ 710              		.loc 1 315 37 is_stmt 0 view .LVU242
+ 711 0014 2148     		ldr	r0, .L44
+ 712 0016 224A     		ldr	r2, .L44+4
+ 713 0018 0260     		str	r2, [r0]
+ 316:../../../init/rev5/init.c **** hadc3.Init.ClockPrescaler           = ADC_CLOCK_ASYNC_DIV1;
+ 714              		.loc 1 316 1 is_stmt 1 view .LVU243
+ 715              		.loc 1 316 37 is_stmt 0 view .LVU244
+ 716 001a 4360     		str	r3, [r0, #4]
+ 317:../../../init/rev5/init.c **** hadc3.Init.Resolution               = ADC_RESOLUTION_16B;
+ 717              		.loc 1 317 1 is_stmt 1 view .LVU245
+ 718              		.loc 1 317 37 is_stmt 0 view .LVU246
+ 719 001c 8360     		str	r3, [r0, #8]
+ 318:../../../init/rev5/init.c **** hadc3.Init.ScanConvMode             = ADC_SCAN_ENABLE;
+ 720              		.loc 1 318 1 is_stmt 1 view .LVU247
+ 721              		.loc 1 318 37 is_stmt 0 view .LVU248
+ 722 001e 0122     		movs	r2, #1
+ 723 0020 C260     		str	r2, [r0, #12]
+ 319:../../../init/rev5/init.c **** hadc3.Init.EOCSelection             = ADC_EOC_SINGLE_CONV;
+ 724              		.loc 1 319 1 is_stmt 1 view .LVU249
+ 725              		.loc 1 319 37 is_stmt 0 view .LVU250
+ 726 0022 0421     		movs	r1, #4
+ 727 0024 0161     		str	r1, [r0, #16]
+ 320:../../../init/rev5/init.c **** hadc3.Init.LowPowerAutoWait         = DISABLE;
+ 728              		.loc 1 320 1 is_stmt 1 view .LVU251
+ 729              		.loc 1 320 37 is_stmt 0 view .LVU252
+ 730 0026 0375     		strb	r3, [r0, #20]
+ 321:../../../init/rev5/init.c **** hadc3.Init.ContinuousConvMode       = DISABLE;
+ 731              		.loc 1 321 1 is_stmt 1 view .LVU253
+ 732              		.loc 1 321 37 is_stmt 0 view .LVU254
+ 733 0028 4375     		strb	r3, [r0, #21]
+ 322:../../../init/rev5/init.c **** hadc3.Init.NbrOfConversion          = 1;
+ 734              		.loc 1 322 1 is_stmt 1 view .LVU255
+ 735              		.loc 1 322 37 is_stmt 0 view .LVU256
+ 736 002a 8261     		str	r2, [r0, #24]
+ 323:../../../init/rev5/init.c **** hadc1.Init.DiscontinuousConvMode    = DISABLE;
+ 737              		.loc 1 323 1 is_stmt 1 view .LVU257
+ 738              		.loc 1 323 37 is_stmt 0 view .LVU258
+ 739 002c 1D4A     		ldr	r2, .L44+8
+ 740 002e 1377     		strb	r3, [r2, #28]
+ 324:../../../init/rev5/init.c **** hadc3.Init.ExternalTrigConv         = ADC_SOFTWARE_START;
+ 741              		.loc 1 324 1 is_stmt 1 view .LVU259
+ 742              		.loc 1 324 37 is_stmt 0 view .LVU260
+ 743 0030 4362     		str	r3, [r0, #36]
+ 325:../../../init/rev5/init.c **** hadc3.Init.ExternalTrigConvEdge     = ADC_EXTERNALTRIGCONVEDGE_NONE;
+ 744              		.loc 1 325 1 is_stmt 1 view .LVU261
+ 745              		.loc 1 325 37 is_stmt 0 view .LVU262
+ 746 0032 8362     		str	r3, [r0, #40]
+ 326:../../../init/rev5/init.c **** hadc3.Init.ConversionDataManagement = ADC_CONVERSIONDATA_DR;
+ 747              		.loc 1 326 1 is_stmt 1 view .LVU263
+ 748              		.loc 1 326 37 is_stmt 0 view .LVU264
+ 749 0034 C362     		str	r3, [r0, #44]
+ 327:../../../init/rev5/init.c **** hadc3.Init.Overrun                  = ADC_OVR_DATA_PRESERVED;
+ 750              		.loc 1 327 1 is_stmt 1 view .LVU265
+ 751              		.loc 1 327 37 is_stmt 0 view .LVU266
+ARM GAS  /tmp/ccAEaq5Q.s 			page 20
+
+
+ 752 0036 0363     		str	r3, [r0, #48]
+ 328:../../../init/rev5/init.c **** hadc3.Init.LeftBitShift             = ADC_LEFTBITSHIFT_NONE;
+ 753              		.loc 1 328 1 is_stmt 1 view .LVU267
+ 754              		.loc 1 328 37 is_stmt 0 view .LVU268
+ 755 0038 4363     		str	r3, [r0, #52]
+ 329:../../../init/rev5/init.c **** hadc3.Init.OversamplingMode = DISABLE;
+ 756              		.loc 1 329 1 is_stmt 1 view .LVU269
+ 757              		.loc 1 329 29 is_stmt 0 view .LVU270
+ 758 003a 80F83830 		strb	r3, [r0, #56]
+ 330:../../../init/rev5/init.c **** if ( HAL_ADC_Init( &hadc3 ) != HAL_OK )
+ 759              		.loc 1 330 1 is_stmt 1 view .LVU271
+ 760              		.loc 1 330 6 is_stmt 0 view .LVU272
+ 761 003e FFF7FEFF 		bl	HAL_ADC_Init
+ 762              	.LVL24:
+ 763              		.loc 1 330 4 view .LVU273
+ 764 0042 F8B9     		cbnz	r0, .L41
+ 765              	.L37:
+ 331:../../../init/rev5/init.c **** 	{
+ 332:../../../init/rev5/init.c **** 	Error_Handler( ERROR_PT_ADC_INIT_ERROR );
+ 333:../../../init/rev5/init.c **** 	}
+ 334:../../../init/rev5/init.c **** 
+ 335:../../../init/rev5/init.c **** /* Configure Regular Channel */
+ 336:../../../init/rev5/init.c **** sConfig.Channel                = ADC_CHANNEL_0;
+ 766              		.loc 1 336 1 is_stmt 1 view .LVU274
+ 767              		.loc 1 336 32 is_stmt 0 view .LVU275
+ 768 0044 0123     		movs	r3, #1
+ 769 0046 0193     		str	r3, [sp, #4]
+ 337:../../../init/rev5/init.c **** sConfig.Rank                   = ADC_REGULAR_RANK_1;
+ 770              		.loc 1 337 1 is_stmt 1 view .LVU276
+ 771              		.loc 1 337 32 is_stmt 0 view .LVU277
+ 772 0048 0623     		movs	r3, #6
+ 773 004a 0293     		str	r3, [sp, #8]
+ 338:../../../init/rev5/init.c **** sConfig.SamplingTime           = ADC_SAMPLETIME_1CYCLE_5;
+ 774              		.loc 1 338 1 is_stmt 1 view .LVU278
+ 775              		.loc 1 338 32 is_stmt 0 view .LVU279
+ 776 004c 0023     		movs	r3, #0
+ 777 004e 0393     		str	r3, [sp, #12]
+ 339:../../../init/rev5/init.c **** sConfig.SingleDiff             = ADC_SINGLE_ENDED;
+ 778              		.loc 1 339 1 is_stmt 1 view .LVU280
+ 779              		.loc 1 339 32 is_stmt 0 view .LVU281
+ 780 0050 40F2FF72 		movw	r2, #2047
+ 781 0054 0492     		str	r2, [sp, #16]
+ 340:../../../init/rev5/init.c **** sConfig.OffsetNumber           = ADC_OFFSET_NONE;
+ 782              		.loc 1 340 1 is_stmt 1 view .LVU282
+ 783              		.loc 1 340 32 is_stmt 0 view .LVU283
+ 784 0056 0422     		movs	r2, #4
+ 785 0058 0592     		str	r2, [sp, #20]
+ 341:../../../init/rev5/init.c **** sConfig.Offset                 = 0;
+ 786              		.loc 1 341 1 is_stmt 1 view .LVU284
+ 787              		.loc 1 341 32 is_stmt 0 view .LVU285
+ 788 005a 0693     		str	r3, [sp, #24]
+ 342:../../../init/rev5/init.c **** sConfig.OffsetSignedSaturation = DISABLE;
+ 789              		.loc 1 342 1 is_stmt 1 view .LVU286
+ 790              		.loc 1 342 32 is_stmt 0 view .LVU287
+ 791 005c 8DF81D30 		strb	r3, [sp, #29]
+ 343:../../../init/rev5/init.c **** if ( HAL_ADC_ConfigChannel( &hadc3, &sConfig ) != HAL_OK )
+ 792              		.loc 1 343 1 is_stmt 1 view .LVU288
+ARM GAS  /tmp/ccAEaq5Q.s 			page 21
+
+
+ 793              		.loc 1 343 6 is_stmt 0 view .LVU289
+ 794 0060 0DEB0201 		add	r1, sp, r2
+ 795 0064 0D48     		ldr	r0, .L44
+ 796 0066 FFF7FEFF 		bl	HAL_ADC_ConfigChannel
+ 797              	.LVL25:
+ 798              		.loc 1 343 4 view .LVU290
+ 799 006a 78B9     		cbnz	r0, .L42
+ 800              	.L38:
+ 344:../../../init/rev5/init.c **** 	{
+ 345:../../../init/rev5/init.c **** 	Error_Handler( ERROR_PT_ADC_INIT_ERROR );
+ 346:../../../init/rev5/init.c **** 	}
+ 347:../../../init/rev5/init.c **** 
+ 348:../../../init/rev5/init.c **** /* Configure Regular Channel */
+ 349:../../../init/rev5/init.c **** sConfig.Channel = ADC_CHANNEL_1;
+ 801              		.loc 1 349 1 is_stmt 1 view .LVU291
+ 802              		.loc 1 349 17 is_stmt 0 view .LVU292
+ 803 006c 0E4B     		ldr	r3, .L44+12
+ 804 006e 0193     		str	r3, [sp, #4]
+ 350:../../../init/rev5/init.c **** sConfig.Rank    = ADC_REGULAR_RANK_2;
+ 805              		.loc 1 350 1 is_stmt 1 view .LVU293
+ 806              		.loc 1 350 17 is_stmt 0 view .LVU294
+ 807 0070 0C23     		movs	r3, #12
+ 808 0072 0293     		str	r3, [sp, #8]
+ 351:../../../init/rev5/init.c **** if ( HAL_ADC_ConfigChannel( &hadc3, &sConfig ) != HAL_OK )
+ 809              		.loc 1 351 1 is_stmt 1 view .LVU295
+ 810              		.loc 1 351 6 is_stmt 0 view .LVU296
+ 811 0074 01A9     		add	r1, sp, #4
+ 812 0076 0948     		ldr	r0, .L44
+ 813 0078 FFF7FEFF 		bl	HAL_ADC_ConfigChannel
+ 814              	.LVL26:
+ 815              		.loc 1 351 4 view .LVU297
+ 816 007c 50B9     		cbnz	r0, .L43
+ 817              	.L36:
+ 352:../../../init/rev5/init.c **** 	{
+ 353:../../../init/rev5/init.c **** 	Error_Handler( ERROR_PT_ADC_INIT_ERROR );
+ 354:../../../init/rev5/init.c **** 	}
+ 355:../../../init/rev5/init.c **** } /* PRESSURE5_ADC_INIT */
+ 818              		.loc 1 355 1 view .LVU298
+ 819 007e 09B0     		add	sp, sp, #36
+ 820              	.LCFI18:
+ 821              		.cfi_remember_state
+ 822              		.cfi_def_cfa_offset 4
+ 823              		@ sp needed
+ 824 0080 5DF804FB 		ldr	pc, [sp], #4
+ 825              	.L41:
+ 826              	.LCFI19:
+ 827              		.cfi_restore_state
+ 332:../../../init/rev5/init.c **** 	}
+ 828              		.loc 1 332 2 is_stmt 1 view .LVU299
+ 829 0084 1C20     		movs	r0, #28
+ 830 0086 FFF7FEFF 		bl	Error_Handler
+ 831              	.LVL27:
+ 832 008a DBE7     		b	.L37
+ 833              	.L42:
+ 345:../../../init/rev5/init.c **** 	}
+ 834              		.loc 1 345 2 view .LVU300
+ 835 008c 1C20     		movs	r0, #28
+ARM GAS  /tmp/ccAEaq5Q.s 			page 22
+
+
+ 836 008e FFF7FEFF 		bl	Error_Handler
+ 837              	.LVL28:
+ 838 0092 EBE7     		b	.L38
+ 839              	.L43:
+ 353:../../../init/rev5/init.c **** 	}
+ 840              		.loc 1 353 2 view .LVU301
+ 841 0094 1C20     		movs	r0, #28
+ 842 0096 FFF7FEFF 		bl	Error_Handler
+ 843              	.LVL29:
+ 844              		.loc 1 355 1 is_stmt 0 view .LVU302
+ 845 009a F0E7     		b	.L36
+ 846              	.L45:
+ 847              		.align	2
+ 848              	.L44:
+ 849 009c 00000000 		.word	hadc3
+ 850 00a0 00600258 		.word	1476550656
+ 851 00a4 00000000 		.word	hadc1
+ 852 00a8 02003004 		.word	70254594
+ 853              		.cfi_endproc
+ 854              	.LFE337:
+ 856              		.section	.text.Thermocouple_I2C_Init,"ax",%progbits
+ 857              		.align	1
+ 858              		.global	Thermocouple_I2C_Init
+ 859              		.syntax unified
+ 860              		.thumb
+ 861              		.thumb_func
+ 863              	Thermocouple_I2C_Init:
+ 864              	.LFB338:
+ 356:../../../init/rev5/init.c **** 
+ 357:../../../init/rev5/init.c **** 
+ 358:../../../init/rev5/init.c **** /*******************************************************************************
+ 359:../../../init/rev5/init.c **** *                                                                              *
+ 360:../../../init/rev5/init.c **** * PROCEDURE:                                                                   *
+ 361:../../../init/rev5/init.c **** * 		Thermocouple_I2C_Init                                                  *
+ 362:../../../init/rev5/init.c **** *                                                                              *
+ 363:../../../init/rev5/init.c **** * DESCRIPTION:                                                                 *
+ 364:../../../init/rev5/init.c **** * 		Initializes the I2C peripheral used for communication with the         *
+ 365:../../../init/rev5/init.c **** *       thermocouple cold-junction compensation chip                           *
+ 366:../../../init/rev5/init.c **** *                                                                              *
+ 367:../../../init/rev5/init.c **** *******************************************************************************/
+ 368:../../../init/rev5/init.c **** void Thermocouple_I2C_Init
+ 369:../../../init/rev5/init.c **** 	(
+ 370:../../../init/rev5/init.c **** 	void
+ 371:../../../init/rev5/init.c **** 	)
+ 372:../../../init/rev5/init.c **** {
+ 865              		.loc 1 372 1 is_stmt 1 view -0
+ 866              		.cfi_startproc
+ 867              		@ args = 0, pretend = 0, frame = 0
+ 868              		@ frame_needed = 0, uses_anonymous_args = 0
+ 869 0000 08B5     		push	{r3, lr}
+ 870              	.LCFI20:
+ 871              		.cfi_def_cfa_offset 8
+ 872              		.cfi_offset 3, -8
+ 873              		.cfi_offset 14, -4
+ 373:../../../init/rev5/init.c **** /* Fill init struct */
+ 374:../../../init/rev5/init.c **** hi2c1.Instance              = I2C1;
+ 874              		.loc 1 374 1 view .LVU304
+ARM GAS  /tmp/ccAEaq5Q.s 			page 23
+
+
+ 875              		.loc 1 374 29 is_stmt 0 view .LVU305
+ 876 0002 1648     		ldr	r0, .L54
+ 877 0004 164B     		ldr	r3, .L54+4
+ 878 0006 0360     		str	r3, [r0]
+ 375:../../../init/rev5/init.c **** hi2c1.Init.Timing           = 0x307075B1;
+ 879              		.loc 1 375 1 is_stmt 1 view .LVU306
+ 880              		.loc 1 375 29 is_stmt 0 view .LVU307
+ 881 0008 A3F17863 		sub	r3, r3, #260046848
+ 882 000c A3F57D23 		sub	r3, r3, #1036288
+ 883 0010 A3F64F63 		subw	r3, r3, #3663
+ 884 0014 4360     		str	r3, [r0, #4]
+ 376:../../../init/rev5/init.c **** hi2c1.Init.OwnAddress1      = 0;
+ 885              		.loc 1 376 1 is_stmt 1 view .LVU308
+ 886              		.loc 1 376 29 is_stmt 0 view .LVU309
+ 887 0016 0023     		movs	r3, #0
+ 888 0018 8360     		str	r3, [r0, #8]
+ 377:../../../init/rev5/init.c **** hi2c1.Init.AddressingMode   = I2C_ADDRESSINGMODE_7BIT;
+ 889              		.loc 1 377 1 is_stmt 1 view .LVU310
+ 890              		.loc 1 377 29 is_stmt 0 view .LVU311
+ 891 001a 0122     		movs	r2, #1
+ 892 001c C260     		str	r2, [r0, #12]
+ 378:../../../init/rev5/init.c **** hi2c1.Init.DualAddressMode  = I2C_DUALADDRESS_DISABLE;
+ 893              		.loc 1 378 1 is_stmt 1 view .LVU312
+ 894              		.loc 1 378 29 is_stmt 0 view .LVU313
+ 895 001e 0361     		str	r3, [r0, #16]
+ 379:../../../init/rev5/init.c **** hi2c1.Init.OwnAddress2      = 0;
+ 896              		.loc 1 379 1 is_stmt 1 view .LVU314
+ 897              		.loc 1 379 29 is_stmt 0 view .LVU315
+ 898 0020 4361     		str	r3, [r0, #20]
+ 380:../../../init/rev5/init.c **** hi2c1.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+ 899              		.loc 1 380 1 is_stmt 1 view .LVU316
+ 900              		.loc 1 380 29 is_stmt 0 view .LVU317
+ 901 0022 8361     		str	r3, [r0, #24]
+ 381:../../../init/rev5/init.c **** hi2c1.Init.GeneralCallMode  = I2C_GENERALCALL_DISABLE;
+ 902              		.loc 1 381 1 is_stmt 1 view .LVU318
+ 903              		.loc 1 381 29 is_stmt 0 view .LVU319
+ 904 0024 C361     		str	r3, [r0, #28]
+ 382:../../../init/rev5/init.c **** hi2c1.Init.NoStretchMode    = I2C_NOSTRETCH_DISABLE;
+ 905              		.loc 1 382 1 is_stmt 1 view .LVU320
+ 906              		.loc 1 382 29 is_stmt 0 view .LVU321
+ 907 0026 0362     		str	r3, [r0, #32]
+ 383:../../../init/rev5/init.c **** if ( HAL_I2C_Init( &hi2c1 ) != HAL_OK )
+ 908              		.loc 1 383 1 is_stmt 1 view .LVU322
+ 909              		.loc 1 383 6 is_stmt 0 view .LVU323
+ 910 0028 FFF7FEFF 		bl	HAL_I2C_Init
+ 911              	.LVL30:
+ 912              		.loc 1 383 4 view .LVU324
+ 913 002c 50B9     		cbnz	r0, .L51
+ 914              	.L47:
+ 384:../../../init/rev5/init.c **** 	{
+ 385:../../../init/rev5/init.c **** 	Error_Handler( ERROR_THERMO_I2C_INIT_ERROR );
+ 386:../../../init/rev5/init.c **** 	}
+ 387:../../../init/rev5/init.c **** 
+ 388:../../../init/rev5/init.c **** /* Configure Analogue filter */
+ 389:../../../init/rev5/init.c **** if ( HAL_I2CEx_ConfigAnalogFilter( &hi2c1, I2C_ANALOGFILTER_ENABLE ) != HAL_OK )
+ 915              		.loc 1 389 1 is_stmt 1 view .LVU325
+ 916              		.loc 1 389 6 is_stmt 0 view .LVU326
+ARM GAS  /tmp/ccAEaq5Q.s 			page 24
+
+
+ 917 002e 0021     		movs	r1, #0
+ 918 0030 0A48     		ldr	r0, .L54
+ 919 0032 FFF7FEFF 		bl	HAL_I2CEx_ConfigAnalogFilter
+ 920              	.LVL31:
+ 921              		.loc 1 389 4 view .LVU327
+ 922 0036 48B9     		cbnz	r0, .L52
+ 923              	.L48:
+ 390:../../../init/rev5/init.c **** 	{
+ 391:../../../init/rev5/init.c **** 	Error_Handler( ERROR_THERMO_I2C_INIT_ERROR );
+ 392:../../../init/rev5/init.c **** 	}
+ 393:../../../init/rev5/init.c **** 
+ 394:../../../init/rev5/init.c **** /* Configure Digital filter */
+ 395:../../../init/rev5/init.c **** if ( HAL_I2CEx_ConfigDigitalFilter( &hi2c1, 0 ) != HAL_OK )
+ 924              		.loc 1 395 1 is_stmt 1 view .LVU328
+ 925              		.loc 1 395 6 is_stmt 0 view .LVU329
+ 926 0038 0021     		movs	r1, #0
+ 927 003a 0848     		ldr	r0, .L54
+ 928 003c FFF7FEFF 		bl	HAL_I2CEx_ConfigDigitalFilter
+ 929              	.LVL32:
+ 930              		.loc 1 395 4 view .LVU330
+ 931 0040 40B9     		cbnz	r0, .L53
+ 932              	.L46:
+ 396:../../../init/rev5/init.c **** 	{
+ 397:../../../init/rev5/init.c **** 	Error_Handler( ERROR_THERMO_I2C_INIT_ERROR );
+ 398:../../../init/rev5/init.c **** 	}
+ 399:../../../init/rev5/init.c **** } /* Thermocouple_I2C_Init */
+ 933              		.loc 1 399 1 view .LVU331
+ 934 0042 08BD     		pop	{r3, pc}
+ 935              	.L51:
+ 385:../../../init/rev5/init.c **** 	}
+ 936              		.loc 1 385 2 is_stmt 1 view .LVU332
+ 937 0044 1E20     		movs	r0, #30
+ 938 0046 FFF7FEFF 		bl	Error_Handler
+ 939              	.LVL33:
+ 940 004a F0E7     		b	.L47
+ 941              	.L52:
+ 391:../../../init/rev5/init.c **** 	}
+ 942              		.loc 1 391 2 view .LVU333
+ 943 004c 1E20     		movs	r0, #30
+ 944 004e FFF7FEFF 		bl	Error_Handler
+ 945              	.LVL34:
+ 946 0052 F1E7     		b	.L48
+ 947              	.L53:
+ 397:../../../init/rev5/init.c **** 	}
+ 948              		.loc 1 397 2 view .LVU334
+ 949 0054 1E20     		movs	r0, #30
+ 950 0056 FFF7FEFF 		bl	Error_Handler
+ 951              	.LVL35:
+ 952              		.loc 1 399 1 is_stmt 0 view .LVU335
+ 953 005a F2E7     		b	.L46
+ 954              	.L55:
+ 955              		.align	2
+ 956              	.L54:
+ 957 005c 00000000 		.word	hi2c1
+ 958 0060 00540040 		.word	1073763328
+ 959              		.cfi_endproc
+ 960              	.LFE338:
+ARM GAS  /tmp/ccAEaq5Q.s 			page 25
+
+
+ 962              		.section	.text.FLASH_SPI_Init,"ax",%progbits
+ 963              		.align	1
+ 964              		.global	FLASH_SPI_Init
+ 965              		.syntax unified
+ 966              		.thumb
+ 967              		.thumb_func
+ 969              	FLASH_SPI_Init:
+ 970              	.LFB339:
+ 400:../../../init/rev5/init.c **** 
+ 401:../../../init/rev5/init.c **** 
+ 402:../../../init/rev5/init.c **** /*******************************************************************************
+ 403:../../../init/rev5/init.c **** *                                                                              *
+ 404:../../../init/rev5/init.c **** * PROCEDURE:                                                                   *
+ 405:../../../init/rev5/init.c **** * 		FLASH_SPI_Init                                                         *
+ 406:../../../init/rev5/init.c **** *                                                                              *
+ 407:../../../init/rev5/init.c **** * DESCRIPTION:                                                                 *
+ 408:../../../init/rev5/init.c **** * 		Initializes the SPI peripheral used for communication with the         *
+ 409:../../../init/rev5/init.c **** *       external flash chip                                                    *
+ 410:../../../init/rev5/init.c **** *                                                                              *
+ 411:../../../init/rev5/init.c **** *       Uses MCU SPI2 peripheral                                               *
+ 412:../../../init/rev5/init.c **** *                                                                              *
+ 413:../../../init/rev5/init.c **** *******************************************************************************/
+ 414:../../../init/rev5/init.c **** void FLASH_SPI_Init
+ 415:../../../init/rev5/init.c **** 	(
+ 416:../../../init/rev5/init.c **** 	void
+ 417:../../../init/rev5/init.c **** 	)
+ 418:../../../init/rev5/init.c **** {
+ 971              		.loc 1 418 1 is_stmt 1 view -0
+ 972              		.cfi_startproc
+ 973              		@ args = 0, pretend = 0, frame = 0
+ 974              		@ frame_needed = 0, uses_anonymous_args = 0
+ 975 0000 08B5     		push	{r3, lr}
+ 976              	.LCFI21:
+ 977              		.cfi_def_cfa_offset 8
+ 978              		.cfi_offset 3, -8
+ 979              		.cfi_offset 14, -4
+ 419:../../../init/rev5/init.c **** 
+ 420:../../../init/rev5/init.c **** /* SPI2 parameter configuration */
+ 421:../../../init/rev5/init.c **** hspi2.Instance                        = SPI2;
+ 980              		.loc 1 421 1 view .LVU337
+ 981              		.loc 1 421 39 is_stmt 0 view .LVU338
+ 982 0002 1448     		ldr	r0, .L60
+ 983 0004 144B     		ldr	r3, .L60+4
+ 984 0006 0360     		str	r3, [r0]
+ 422:../../../init/rev5/init.c **** hspi2.Init.Mode                       = SPI_MODE_MASTER;
+ 985              		.loc 1 422 1 is_stmt 1 view .LVU339
+ 986              		.loc 1 422 39 is_stmt 0 view .LVU340
+ 987 0008 4FF48003 		mov	r3, #4194304
+ 988 000c 4360     		str	r3, [r0, #4]
+ 423:../../../init/rev5/init.c **** hspi2.Init.Direction                  = SPI_DIRECTION_2LINES;
+ 989              		.loc 1 423 1 is_stmt 1 view .LVU341
+ 990              		.loc 1 423 39 is_stmt 0 view .LVU342
+ 991 000e 0023     		movs	r3, #0
+ 992 0010 8360     		str	r3, [r0, #8]
+ 424:../../../init/rev5/init.c **** hspi2.Init.DataSize                   = SPI_DATASIZE_8BIT;
+ 993              		.loc 1 424 1 is_stmt 1 view .LVU343
+ 994              		.loc 1 424 39 is_stmt 0 view .LVU344
+ARM GAS  /tmp/ccAEaq5Q.s 			page 26
+
+
+ 995 0012 0722     		movs	r2, #7
+ 996 0014 C260     		str	r2, [r0, #12]
+ 425:../../../init/rev5/init.c **** hspi2.Init.CLKPolarity                = SPI_POLARITY_LOW;
+ 997              		.loc 1 425 1 is_stmt 1 view .LVU345
+ 998              		.loc 1 425 39 is_stmt 0 view .LVU346
+ 999 0016 0361     		str	r3, [r0, #16]
+ 426:../../../init/rev5/init.c **** hspi2.Init.CLKPhase                   = SPI_PHASE_1EDGE;
+ 1000              		.loc 1 426 1 is_stmt 1 view .LVU347
+ 1001              		.loc 1 426 39 is_stmt 0 view .LVU348
+ 1002 0018 4361     		str	r3, [r0, #20]
+ 427:../../../init/rev5/init.c **** hspi2.Init.NSS                        = SPI_NSS_SOFT;
+ 1003              		.loc 1 427 1 is_stmt 1 view .LVU349
+ 1004              		.loc 1 427 39 is_stmt 0 view .LVU350
+ 1005 001a 4FF08062 		mov	r2, #67108864
+ 1006 001e 8261     		str	r2, [r0, #24]
+ 428:../../../init/rev5/init.c **** hspi2.Init.BaudRatePrescaler          = SPI_BAUDRATEPRESCALER_2;
+ 1007              		.loc 1 428 1 is_stmt 1 view .LVU351
+ 1008              		.loc 1 428 39 is_stmt 0 view .LVU352
+ 1009 0020 C361     		str	r3, [r0, #28]
+ 429:../../../init/rev5/init.c **** hspi2.Init.FirstBit                   = SPI_FIRSTBIT_MSB;
+ 1010              		.loc 1 429 1 is_stmt 1 view .LVU353
+ 1011              		.loc 1 429 39 is_stmt 0 view .LVU354
+ 1012 0022 0362     		str	r3, [r0, #32]
+ 430:../../../init/rev5/init.c **** hspi2.Init.TIMode                     = SPI_TIMODE_DISABLE;
+ 1013              		.loc 1 430 1 is_stmt 1 view .LVU355
+ 1014              		.loc 1 430 39 is_stmt 0 view .LVU356
+ 1015 0024 4362     		str	r3, [r0, #36]
+ 431:../../../init/rev5/init.c **** hspi2.Init.CRCCalculation             = SPI_CRCCALCULATION_DISABLE;
+ 1016              		.loc 1 431 1 is_stmt 1 view .LVU357
+ 1017              		.loc 1 431 39 is_stmt 0 view .LVU358
+ 1018 0026 8362     		str	r3, [r0, #40]
+ 432:../../../init/rev5/init.c **** hspi2.Init.CRCPolynomial              = 0x0;
+ 1019              		.loc 1 432 1 is_stmt 1 view .LVU359
+ 1020              		.loc 1 432 39 is_stmt 0 view .LVU360
+ 1021 0028 C362     		str	r3, [r0, #44]
+ 433:../../../init/rev5/init.c **** hspi2.Init.NSSPMode                   = SPI_NSS_PULSE_ENABLE;
+ 1022              		.loc 1 433 1 is_stmt 1 view .LVU361
+ 1023              		.loc 1 433 39 is_stmt 0 view .LVU362
+ 1024 002a 4FF08042 		mov	r2, #1073741824
+ 1025 002e 4263     		str	r2, [r0, #52]
+ 434:../../../init/rev5/init.c **** hspi2.Init.NSSPolarity                = SPI_NSS_POLARITY_LOW;
+ 1026              		.loc 1 434 1 is_stmt 1 view .LVU363
+ 1027              		.loc 1 434 39 is_stmt 0 view .LVU364
+ 1028 0030 8363     		str	r3, [r0, #56]
+ 435:../../../init/rev5/init.c **** hspi2.Init.FifoThreshold              = SPI_FIFO_THRESHOLD_01DATA;
+ 1029              		.loc 1 435 1 is_stmt 1 view .LVU365
+ 1030              		.loc 1 435 39 is_stmt 0 view .LVU366
+ 1031 0032 C363     		str	r3, [r0, #60]
+ 436:../../../init/rev5/init.c **** hspi2.Init.TxCRCInitializationPattern = SPI_CRC_INITIALIZATION_ALL_ZERO_PATTERN;
+ 1032              		.loc 1 436 1 is_stmt 1 view .LVU367
+ 1033              		.loc 1 436 39 is_stmt 0 view .LVU368
+ 1034 0034 0364     		str	r3, [r0, #64]
+ 437:../../../init/rev5/init.c **** hspi2.Init.RxCRCInitializationPattern = SPI_CRC_INITIALIZATION_ALL_ZERO_PATTERN;
+ 1035              		.loc 1 437 1 is_stmt 1 view .LVU369
+ 1036              		.loc 1 437 39 is_stmt 0 view .LVU370
+ 1037 0036 4364     		str	r3, [r0, #68]
+ 438:../../../init/rev5/init.c **** hspi2.Init.MasterSSIdleness           = SPI_MASTER_SS_IDLENESS_00CYCLE;
+ARM GAS  /tmp/ccAEaq5Q.s 			page 27
+
+
+ 1038              		.loc 1 438 1 is_stmt 1 view .LVU371
+ 1039              		.loc 1 438 39 is_stmt 0 view .LVU372
+ 1040 0038 8364     		str	r3, [r0, #72]
+ 439:../../../init/rev5/init.c **** hspi2.Init.MasterInterDataIdleness    = SPI_MASTER_INTERDATA_IDLENESS_00CYCLE;
+ 1041              		.loc 1 439 1 is_stmt 1 view .LVU373
+ 1042              		.loc 1 439 39 is_stmt 0 view .LVU374
+ 1043 003a C364     		str	r3, [r0, #76]
+ 440:../../../init/rev5/init.c **** hspi2.Init.MasterReceiverAutoSusp     = SPI_MASTER_RX_AUTOSUSP_DISABLE;
+ 1044              		.loc 1 440 1 is_stmt 1 view .LVU375
+ 1045              		.loc 1 440 39 is_stmt 0 view .LVU376
+ 1046 003c 0365     		str	r3, [r0, #80]
+ 441:../../../init/rev5/init.c **** hspi2.Init.MasterKeepIOState          = SPI_MASTER_KEEP_IO_STATE_DISABLE;
+ 1047              		.loc 1 441 1 is_stmt 1 view .LVU377
+ 1048              		.loc 1 441 39 is_stmt 0 view .LVU378
+ 1049 003e 4365     		str	r3, [r0, #84]
+ 442:../../../init/rev5/init.c **** hspi2.Init.IOSwap                     = SPI_IO_SWAP_DISABLE;
+ 1050              		.loc 1 442 1 is_stmt 1 view .LVU379
+ 1051              		.loc 1 442 39 is_stmt 0 view .LVU380
+ 1052 0040 8365     		str	r3, [r0, #88]
+ 443:../../../init/rev5/init.c **** if ( HAL_SPI_Init( &hspi2 ) != HAL_OK )
+ 1053              		.loc 1 443 1 is_stmt 1 view .LVU381
+ 1054              		.loc 1 443 6 is_stmt 0 view .LVU382
+ 1055 0042 FFF7FEFF 		bl	HAL_SPI_Init
+ 1056              	.LVL36:
+ 1057              		.loc 1 443 4 view .LVU383
+ 1058 0046 00B9     		cbnz	r0, .L59
+ 1059              	.L56:
+ 444:../../../init/rev5/init.c **** 	{
+ 445:../../../init/rev5/init.c **** 	Error_Handler( ERROR_FLASH_SPI_INIT_ERROR );
+ 446:../../../init/rev5/init.c **** 	}
+ 447:../../../init/rev5/init.c **** 
+ 448:../../../init/rev5/init.c **** } /* FLASH_SPI_Init */
+ 1060              		.loc 1 448 1 view .LVU384
+ 1061 0048 08BD     		pop	{r3, pc}
+ 1062              	.L59:
+ 445:../../../init/rev5/init.c **** 	}
+ 1063              		.loc 1 445 2 is_stmt 1 view .LVU385
+ 1064 004a 0F20     		movs	r0, #15
+ 1065 004c FFF7FEFF 		bl	Error_Handler
+ 1066              	.LVL37:
+ 1067              		.loc 1 448 1 is_stmt 0 view .LVU386
+ 1068 0050 FAE7     		b	.L56
+ 1069              	.L61:
+ 1070 0052 00BF     		.align	2
+ 1071              	.L60:
+ 1072 0054 00000000 		.word	hspi2
+ 1073 0058 00380040 		.word	1073756160
+ 1074              		.cfi_endproc
+ 1075              	.LFE339:
+ 1077              		.section	.text.USB_UART_Init,"ax",%progbits
+ 1078              		.align	1
+ 1079              		.global	USB_UART_Init
+ 1080              		.syntax unified
+ 1081              		.thumb
+ 1082              		.thumb_func
+ 1084              	USB_UART_Init:
+ 1085              	.LFB340:
+ARM GAS  /tmp/ccAEaq5Q.s 			page 28
+
+
+ 449:../../../init/rev5/init.c **** 
+ 450:../../../init/rev5/init.c **** 
+ 451:../../../init/rev5/init.c **** /*******************************************************************************
+ 452:../../../init/rev5/init.c **** *                                                                              *
+ 453:../../../init/rev5/init.c **** * PROCEDURE NAME:                                                              *
+ 454:../../../init/rev5/init.c **** * 		USB_UART_Init                                                          *
+ 455:../../../init/rev5/init.c **** *                                                                              *
+ 456:../../../init/rev5/init.c **** * DESCRIPTION:                                                                 *
+ 457:../../../init/rev5/init.c **** * 		Initializes the UART interface used for USB communication with a host  *
+ 458:../../../init/rev5/init.c **** *       PC                                                                     *
+ 459:../../../init/rev5/init.c **** *                                                                              *
+ 460:../../../init/rev5/init.c **** *       Uses MCU USART1 peripheral                                             *
+ 461:../../../init/rev5/init.c **** *                                                                              *
+ 462:../../../init/rev5/init.c **** *******************************************************************************/
+ 463:../../../init/rev5/init.c **** void USB_UART_Init
+ 464:../../../init/rev5/init.c **** 	(
+ 465:../../../init/rev5/init.c ****  	void
+ 466:../../../init/rev5/init.c **** 	)
+ 467:../../../init/rev5/init.c **** {
+ 1086              		.loc 1 467 1 is_stmt 1 view -0
+ 1087              		.cfi_startproc
+ 1088              		@ args = 0, pretend = 0, frame = 0
+ 1089              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1090 0000 08B5     		push	{r3, lr}
+ 1091              	.LCFI22:
+ 1092              		.cfi_def_cfa_offset 8
+ 1093              		.cfi_offset 3, -8
+ 1094              		.cfi_offset 14, -4
+ 468:../../../init/rev5/init.c **** /* UART handler instance */
+ 469:../../../init/rev5/init.c **** huart1.Instance = USART1;
+ 1095              		.loc 1 469 1 view .LVU388
+ 1096              		.loc 1 469 17 is_stmt 0 view .LVU389
+ 1097 0002 1948     		ldr	r0, .L72
+ 1098 0004 194B     		ldr	r3, .L72+4
+ 1099 0006 0360     		str	r3, [r0]
+ 470:../../../init/rev5/init.c **** 
+ 471:../../../init/rev5/init.c **** /* Initialization settings */
+ 472:../../../init/rev5/init.c **** huart1.Init.BaudRate               = 921600;
+ 1100              		.loc 1 472 1 is_stmt 1 view .LVU390
+ 1101              		.loc 1 472 36 is_stmt 0 view .LVU391
+ 1102 0008 4FF46123 		mov	r3, #921600
+ 1103 000c 4360     		str	r3, [r0, #4]
+ 473:../../../init/rev5/init.c **** huart1.Init.WordLength             = UART_WORDLENGTH_8B;
+ 1104              		.loc 1 473 1 is_stmt 1 view .LVU392
+ 1105              		.loc 1 473 36 is_stmt 0 view .LVU393
+ 1106 000e 0023     		movs	r3, #0
+ 1107 0010 8360     		str	r3, [r0, #8]
+ 474:../../../init/rev5/init.c **** huart1.Init.StopBits               = UART_STOPBITS_1;
+ 1108              		.loc 1 474 1 is_stmt 1 view .LVU394
+ 1109              		.loc 1 474 36 is_stmt 0 view .LVU395
+ 1110 0012 C360     		str	r3, [r0, #12]
+ 475:../../../init/rev5/init.c **** huart1.Init.Parity                 = UART_PARITY_NONE;
+ 1111              		.loc 1 475 1 is_stmt 1 view .LVU396
+ 1112              		.loc 1 475 36 is_stmt 0 view .LVU397
+ 1113 0014 0361     		str	r3, [r0, #16]
+ 476:../../../init/rev5/init.c **** huart1.Init.Mode                   = UART_MODE_TX_RX;
+ 1114              		.loc 1 476 1 is_stmt 1 view .LVU398
+ARM GAS  /tmp/ccAEaq5Q.s 			page 29
+
+
+ 1115              		.loc 1 476 36 is_stmt 0 view .LVU399
+ 1116 0016 0C22     		movs	r2, #12
+ 1117 0018 4261     		str	r2, [r0, #20]
+ 477:../../../init/rev5/init.c **** huart1.Init.HwFlowCtl              = UART_HWCONTROL_NONE;
+ 1118              		.loc 1 477 1 is_stmt 1 view .LVU400
+ 1119              		.loc 1 477 36 is_stmt 0 view .LVU401
+ 1120 001a 8361     		str	r3, [r0, #24]
+ 478:../../../init/rev5/init.c **** huart1.Init.OverSampling           = UART_OVERSAMPLING_16;
+ 1121              		.loc 1 478 1 is_stmt 1 view .LVU402
+ 1122              		.loc 1 478 36 is_stmt 0 view .LVU403
+ 1123 001c C361     		str	r3, [r0, #28]
+ 479:../../../init/rev5/init.c **** huart1.Init.OneBitSampling         = UART_ONE_BIT_SAMPLE_DISABLE;
+ 1124              		.loc 1 479 1 is_stmt 1 view .LVU404
+ 1125              		.loc 1 479 36 is_stmt 0 view .LVU405
+ 1126 001e 0362     		str	r3, [r0, #32]
+ 480:../../../init/rev5/init.c **** huart1.Init.ClockPrescaler         = UART_PRESCALER_DIV1;
+ 1127              		.loc 1 480 1 is_stmt 1 view .LVU406
+ 1128              		.loc 1 480 36 is_stmt 0 view .LVU407
+ 1129 0020 4362     		str	r3, [r0, #36]
+ 481:../../../init/rev5/init.c **** huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+ 1130              		.loc 1 481 1 is_stmt 1 view .LVU408
+ 1131              		.loc 1 481 36 is_stmt 0 view .LVU409
+ 1132 0022 8362     		str	r3, [r0, #40]
+ 482:../../../init/rev5/init.c **** 
+ 483:../../../init/rev5/init.c **** /* Write to registers and call error handler if initialization fails */
+ 484:../../../init/rev5/init.c **** if ( HAL_UART_Init( &huart1 ) != HAL_OK )
+ 1133              		.loc 1 484 1 is_stmt 1 view .LVU410
+ 1134              		.loc 1 484 6 is_stmt 0 view .LVU411
+ 1135 0024 FFF7FEFF 		bl	HAL_UART_Init
+ 1136              	.LVL38:
+ 1137              		.loc 1 484 4 view .LVU412
+ 1138 0028 70B9     		cbnz	r0, .L68
+ 1139              	.L63:
+ 485:../../../init/rev5/init.c **** 	{
+ 486:../../../init/rev5/init.c **** 	Error_Handler( ERROR_USB_UART_INIT_ERROR );
+ 487:../../../init/rev5/init.c **** 	}
+ 488:../../../init/rev5/init.c **** if ( HAL_UARTEx_SetTxFifoThreshold( &huart1, UART_TXFIFO_THRESHOLD_1_8 ) != HAL_OK )
+ 1140              		.loc 1 488 1 is_stmt 1 view .LVU413
+ 1141              		.loc 1 488 6 is_stmt 0 view .LVU414
+ 1142 002a 0021     		movs	r1, #0
+ 1143 002c 0E48     		ldr	r0, .L72
+ 1144 002e FFF7FEFF 		bl	HAL_UARTEx_SetTxFifoThreshold
+ 1145              	.LVL39:
+ 1146              		.loc 1 488 4 view .LVU415
+ 1147 0032 68B9     		cbnz	r0, .L69
+ 1148              	.L64:
+ 489:../../../init/rev5/init.c **** 	{
+ 490:../../../init/rev5/init.c **** 	Error_Handler( ERROR_USB_UART_INIT_ERROR );
+ 491:../../../init/rev5/init.c **** 	}
+ 492:../../../init/rev5/init.c **** if (HAL_UARTEx_SetRxFifoThreshold(&huart1, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
+ 1149              		.loc 1 492 1 is_stmt 1 view .LVU416
+ 1150              		.loc 1 492 5 is_stmt 0 view .LVU417
+ 1151 0034 0021     		movs	r1, #0
+ 1152 0036 0C48     		ldr	r0, .L72
+ 1153 0038 FFF7FEFF 		bl	HAL_UARTEx_SetRxFifoThreshold
+ 1154              	.LVL40:
+ 1155              		.loc 1 492 4 view .LVU418
+ARM GAS  /tmp/ccAEaq5Q.s 			page 30
+
+
+ 1156 003c 60B9     		cbnz	r0, .L70
+ 1157              	.L65:
+ 493:../../../init/rev5/init.c **** 	{
+ 494:../../../init/rev5/init.c **** 	Error_Handler( ERROR_USB_UART_INIT_ERROR );
+ 495:../../../init/rev5/init.c **** 	}
+ 496:../../../init/rev5/init.c **** if (HAL_UARTEx_DisableFifoMode(&huart1) != HAL_OK)
+ 1158              		.loc 1 496 1 is_stmt 1 view .LVU419
+ 1159              		.loc 1 496 5 is_stmt 0 view .LVU420
+ 1160 003e 0A48     		ldr	r0, .L72
+ 1161 0040 FFF7FEFF 		bl	HAL_UARTEx_DisableFifoMode
+ 1162              	.LVL41:
+ 1163              		.loc 1 496 4 view .LVU421
+ 1164 0044 60B9     		cbnz	r0, .L71
+ 1165              	.L62:
+ 497:../../../init/rev5/init.c **** 	{
+ 498:../../../init/rev5/init.c **** 	Error_Handler( ERROR_USB_UART_INIT_ERROR );
+ 499:../../../init/rev5/init.c **** 	}
+ 500:../../../init/rev5/init.c **** 
+ 501:../../../init/rev5/init.c **** } /* USB_UART_Init */
+ 1166              		.loc 1 501 1 view .LVU422
+ 1167 0046 08BD     		pop	{r3, pc}
+ 1168              	.L68:
+ 486:../../../init/rev5/init.c **** 	}
+ 1169              		.loc 1 486 2 is_stmt 1 view .LVU423
+ 1170 0048 1020     		movs	r0, #16
+ 1171 004a FFF7FEFF 		bl	Error_Handler
+ 1172              	.LVL42:
+ 1173 004e ECE7     		b	.L63
+ 1174              	.L69:
+ 490:../../../init/rev5/init.c **** 	}
+ 1175              		.loc 1 490 2 view .LVU424
+ 1176 0050 1020     		movs	r0, #16
+ 1177 0052 FFF7FEFF 		bl	Error_Handler
+ 1178              	.LVL43:
+ 1179 0056 EDE7     		b	.L64
+ 1180              	.L70:
+ 494:../../../init/rev5/init.c **** 	}
+ 1181              		.loc 1 494 2 view .LVU425
+ 1182 0058 1020     		movs	r0, #16
+ 1183 005a FFF7FEFF 		bl	Error_Handler
+ 1184              	.LVL44:
+ 1185 005e EEE7     		b	.L65
+ 1186              	.L71:
+ 498:../../../init/rev5/init.c **** 	}
+ 1187              		.loc 1 498 2 view .LVU426
+ 1188 0060 1020     		movs	r0, #16
+ 1189 0062 FFF7FEFF 		bl	Error_Handler
+ 1190              	.LVL45:
+ 1191              		.loc 1 501 1 is_stmt 0 view .LVU427
+ 1192 0066 EEE7     		b	.L62
+ 1193              	.L73:
+ 1194              		.align	2
+ 1195              	.L72:
+ 1196 0068 00000000 		.word	huart1
+ 1197 006c 00100140 		.word	1073811456
+ 1198              		.cfi_endproc
+ 1199              	.LFE340:
+ARM GAS  /tmp/ccAEaq5Q.s 			page 31
+
+
+ 1201              		.section	.text.Valve_UART_Init,"ax",%progbits
+ 1202              		.align	1
+ 1203              		.global	Valve_UART_Init
+ 1204              		.syntax unified
+ 1205              		.thumb
+ 1206              		.thumb_func
+ 1208              	Valve_UART_Init:
+ 1209              	.LFB341:
+ 502:../../../init/rev5/init.c **** 
+ 503:../../../init/rev5/init.c **** 
+ 504:../../../init/rev5/init.c **** /*******************************************************************************
+ 505:../../../init/rev5/init.c **** *                                                                              *
+ 506:../../../init/rev5/init.c **** * PROCEDURE:                                                                   *
+ 507:../../../init/rev5/init.c **** * 		Valve_UART_Init                                                        *
+ 508:../../../init/rev5/init.c **** *                                                                              *
+ 509:../../../init/rev5/init.c **** * DESCRIPTION:                                                                 *
+ 510:../../../init/rev5/init.c **** * 		Initializes the UART interface used for serial communication with      *
+ 511:../../../init/rev5/init.c **** *       the valve controller                                                   *
+ 512:../../../init/rev5/init.c **** *                                                                              *
+ 513:../../../init/rev5/init.c **** *******************************************************************************/
+ 514:../../../init/rev5/init.c **** void Valve_UART_Init
+ 515:../../../init/rev5/init.c **** 	(
+ 516:../../../init/rev5/init.c **** 	void
+ 517:../../../init/rev5/init.c **** 	)
+ 518:../../../init/rev5/init.c **** {
+ 1210              		.loc 1 518 1 is_stmt 1 view -0
+ 1211              		.cfi_startproc
+ 1212              		@ args = 0, pretend = 0, frame = 0
+ 1213              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1214 0000 08B5     		push	{r3, lr}
+ 1215              	.LCFI23:
+ 1216              		.cfi_def_cfa_offset 8
+ 1217              		.cfi_offset 3, -8
+ 1218              		.cfi_offset 14, -4
+ 519:../../../init/rev5/init.c **** /* Initialization Configuration */
+ 520:../../../init/rev5/init.c **** huart2.Instance                    = USART2;
+ 1219              		.loc 1 520 1 view .LVU429
+ 1220              		.loc 1 520 36 is_stmt 0 view .LVU430
+ 1221 0002 1948     		ldr	r0, .L84
+ 1222 0004 194B     		ldr	r3, .L84+4
+ 1223 0006 0360     		str	r3, [r0]
+ 521:../../../init/rev5/init.c **** huart2.Init.BaudRate               = 921600;
+ 1224              		.loc 1 521 1 is_stmt 1 view .LVU431
+ 1225              		.loc 1 521 36 is_stmt 0 view .LVU432
+ 1226 0008 4FF46123 		mov	r3, #921600
+ 1227 000c 4360     		str	r3, [r0, #4]
+ 522:../../../init/rev5/init.c **** huart2.Init.WordLength             = UART_WORDLENGTH_8B;
+ 1228              		.loc 1 522 1 is_stmt 1 view .LVU433
+ 1229              		.loc 1 522 36 is_stmt 0 view .LVU434
+ 1230 000e 0023     		movs	r3, #0
+ 1231 0010 8360     		str	r3, [r0, #8]
+ 523:../../../init/rev5/init.c **** huart2.Init.StopBits               = UART_STOPBITS_1;
+ 1232              		.loc 1 523 1 is_stmt 1 view .LVU435
+ 1233              		.loc 1 523 36 is_stmt 0 view .LVU436
+ 1234 0012 C360     		str	r3, [r0, #12]
+ 524:../../../init/rev5/init.c **** huart2.Init.Parity                 = UART_PARITY_NONE;
+ 1235              		.loc 1 524 1 is_stmt 1 view .LVU437
+ARM GAS  /tmp/ccAEaq5Q.s 			page 32
+
+
+ 1236              		.loc 1 524 36 is_stmt 0 view .LVU438
+ 1237 0014 0361     		str	r3, [r0, #16]
+ 525:../../../init/rev5/init.c **** huart2.Init.Mode                   = UART_MODE_TX_RX;
+ 1238              		.loc 1 525 1 is_stmt 1 view .LVU439
+ 1239              		.loc 1 525 36 is_stmt 0 view .LVU440
+ 1240 0016 0C22     		movs	r2, #12
+ 1241 0018 4261     		str	r2, [r0, #20]
+ 526:../../../init/rev5/init.c **** huart2.Init.HwFlowCtl              = UART_HWCONTROL_NONE;
+ 1242              		.loc 1 526 1 is_stmt 1 view .LVU441
+ 1243              		.loc 1 526 36 is_stmt 0 view .LVU442
+ 1244 001a 8361     		str	r3, [r0, #24]
+ 527:../../../init/rev5/init.c **** huart2.Init.OverSampling           = UART_OVERSAMPLING_16;
+ 1245              		.loc 1 527 1 is_stmt 1 view .LVU443
+ 1246              		.loc 1 527 36 is_stmt 0 view .LVU444
+ 1247 001c C361     		str	r3, [r0, #28]
+ 528:../../../init/rev5/init.c **** huart2.Init.OneBitSampling         = UART_ONE_BIT_SAMPLE_DISABLE;
+ 1248              		.loc 1 528 1 is_stmt 1 view .LVU445
+ 1249              		.loc 1 528 36 is_stmt 0 view .LVU446
+ 1250 001e 0362     		str	r3, [r0, #32]
+ 529:../../../init/rev5/init.c **** huart2.Init.ClockPrescaler         = UART_PRESCALER_DIV1;
+ 1251              		.loc 1 529 1 is_stmt 1 view .LVU447
+ 1252              		.loc 1 529 36 is_stmt 0 view .LVU448
+ 1253 0020 4362     		str	r3, [r0, #36]
+ 530:../../../init/rev5/init.c **** huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+ 1254              		.loc 1 530 1 is_stmt 1 view .LVU449
+ 1255              		.loc 1 530 36 is_stmt 0 view .LVU450
+ 1256 0022 8362     		str	r3, [r0, #40]
+ 531:../../../init/rev5/init.c **** 
+ 532:../../../init/rev5/init.c **** /* Initialize the UART interface */
+ 533:../../../init/rev5/init.c **** if ( HAL_UART_Init( &huart2 ) != HAL_OK )
+ 1257              		.loc 1 533 1 is_stmt 1 view .LVU451
+ 1258              		.loc 1 533 6 is_stmt 0 view .LVU452
+ 1259 0024 FFF7FEFF 		bl	HAL_UART_Init
+ 1260              	.LVL46:
+ 1261              		.loc 1 533 4 view .LVU453
+ 1262 0028 70B9     		cbnz	r0, .L80
+ 1263              	.L75:
+ 534:../../../init/rev5/init.c **** 	{
+ 535:../../../init/rev5/init.c **** 	Error_Handler( ERROR_VALVE_UART_INIT_ERROR );
+ 536:../../../init/rev5/init.c **** 	}
+ 537:../../../init/rev5/init.c **** if ( HAL_UARTEx_SetTxFifoThreshold( &huart2, UART_TXFIFO_THRESHOLD_1_8 ) != HAL_OK )
+ 1264              		.loc 1 537 1 is_stmt 1 view .LVU454
+ 1265              		.loc 1 537 6 is_stmt 0 view .LVU455
+ 1266 002a 0021     		movs	r1, #0
+ 1267 002c 0E48     		ldr	r0, .L84
+ 1268 002e FFF7FEFF 		bl	HAL_UARTEx_SetTxFifoThreshold
+ 1269              	.LVL47:
+ 1270              		.loc 1 537 4 view .LVU456
+ 1271 0032 68B9     		cbnz	r0, .L81
+ 1272              	.L76:
+ 538:../../../init/rev5/init.c **** 	{
+ 539:../../../init/rev5/init.c **** 	Error_Handler( ERROR_VALVE_UART_INIT_ERROR );
+ 540:../../../init/rev5/init.c **** 	}
+ 541:../../../init/rev5/init.c **** if ( HAL_UARTEx_SetRxFifoThreshold( &huart2, UART_RXFIFO_THRESHOLD_1_8 ) != HAL_OK )
+ 1273              		.loc 1 541 1 is_stmt 1 view .LVU457
+ 1274              		.loc 1 541 6 is_stmt 0 view .LVU458
+ 1275 0034 0021     		movs	r1, #0
+ARM GAS  /tmp/ccAEaq5Q.s 			page 33
+
+
+ 1276 0036 0C48     		ldr	r0, .L84
+ 1277 0038 FFF7FEFF 		bl	HAL_UARTEx_SetRxFifoThreshold
+ 1278              	.LVL48:
+ 1279              		.loc 1 541 4 view .LVU459
+ 1280 003c 60B9     		cbnz	r0, .L82
+ 1281              	.L77:
+ 542:../../../init/rev5/init.c **** 	{
+ 543:../../../init/rev5/init.c **** 	Error_Handler( ERROR_VALVE_UART_INIT_ERROR );
+ 544:../../../init/rev5/init.c **** 	}
+ 545:../../../init/rev5/init.c **** if ( HAL_UARTEx_DisableFifoMode( &huart2 ) != HAL_OK )
+ 1282              		.loc 1 545 1 is_stmt 1 view .LVU460
+ 1283              		.loc 1 545 6 is_stmt 0 view .LVU461
+ 1284 003e 0A48     		ldr	r0, .L84
+ 1285 0040 FFF7FEFF 		bl	HAL_UARTEx_DisableFifoMode
+ 1286              	.LVL49:
+ 1287              		.loc 1 545 4 view .LVU462
+ 1288 0044 60B9     		cbnz	r0, .L83
+ 1289              	.L74:
+ 546:../../../init/rev5/init.c **** 	{
+ 547:../../../init/rev5/init.c **** 	Error_Handler( ERROR_VALVE_UART_INIT_ERROR );
+ 548:../../../init/rev5/init.c **** 	}
+ 549:../../../init/rev5/init.c **** } /* Valve_UART_Init */
+ 1290              		.loc 1 549 1 view .LVU463
+ 1291 0046 08BD     		pop	{r3, pc}
+ 1292              	.L80:
+ 535:../../../init/rev5/init.c **** 	}
+ 1293              		.loc 1 535 2 is_stmt 1 view .LVU464
+ 1294 0048 1F20     		movs	r0, #31
+ 1295 004a FFF7FEFF 		bl	Error_Handler
+ 1296              	.LVL50:
+ 1297 004e ECE7     		b	.L75
+ 1298              	.L81:
+ 539:../../../init/rev5/init.c **** 	}
+ 1299              		.loc 1 539 2 view .LVU465
+ 1300 0050 1F20     		movs	r0, #31
+ 1301 0052 FFF7FEFF 		bl	Error_Handler
+ 1302              	.LVL51:
+ 1303 0056 EDE7     		b	.L76
+ 1304              	.L82:
+ 543:../../../init/rev5/init.c **** 	}
+ 1305              		.loc 1 543 2 view .LVU466
+ 1306 0058 1F20     		movs	r0, #31
+ 1307 005a FFF7FEFF 		bl	Error_Handler
+ 1308              	.LVL52:
+ 1309 005e EEE7     		b	.L77
+ 1310              	.L83:
+ 547:../../../init/rev5/init.c **** 	}
+ 1311              		.loc 1 547 2 view .LVU467
+ 1312 0060 1F20     		movs	r0, #31
+ 1313 0062 FFF7FEFF 		bl	Error_Handler
+ 1314              	.LVL53:
+ 1315              		.loc 1 549 1 is_stmt 0 view .LVU468
+ 1316 0066 EEE7     		b	.L74
+ 1317              	.L85:
+ 1318              		.align	2
+ 1319              	.L84:
+ 1320 0068 00000000 		.word	huart2
+ARM GAS  /tmp/ccAEaq5Q.s 			page 34
+
+
+ 1321 006c 00440040 		.word	1073759232
+ 1322              		.cfi_endproc
+ 1323              	.LFE341:
+ 1325              		.section	.text.Wireless_UART_Init,"ax",%progbits
+ 1326              		.align	1
+ 1327              		.global	Wireless_UART_Init
+ 1328              		.syntax unified
+ 1329              		.thumb
+ 1330              		.thumb_func
+ 1332              	Wireless_UART_Init:
+ 1333              	.LFB342:
+ 550:../../../init/rev5/init.c **** 
+ 551:../../../init/rev5/init.c **** 
+ 552:../../../init/rev5/init.c **** /*******************************************************************************
+ 553:../../../init/rev5/init.c **** *                                                                              *
+ 554:../../../init/rev5/init.c **** * PROCEDURE:                                                                   *
+ 555:../../../init/rev5/init.c **** * 		Wireless_UART_Init                                                     *
+ 556:../../../init/rev5/init.c **** *                                                                              *
+ 557:../../../init/rev5/init.c **** * DESCRIPTION:                                                                 *
+ 558:../../../init/rev5/init.c **** * 		Initializes the UART interface used for serial communication over      *
+ 559:../../../init/rev5/init.c **** *       the wireless interface                                                 *
+ 560:../../../init/rev5/init.c **** *                                                                              *
+ 561:../../../init/rev5/init.c **** *******************************************************************************/
+ 562:../../../init/rev5/init.c **** void Wireless_UART_Init
+ 563:../../../init/rev5/init.c **** 	(
+ 564:../../../init/rev5/init.c **** 	void
+ 565:../../../init/rev5/init.c **** 	)
+ 566:../../../init/rev5/init.c **** {
+ 1334              		.loc 1 566 1 is_stmt 1 view -0
+ 1335              		.cfi_startproc
+ 1336              		@ args = 0, pretend = 0, frame = 0
+ 1337              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1338 0000 08B5     		push	{r3, lr}
+ 1339              	.LCFI24:
+ 1340              		.cfi_def_cfa_offset 8
+ 1341              		.cfi_offset 3, -8
+ 1342              		.cfi_offset 14, -4
+ 567:../../../init/rev5/init.c **** /* UART Initialization configuration */
+ 568:../../../init/rev5/init.c **** huart4.Instance                    = UART4;
+ 1343              		.loc 1 568 1 view .LVU470
+ 1344              		.loc 1 568 36 is_stmt 0 view .LVU471
+ 1345 0002 1948     		ldr	r0, .L96
+ 1346 0004 194B     		ldr	r3, .L96+4
+ 1347 0006 0360     		str	r3, [r0]
+ 569:../../../init/rev5/init.c **** huart4.Init.BaudRate               = 9600;
+ 1348              		.loc 1 569 1 is_stmt 1 view .LVU472
+ 1349              		.loc 1 569 36 is_stmt 0 view .LVU473
+ 1350 0008 4FF41653 		mov	r3, #9600
+ 1351 000c 4360     		str	r3, [r0, #4]
+ 570:../../../init/rev5/init.c **** huart4.Init.WordLength             = UART_WORDLENGTH_8B;
+ 1352              		.loc 1 570 1 is_stmt 1 view .LVU474
+ 1353              		.loc 1 570 36 is_stmt 0 view .LVU475
+ 1354 000e 0023     		movs	r3, #0
+ 1355 0010 8360     		str	r3, [r0, #8]
+ 571:../../../init/rev5/init.c **** huart4.Init.StopBits               = UART_STOPBITS_1;
+ 1356              		.loc 1 571 1 is_stmt 1 view .LVU476
+ 1357              		.loc 1 571 36 is_stmt 0 view .LVU477
+ARM GAS  /tmp/ccAEaq5Q.s 			page 35
+
+
+ 1358 0012 C360     		str	r3, [r0, #12]
+ 572:../../../init/rev5/init.c **** huart4.Init.Parity                 = UART_PARITY_NONE;
+ 1359              		.loc 1 572 1 is_stmt 1 view .LVU478
+ 1360              		.loc 1 572 36 is_stmt 0 view .LVU479
+ 1361 0014 0361     		str	r3, [r0, #16]
+ 573:../../../init/rev5/init.c **** huart4.Init.Mode                   = UART_MODE_TX_RX;
+ 1362              		.loc 1 573 1 is_stmt 1 view .LVU480
+ 1363              		.loc 1 573 36 is_stmt 0 view .LVU481
+ 1364 0016 0C22     		movs	r2, #12
+ 1365 0018 4261     		str	r2, [r0, #20]
+ 574:../../../init/rev5/init.c **** huart4.Init.HwFlowCtl              = UART_HWCONTROL_NONE;
+ 1366              		.loc 1 574 1 is_stmt 1 view .LVU482
+ 1367              		.loc 1 574 36 is_stmt 0 view .LVU483
+ 1368 001a 8361     		str	r3, [r0, #24]
+ 575:../../../init/rev5/init.c **** huart4.Init.OverSampling           = UART_OVERSAMPLING_16;
+ 1369              		.loc 1 575 1 is_stmt 1 view .LVU484
+ 1370              		.loc 1 575 36 is_stmt 0 view .LVU485
+ 1371 001c C361     		str	r3, [r0, #28]
+ 576:../../../init/rev5/init.c **** huart4.Init.OneBitSampling         = UART_ONE_BIT_SAMPLE_DISABLE;
+ 1372              		.loc 1 576 1 is_stmt 1 view .LVU486
+ 1373              		.loc 1 576 36 is_stmt 0 view .LVU487
+ 1374 001e 0362     		str	r3, [r0, #32]
+ 577:../../../init/rev5/init.c **** huart4.Init.ClockPrescaler         = UART_PRESCALER_DIV1;
+ 1375              		.loc 1 577 1 is_stmt 1 view .LVU488
+ 1376              		.loc 1 577 36 is_stmt 0 view .LVU489
+ 1377 0020 4362     		str	r3, [r0, #36]
+ 578:../../../init/rev5/init.c **** huart4.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+ 1378              		.loc 1 578 1 is_stmt 1 view .LVU490
+ 1379              		.loc 1 578 36 is_stmt 0 view .LVU491
+ 1380 0022 8362     		str	r3, [r0, #40]
+ 579:../../../init/rev5/init.c **** 
+ 580:../../../init/rev5/init.c **** /* Initialize the UART peripheral */
+ 581:../../../init/rev5/init.c **** if ( HAL_UART_Init( &huart4 ) != HAL_OK )
+ 1381              		.loc 1 581 1 is_stmt 1 view .LVU492
+ 1382              		.loc 1 581 6 is_stmt 0 view .LVU493
+ 1383 0024 FFF7FEFF 		bl	HAL_UART_Init
+ 1384              	.LVL54:
+ 1385              		.loc 1 581 4 view .LVU494
+ 1386 0028 70B9     		cbnz	r0, .L92
+ 1387              	.L87:
+ 582:../../../init/rev5/init.c **** 	{
+ 583:../../../init/rev5/init.c **** 	Error_Handler( ERROR_RF_UART_INIT_ERROR );
+ 584:../../../init/rev5/init.c **** 	}
+ 585:../../../init/rev5/init.c **** if ( HAL_UARTEx_SetTxFifoThreshold( &huart4, UART_TXFIFO_THRESHOLD_1_8 ) != HAL_OK )
+ 1388              		.loc 1 585 1 is_stmt 1 view .LVU495
+ 1389              		.loc 1 585 6 is_stmt 0 view .LVU496
+ 1390 002a 0021     		movs	r1, #0
+ 1391 002c 0E48     		ldr	r0, .L96
+ 1392 002e FFF7FEFF 		bl	HAL_UARTEx_SetTxFifoThreshold
+ 1393              	.LVL55:
+ 1394              		.loc 1 585 4 view .LVU497
+ 1395 0032 68B9     		cbnz	r0, .L93
+ 1396              	.L88:
+ 586:../../../init/rev5/init.c **** 	{
+ 587:../../../init/rev5/init.c **** 	Error_Handler( ERROR_RF_UART_INIT_ERROR );
+ 588:../../../init/rev5/init.c **** 	}
+ 589:../../../init/rev5/init.c **** if ( HAL_UARTEx_SetRxFifoThreshold( &huart4, UART_RXFIFO_THRESHOLD_1_8 ) != HAL_OK )
+ARM GAS  /tmp/ccAEaq5Q.s 			page 36
+
+
+ 1397              		.loc 1 589 1 is_stmt 1 view .LVU498
+ 1398              		.loc 1 589 6 is_stmt 0 view .LVU499
+ 1399 0034 0021     		movs	r1, #0
+ 1400 0036 0C48     		ldr	r0, .L96
+ 1401 0038 FFF7FEFF 		bl	HAL_UARTEx_SetRxFifoThreshold
+ 1402              	.LVL56:
+ 1403              		.loc 1 589 4 view .LVU500
+ 1404 003c 60B9     		cbnz	r0, .L94
+ 1405              	.L89:
+ 590:../../../init/rev5/init.c **** 	{
+ 591:../../../init/rev5/init.c **** 	Error_Handler( ERROR_RF_UART_INIT_ERROR );
+ 592:../../../init/rev5/init.c **** 	}
+ 593:../../../init/rev5/init.c **** if ( HAL_UARTEx_DisableFifoMode( &huart4 ) != HAL_OK )
+ 1406              		.loc 1 593 1 is_stmt 1 view .LVU501
+ 1407              		.loc 1 593 6 is_stmt 0 view .LVU502
+ 1408 003e 0A48     		ldr	r0, .L96
+ 1409 0040 FFF7FEFF 		bl	HAL_UARTEx_DisableFifoMode
+ 1410              	.LVL57:
+ 1411              		.loc 1 593 4 view .LVU503
+ 1412 0044 60B9     		cbnz	r0, .L95
+ 1413              	.L86:
+ 594:../../../init/rev5/init.c **** 	{
+ 595:../../../init/rev5/init.c **** 	Error_Handler( ERROR_RF_UART_INIT_ERROR );
+ 596:../../../init/rev5/init.c **** 	}
+ 597:../../../init/rev5/init.c **** } /* Wireless_UART_Init */
+ 1414              		.loc 1 597 1 view .LVU504
+ 1415 0046 08BD     		pop	{r3, pc}
+ 1416              	.L92:
+ 583:../../../init/rev5/init.c **** 	}
+ 1417              		.loc 1 583 2 is_stmt 1 view .LVU505
+ 1418 0048 1920     		movs	r0, #25
+ 1419 004a FFF7FEFF 		bl	Error_Handler
+ 1420              	.LVL58:
+ 1421 004e ECE7     		b	.L87
+ 1422              	.L93:
+ 587:../../../init/rev5/init.c **** 	}
+ 1423              		.loc 1 587 2 view .LVU506
+ 1424 0050 1920     		movs	r0, #25
+ 1425 0052 FFF7FEFF 		bl	Error_Handler
+ 1426              	.LVL59:
+ 1427 0056 EDE7     		b	.L88
+ 1428              	.L94:
+ 591:../../../init/rev5/init.c **** 	}
+ 1429              		.loc 1 591 2 view .LVU507
+ 1430 0058 1920     		movs	r0, #25
+ 1431 005a FFF7FEFF 		bl	Error_Handler
+ 1432              	.LVL60:
+ 1433 005e EEE7     		b	.L89
+ 1434              	.L95:
+ 595:../../../init/rev5/init.c **** 	}
+ 1435              		.loc 1 595 2 view .LVU508
+ 1436 0060 1920     		movs	r0, #25
+ 1437 0062 FFF7FEFF 		bl	Error_Handler
+ 1438              	.LVL61:
+ 1439              		.loc 1 597 1 is_stmt 0 view .LVU509
+ 1440 0066 EEE7     		b	.L86
+ 1441              	.L97:
+ARM GAS  /tmp/ccAEaq5Q.s 			page 37
+
+
+ 1442              		.align	2
+ 1443              	.L96:
+ 1444 0068 00000000 		.word	huart4
+ 1445 006c 004C0040 		.word	1073761280
+ 1446              		.cfi_endproc
+ 1447              	.LFE342:
+ 1449              		.section	.text.GPIO_Init,"ax",%progbits
+ 1450              		.align	1
+ 1451              		.global	GPIO_Init
+ 1452              		.syntax unified
+ 1453              		.thumb
+ 1454              		.thumb_func
+ 1456              	GPIO_Init:
+ 1457              	.LFB343:
+ 598:../../../init/rev5/init.c **** 
+ 599:../../../init/rev5/init.c **** 
+ 600:../../../init/rev5/init.c **** /*******************************************************************************
+ 601:../../../init/rev5/init.c **** *                                                                              *
+ 602:../../../init/rev5/init.c **** * PROCEDURE:                                                                   *
+ 603:../../../init/rev5/init.c **** * 		GPIO_Init                                                              * 
+ 604:../../../init/rev5/init.c **** *                                                                              *
+ 605:../../../init/rev5/init.c **** * DESCRIPTION:                                                                 * 
+ 606:../../../init/rev5/init.c **** * 		Initializes all GPIO pins and sets alternate functions                 *
+ 607:../../../init/rev5/init.c **** *                                                                              *
+ 608:../../../init/rev5/init.c **** *******************************************************************************/
+ 609:../../../init/rev5/init.c **** void GPIO_Init
+ 610:../../../init/rev5/init.c **** 	(
+ 611:../../../init/rev5/init.c ****  	void
+ 612:../../../init/rev5/init.c **** 	)
+ 613:../../../init/rev5/init.c **** {
+ 1458              		.loc 1 613 1 is_stmt 1 view -0
+ 1459              		.cfi_startproc
+ 1460              		@ args = 0, pretend = 0, frame = 48
+ 1461              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1462 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 1463              	.LCFI25:
+ 1464              		.cfi_def_cfa_offset 24
+ 1465              		.cfi_offset 4, -24
+ 1466              		.cfi_offset 5, -20
+ 1467              		.cfi_offset 6, -16
+ 1468              		.cfi_offset 7, -12
+ 1469              		.cfi_offset 8, -8
+ 1470              		.cfi_offset 14, -4
+ 1471 0004 8CB0     		sub	sp, sp, #48
+ 1472              	.LCFI26:
+ 1473              		.cfi_def_cfa_offset 72
+ 614:../../../init/rev5/init.c **** /* GPIO Initialization Struct */
+ 615:../../../init/rev5/init.c **** GPIO_InitTypeDef GPIO_InitStruct = {0};
+ 1474              		.loc 1 615 1 view .LVU511
+ 1475              		.loc 1 615 18 is_stmt 0 view .LVU512
+ 1476 0006 0024     		movs	r4, #0
+ 1477 0008 0794     		str	r4, [sp, #28]
+ 1478 000a 0894     		str	r4, [sp, #32]
+ 1479 000c 0994     		str	r4, [sp, #36]
+ 1480 000e 0A94     		str	r4, [sp, #40]
+ 1481 0010 0B94     		str	r4, [sp, #44]
+ 616:../../../init/rev5/init.c **** 
+ARM GAS  /tmp/ccAEaq5Q.s 			page 38
+
+
+ 617:../../../init/rev5/init.c **** /* GPIO Ports Clock Enable */
+ 618:../../../init/rev5/init.c **** __HAL_RCC_GPIOA_CLK_ENABLE();
+ 1482              		.loc 1 618 1 is_stmt 1 view .LVU513
+ 1483              	.LBB3:
+ 1484              		.loc 1 618 1 view .LVU514
+ 1485              		.loc 1 618 1 view .LVU515
+ 1486 0012 694B     		ldr	r3, .L100
+ 1487 0014 D3F8E020 		ldr	r2, [r3, #224]
+ 1488 0018 42F00102 		orr	r2, r2, #1
+ 1489 001c C3F8E020 		str	r2, [r3, #224]
+ 1490              		.loc 1 618 1 view .LVU516
+ 1491 0020 D3F8E020 		ldr	r2, [r3, #224]
+ 1492 0024 02F00102 		and	r2, r2, #1
+ 1493 0028 0192     		str	r2, [sp, #4]
+ 1494              		.loc 1 618 1 view .LVU517
+ 1495 002a 019A     		ldr	r2, [sp, #4]
+ 1496              	.LBE3:
+ 1497              		.loc 1 618 1 view .LVU518
+ 619:../../../init/rev5/init.c **** __HAL_RCC_GPIOB_CLK_ENABLE();
+ 1498              		.loc 1 619 1 view .LVU519
+ 1499              	.LBB4:
+ 1500              		.loc 1 619 1 view .LVU520
+ 1501              		.loc 1 619 1 view .LVU521
+ 1502 002c D3F8E020 		ldr	r2, [r3, #224]
+ 1503 0030 42F00202 		orr	r2, r2, #2
+ 1504 0034 C3F8E020 		str	r2, [r3, #224]
+ 1505              		.loc 1 619 1 view .LVU522
+ 1506 0038 D3F8E020 		ldr	r2, [r3, #224]
+ 1507 003c 02F00202 		and	r2, r2, #2
+ 1508 0040 0292     		str	r2, [sp, #8]
+ 1509              		.loc 1 619 1 view .LVU523
+ 1510 0042 029A     		ldr	r2, [sp, #8]
+ 1511              	.LBE4:
+ 1512              		.loc 1 619 1 view .LVU524
+ 620:../../../init/rev5/init.c **** __HAL_RCC_GPIOC_CLK_ENABLE();
+ 1513              		.loc 1 620 1 view .LVU525
+ 1514              	.LBB5:
+ 1515              		.loc 1 620 1 view .LVU526
+ 1516              		.loc 1 620 1 view .LVU527
+ 1517 0044 D3F8E020 		ldr	r2, [r3, #224]
+ 1518 0048 42F00402 		orr	r2, r2, #4
+ 1519 004c C3F8E020 		str	r2, [r3, #224]
+ 1520              		.loc 1 620 1 view .LVU528
+ 1521 0050 D3F8E020 		ldr	r2, [r3, #224]
+ 1522 0054 02F00402 		and	r2, r2, #4
+ 1523 0058 0392     		str	r2, [sp, #12]
+ 1524              		.loc 1 620 1 view .LVU529
+ 1525 005a 039A     		ldr	r2, [sp, #12]
+ 1526              	.LBE5:
+ 1527              		.loc 1 620 1 view .LVU530
+ 621:../../../init/rev5/init.c **** __HAL_RCC_GPIOD_CLK_ENABLE();
+ 1528              		.loc 1 621 1 view .LVU531
+ 1529              	.LBB6:
+ 1530              		.loc 1 621 1 view .LVU532
+ 1531              		.loc 1 621 1 view .LVU533
+ 1532 005c D3F8E020 		ldr	r2, [r3, #224]
+ 1533 0060 42F00802 		orr	r2, r2, #8
+ARM GAS  /tmp/ccAEaq5Q.s 			page 39
+
+
+ 1534 0064 C3F8E020 		str	r2, [r3, #224]
+ 1535              		.loc 1 621 1 view .LVU534
+ 1536 0068 D3F8E020 		ldr	r2, [r3, #224]
+ 1537 006c 02F00802 		and	r2, r2, #8
+ 1538 0070 0492     		str	r2, [sp, #16]
+ 1539              		.loc 1 621 1 view .LVU535
+ 1540 0072 049A     		ldr	r2, [sp, #16]
+ 1541              	.LBE6:
+ 1542              		.loc 1 621 1 view .LVU536
+ 622:../../../init/rev5/init.c **** __HAL_RCC_GPIOE_CLK_ENABLE();
+ 1543              		.loc 1 622 1 view .LVU537
+ 1544              	.LBB7:
+ 1545              		.loc 1 622 1 view .LVU538
+ 1546              		.loc 1 622 1 view .LVU539
+ 1547 0074 D3F8E020 		ldr	r2, [r3, #224]
+ 1548 0078 42F01002 		orr	r2, r2, #16
+ 1549 007c C3F8E020 		str	r2, [r3, #224]
+ 1550              		.loc 1 622 1 view .LVU540
+ 1551 0080 D3F8E020 		ldr	r2, [r3, #224]
+ 1552 0084 02F01002 		and	r2, r2, #16
+ 1553 0088 0592     		str	r2, [sp, #20]
+ 1554              		.loc 1 622 1 view .LVU541
+ 1555 008a 059A     		ldr	r2, [sp, #20]
+ 1556              	.LBE7:
+ 1557              		.loc 1 622 1 view .LVU542
+ 623:../../../init/rev5/init.c **** __HAL_RCC_GPIOH_CLK_ENABLE();
+ 1558              		.loc 1 623 1 view .LVU543
+ 1559              	.LBB8:
+ 1560              		.loc 1 623 1 view .LVU544
+ 1561              		.loc 1 623 1 view .LVU545
+ 1562 008c D3F8E020 		ldr	r2, [r3, #224]
+ 1563 0090 42F08002 		orr	r2, r2, #128
+ 1564 0094 C3F8E020 		str	r2, [r3, #224]
+ 1565              		.loc 1 623 1 view .LVU546
+ 1566 0098 D3F8E030 		ldr	r3, [r3, #224]
+ 1567 009c 03F08003 		and	r3, r3, #128
+ 1568 00a0 0693     		str	r3, [sp, #24]
+ 1569              		.loc 1 623 1 view .LVU547
+ 1570 00a2 069B     		ldr	r3, [sp, #24]
+ 1571              	.LBE8:
+ 1572              		.loc 1 623 1 view .LVU548
+ 624:../../../init/rev5/init.c **** 
+ 625:../../../init/rev5/init.c **** 
+ 626:../../../init/rev5/init.c **** /*--------------------------- LED MCU PINS -----------------------------------*/
+ 627:../../../init/rev5/init.c **** 
+ 628:../../../init/rev5/init.c **** /* Configure GPIO pin Output Level */
+ 629:../../../init/rev5/init.c **** HAL_GPIO_WritePin(
+ 1573              		.loc 1 629 1 view .LVU549
+ 1574 00a4 454F     		ldr	r7, .L100+4
+ 1575 00a6 0122     		movs	r2, #1
+ 1576 00a8 4FF4E051 		mov	r1, #7168
+ 1577 00ac 3846     		mov	r0, r7
+ 1578 00ae FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 1579              	.LVL62:
+ 630:../../../init/rev5/init.c ****                  STATUS_GPIO_PORT, 
+ 631:../../../init/rev5/init.c ****                  STATUS_R_PIN | 
+ 632:../../../init/rev5/init.c ****                  STATUS_B_PIN | 
+ARM GAS  /tmp/ccAEaq5Q.s 			page 40
+
+
+ 633:../../../init/rev5/init.c ****                  STATUS_G_PIN ,
+ 634:../../../init/rev5/init.c ****                  GPIO_PIN_SET
+ 635:../../../init/rev5/init.c ****                  );
+ 636:../../../init/rev5/init.c **** 
+ 637:../../../init/rev5/init.c **** /* Configure GPIO pin : PE2 --> Status LED pin */
+ 638:../../../init/rev5/init.c **** GPIO_InitStruct.Pin   = STATUS_R_PIN | 
+ 1580              		.loc 1 638 1 view .LVU550
+ 1581              		.loc 1 638 23 is_stmt 0 view .LVU551
+ 1582 00b2 4FF4E053 		mov	r3, #7168
+ 1583 00b6 0793     		str	r3, [sp, #28]
+ 639:../../../init/rev5/init.c ****                         STATUS_B_PIN | 
+ 640:../../../init/rev5/init.c ****                         STATUS_G_PIN;
+ 641:../../../init/rev5/init.c **** GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_OD; /* open-drain output   */
+ 1584              		.loc 1 641 1 is_stmt 1 view .LVU552
+ 1585              		.loc 1 641 23 is_stmt 0 view .LVU553
+ 1586 00b8 1123     		movs	r3, #17
+ 1587 00ba 0893     		str	r3, [sp, #32]
+ 642:../../../init/rev5/init.c **** GPIO_InitStruct.Pull  = GPIO_NOPULL;         /* no pull up resistor */
+ 1588              		.loc 1 642 1 is_stmt 1 view .LVU554
+ 1589              		.loc 1 642 23 is_stmt 0 view .LVU555
+ 1590 00bc 0994     		str	r4, [sp, #36]
+ 643:../../../init/rev5/init.c **** GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW; /* Low Frequency       */
+ 1591              		.loc 1 643 1 is_stmt 1 view .LVU556
+ 1592              		.loc 1 643 23 is_stmt 0 view .LVU557
+ 1593 00be 0A94     		str	r4, [sp, #40]
+ 644:../../../init/rev5/init.c **** HAL_GPIO_Init(STATUS_GPIO_PORT, &GPIO_InitStruct);      /* Write to registers  */
+ 1594              		.loc 1 644 1 is_stmt 1 view .LVU558
+ 1595 00c0 07A9     		add	r1, sp, #28
+ 1596 00c2 3846     		mov	r0, r7
+ 1597 00c4 FFF7FEFF 		bl	HAL_GPIO_Init
+ 1598              	.LVL63:
+ 645:../../../init/rev5/init.c **** 
+ 646:../../../init/rev5/init.c **** 
+ 647:../../../init/rev5/init.c **** /*------------------------- IGNITION MCU PIN ---------------------------------*/
+ 648:../../../init/rev5/init.c **** 
+ 649:../../../init/rev5/init.c **** /* Configure Output Level */
+ 650:../../../init/rev5/init.c **** HAL_GPIO_WritePin( FIRE_GPIO_PORT, FIRE_PIN, GPIO_PIN_RESET );
+ 1599              		.loc 1 650 1 view .LVU559
+ 1600 00c8 2246     		mov	r2, r4
+ 1601 00ca 1021     		movs	r1, #16
+ 1602 00cc 3846     		mov	r0, r7
+ 1603 00ce FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 1604              	.LVL64:
+ 651:../../../init/rev5/init.c **** 
+ 652:../../../init/rev5/init.c **** /* Configure pin */
+ 653:../../../init/rev5/init.c **** GPIO_InitStruct.Pin   = FIRE_PIN;
+ 1605              		.loc 1 653 1 view .LVU560
+ 1606              		.loc 1 653 23 is_stmt 0 view .LVU561
+ 1607 00d2 1023     		movs	r3, #16
+ 1608 00d4 0793     		str	r3, [sp, #28]
+ 654:../../../init/rev5/init.c **** GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;       /* push-pull output    */
+ 1609              		.loc 1 654 1 is_stmt 1 view .LVU562
+ 1610              		.loc 1 654 23 is_stmt 0 view .LVU563
+ 1611 00d6 0125     		movs	r5, #1
+ 1612 00d8 0895     		str	r5, [sp, #32]
+ 655:../../../init/rev5/init.c **** GPIO_InitStruct.Pull  = GPIO_NOPULL;               /* no pull up resistor */
+ 1613              		.loc 1 655 1 is_stmt 1 view .LVU564
+ARM GAS  /tmp/ccAEaq5Q.s 			page 41
+
+
+ 1614              		.loc 1 655 23 is_stmt 0 view .LVU565
+ 1615 00da 0994     		str	r4, [sp, #36]
+ 656:../../../init/rev5/init.c **** GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;       /* Low Frequency       */
+ 1616              		.loc 1 656 1 is_stmt 1 view .LVU566
+ 1617              		.loc 1 656 23 is_stmt 0 view .LVU567
+ 1618 00dc 0A94     		str	r4, [sp, #40]
+ 657:../../../init/rev5/init.c **** HAL_GPIO_Init( FIRE_GPIO_PORT, &GPIO_InitStruct ); /* Write to registers  */
+ 1619              		.loc 1 657 1 is_stmt 1 view .LVU568
+ 1620 00de 07A9     		add	r1, sp, #28
+ 1621 00e0 3846     		mov	r0, r7
+ 1622 00e2 FFF7FEFF 		bl	HAL_GPIO_Init
+ 1623              	.LVL65:
+ 658:../../../init/rev5/init.c **** 
+ 659:../../../init/rev5/init.c **** 
+ 660:../../../init/rev5/init.c **** /*--------------------- IGNITION CONTINUITY MCU PIN --------------------------*/
+ 661:../../../init/rev5/init.c **** 
+ 662:../../../init/rev5/init.c **** /* Configure pin */
+ 663:../../../init/rev5/init.c **** GPIO_InitStruct.Pin   = E_CONT_PIN   |
+ 1624              		.loc 1 663 1 view .LVU569
+ 1625              		.loc 1 663 23 is_stmt 0 view .LVU570
+ 1626 00e6 4FF46073 		mov	r3, #896
+ 1627 00ea 0793     		str	r3, [sp, #28]
+ 664:../../../init/rev5/init.c ****                         NOZ_CONT_PIN |
+ 665:../../../init/rev5/init.c ****                         SP_CONT_PIN;
+ 666:../../../init/rev5/init.c **** GPIO_InitStruct.Mode  = GPIO_MODE_INPUT;             /* push-pull output    */
+ 1628              		.loc 1 666 1 is_stmt 1 view .LVU571
+ 1629              		.loc 1 666 23 is_stmt 0 view .LVU572
+ 1630 00ec 0894     		str	r4, [sp, #32]
+ 667:../../../init/rev5/init.c **** GPIO_InitStruct.Pull  = GPIO_NOPULL;                 /* no pull up resistor */
+ 1631              		.loc 1 667 1 is_stmt 1 view .LVU573
+ 1632              		.loc 1 667 23 is_stmt 0 view .LVU574
+ 1633 00ee 0994     		str	r4, [sp, #36]
+ 668:../../../init/rev5/init.c **** GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;         /* Low Frequency       */
+ 1634              		.loc 1 668 1 is_stmt 1 view .LVU575
+ 1635              		.loc 1 668 23 is_stmt 0 view .LVU576
+ 1636 00f0 0A94     		str	r4, [sp, #40]
+ 669:../../../init/rev5/init.c **** HAL_GPIO_Init( E_CONT_GPIO_PORT, &GPIO_InitStruct ); /* Write to registers  */
+ 1637              		.loc 1 669 1 is_stmt 1 view .LVU577
+ 1638 00f2 07A9     		add	r1, sp, #28
+ 1639 00f4 3846     		mov	r0, r7
+ 1640 00f6 FFF7FEFF 		bl	HAL_GPIO_Init
+ 1641              	.LVL66:
+ 670:../../../init/rev5/init.c **** 
+ 671:../../../init/rev5/init.c **** 
+ 672:../../../init/rev5/init.c **** /*----------------------- 5V SOURCE INDICATION PIN ----------------------------*/
+ 673:../../../init/rev5/init.c **** 
+ 674:../../../init/rev5/init.c **** /* Configure pin */
+ 675:../../../init/rev5/init.c **** GPIO_InitStruct.Pin   = PWR_SRC_PIN;
+ 1642              		.loc 1 675 1 view .LVU578
+ 1643              		.loc 1 675 23 is_stmt 0 view .LVU579
+ 1644 00fa 0795     		str	r5, [sp, #28]
+ 676:../../../init/rev5/init.c **** GPIO_InitStruct.Mode  = GPIO_MODE_INPUT;            /* push-pull output    */
+ 1645              		.loc 1 676 1 is_stmt 1 view .LVU580
+ 1646              		.loc 1 676 23 is_stmt 0 view .LVU581
+ 1647 00fc 0894     		str	r4, [sp, #32]
+ 677:../../../init/rev5/init.c **** GPIO_InitStruct.Pull  = GPIO_NOPULL;                /* no pull up resistor */
+ 1648              		.loc 1 677 1 is_stmt 1 view .LVU582
+ARM GAS  /tmp/ccAEaq5Q.s 			page 42
+
+
+ 1649              		.loc 1 677 23 is_stmt 0 view .LVU583
+ 1650 00fe 0994     		str	r4, [sp, #36]
+ 678:../../../init/rev5/init.c **** GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;        /* Low Frequency       */
+ 1651              		.loc 1 678 1 is_stmt 1 view .LVU584
+ 1652              		.loc 1 678 23 is_stmt 0 view .LVU585
+ 1653 0100 0A94     		str	r4, [sp, #40]
+ 679:../../../init/rev5/init.c **** HAL_GPIO_Init(PWR_SRC_GPIO_PORT, &GPIO_InitStruct); /* Write to registers  */
+ 1654              		.loc 1 679 1 is_stmt 1 view .LVU586
+ 1655 0102 07A9     		add	r1, sp, #28
+ 1656 0104 3846     		mov	r0, r7
+ 1657 0106 FFF7FEFF 		bl	HAL_GPIO_Init
+ 1658              	.LVL67:
+ 680:../../../init/rev5/init.c **** 
+ 681:../../../init/rev5/init.c **** 
+ 682:../../../init/rev5/init.c **** /*--------------------------- FLASH CHIP PINS ---------------------------------*/
+ 683:../../../init/rev5/init.c **** 
+ 684:../../../init/rev5/init.c **** /* SPI Chip Select Pin */
+ 685:../../../init/rev5/init.c **** 
+ 686:../../../init/rev5/init.c **** /*Configure GPIO pin Output Level */
+ 687:../../../init/rev5/init.c **** HAL_GPIO_WritePin(FLASH_SS_GPIO_PORT, FLASH_SS_PIN, GPIO_PIN_SET);
+ 1659              		.loc 1 687 1 view .LVU587
+ 1660 010a 2D4E     		ldr	r6, .L100+8
+ 1661 010c 2A46     		mov	r2, r5
+ 1662 010e 4FF48051 		mov	r1, #4096
+ 1663 0112 3046     		mov	r0, r6
+ 1664 0114 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 1665              	.LVL68:
+ 688:../../../init/rev5/init.c **** 
+ 689:../../../init/rev5/init.c **** /*Configure GPIO pin : PB12 */
+ 690:../../../init/rev5/init.c **** GPIO_InitStruct.Pin   = FLASH_SS_PIN;
+ 1666              		.loc 1 690 1 view .LVU588
+ 1667              		.loc 1 690 23 is_stmt 0 view .LVU589
+ 1668 0118 4FF48058 		mov	r8, #4096
+ 1669 011c CDF81C80 		str	r8, [sp, #28]
+ 691:../../../init/rev5/init.c **** GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+ 1670              		.loc 1 691 1 is_stmt 1 view .LVU590
+ 1671              		.loc 1 691 23 is_stmt 0 view .LVU591
+ 1672 0120 0895     		str	r5, [sp, #32]
+ 692:../../../init/rev5/init.c **** GPIO_InitStruct.Pull  = GPIO_NOPULL;
+ 1673              		.loc 1 692 1 is_stmt 1 view .LVU592
+ 1674              		.loc 1 692 23 is_stmt 0 view .LVU593
+ 1675 0122 0994     		str	r4, [sp, #36]
+ 693:../../../init/rev5/init.c **** GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+ 1676              		.loc 1 693 1 is_stmt 1 view .LVU594
+ 1677              		.loc 1 693 23 is_stmt 0 view .LVU595
+ 1678 0124 0A94     		str	r4, [sp, #40]
+ 694:../../../init/rev5/init.c **** HAL_GPIO_Init(FLASH_SS_GPIO_PORT, &GPIO_InitStruct);
+ 1679              		.loc 1 694 1 is_stmt 1 view .LVU596
+ 1680 0126 07A9     		add	r1, sp, #28
+ 1681 0128 3046     		mov	r0, r6
+ 1682 012a FFF7FEFF 		bl	HAL_GPIO_Init
+ 1683              	.LVL69:
+ 695:../../../init/rev5/init.c **** 
+ 696:../../../init/rev5/init.c **** /* Flash write protect Pin */
+ 697:../../../init/rev5/init.c **** 
+ 698:../../../init/rev5/init.c **** /*Configure GPIO pin Output Level */
+ 699:../../../init/rev5/init.c **** HAL_GPIO_WritePin(FLASH_WP_GPIO_PORT, FLASH_WP_PIN, GPIO_PIN_RESET);
+ARM GAS  /tmp/ccAEaq5Q.s 			page 43
+
+
+ 1684              		.loc 1 699 1 view .LVU597
+ 1685 012e 06F50066 		add	r6, r6, #2048
+ 1686 0132 2246     		mov	r2, r4
+ 1687 0134 4146     		mov	r1, r8
+ 1688 0136 3046     		mov	r0, r6
+ 1689 0138 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 1690              	.LVL70:
+ 700:../../../init/rev5/init.c **** 
+ 701:../../../init/rev5/init.c **** /*Configure GPIO pin : PD12 */
+ 702:../../../init/rev5/init.c **** GPIO_InitStruct.Pin   = FLASH_WP_PIN;
+ 1691              		.loc 1 702 1 view .LVU598
+ 1692              		.loc 1 702 23 is_stmt 0 view .LVU599
+ 1693 013c CDF81C80 		str	r8, [sp, #28]
+ 703:../../../init/rev5/init.c **** GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+ 1694              		.loc 1 703 1 is_stmt 1 view .LVU600
+ 1695              		.loc 1 703 23 is_stmt 0 view .LVU601
+ 1696 0140 0895     		str	r5, [sp, #32]
+ 704:../../../init/rev5/init.c **** GPIO_InitStruct.Pull  = GPIO_NOPULL;
+ 1697              		.loc 1 704 1 is_stmt 1 view .LVU602
+ 1698              		.loc 1 704 23 is_stmt 0 view .LVU603
+ 1699 0142 0994     		str	r4, [sp, #36]
+ 705:../../../init/rev5/init.c **** GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+ 1700              		.loc 1 705 1 is_stmt 1 view .LVU604
+ 1701              		.loc 1 705 23 is_stmt 0 view .LVU605
+ 1702 0144 0A94     		str	r4, [sp, #40]
+ 706:../../../init/rev5/init.c **** HAL_GPIO_Init(FLASH_WP_GPIO_PORT, &GPIO_InitStruct);
+ 1703              		.loc 1 706 1 is_stmt 1 view .LVU606
+ 1704 0146 07A9     		add	r1, sp, #28
+ 1705 0148 3046     		mov	r0, r6
+ 1706 014a FFF7FEFF 		bl	HAL_GPIO_Init
+ 1707              	.LVL71:
+ 707:../../../init/rev5/init.c **** 
+ 708:../../../init/rev5/init.c **** /* Flash hold pin */
+ 709:../../../init/rev5/init.c **** 
+ 710:../../../init/rev5/init.c **** /*Configure GPIO pin Output Level */
+ 711:../../../init/rev5/init.c **** HAL_GPIO_WritePin(FLASH_HOLD_GPIO_PORT, FLASH_HOLD_PIN, GPIO_PIN_SET);
+ 1708              		.loc 1 711 1 view .LVU607
+ 1709 014e 2A46     		mov	r2, r5
+ 1710 0150 4FF40051 		mov	r1, #8192
+ 1711 0154 3046     		mov	r0, r6
+ 1712 0156 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 1713              	.LVL72:
+ 712:../../../init/rev5/init.c **** 
+ 713:../../../init/rev5/init.c **** /*Configure GPIO pin : PD13 */
+ 714:../../../init/rev5/init.c **** GPIO_InitStruct.Pin   = FLASH_HOLD_PIN;
+ 1714              		.loc 1 714 1 view .LVU608
+ 1715              		.loc 1 714 23 is_stmt 0 view .LVU609
+ 1716 015a 4FF40053 		mov	r3, #8192
+ 1717 015e 0793     		str	r3, [sp, #28]
+ 715:../../../init/rev5/init.c **** GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+ 1718              		.loc 1 715 1 is_stmt 1 view .LVU610
+ 1719              		.loc 1 715 23 is_stmt 0 view .LVU611
+ 1720 0160 0895     		str	r5, [sp, #32]
+ 716:../../../init/rev5/init.c **** GPIO_InitStruct.Pull  = GPIO_NOPULL;
+ 1721              		.loc 1 716 1 is_stmt 1 view .LVU612
+ 1722              		.loc 1 716 23 is_stmt 0 view .LVU613
+ 1723 0162 0994     		str	r4, [sp, #36]
+ARM GAS  /tmp/ccAEaq5Q.s 			page 44
+
+
+ 717:../../../init/rev5/init.c **** GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+ 1724              		.loc 1 717 1 is_stmt 1 view .LVU614
+ 1725              		.loc 1 717 23 is_stmt 0 view .LVU615
+ 1726 0164 0A94     		str	r4, [sp, #40]
+ 718:../../../init/rev5/init.c **** HAL_GPIO_Init(FLASH_HOLD_GPIO_PORT, &GPIO_InitStruct);
+ 1727              		.loc 1 718 1 is_stmt 1 view .LVU616
+ 1728 0166 07A9     		add	r1, sp, #28
+ 1729 0168 3046     		mov	r0, r6
+ 1730 016a FFF7FEFF 		bl	HAL_GPIO_Init
+ 1731              	.LVL73:
+ 719:../../../init/rev5/init.c **** 
+ 720:../../../init/rev5/init.c **** 
+ 721:../../../init/rev5/init.c **** /*--------------------------- PRESSURE TRANSDUCER PINS ------------------------*/
+ 722:../../../init/rev5/init.c **** 
+ 723:../../../init/rev5/init.c **** /* Pressure transducer gain and multiplexor pins */
+ 724:../../../init/rev5/init.c **** HAL_GPIO_WritePin      (
+ 1732              		.loc 1 724 1 view .LVU617
+ 1733 016e 2246     		mov	r2, r4
+ 1734 0170 4FF46061 		mov	r1, #3584
+ 1735 0174 3046     		mov	r0, r6
+ 1736 0176 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 1737              	.LVL74:
+ 725:../../../init/rev5/init.c ****                         PRESSURE_GPIO_PORT  , 
+ 726:../../../init/rev5/init.c ****                         PRESSURE_MUXA_PIN  |
+ 727:../../../init/rev5/init.c ****                         PRESSURE_MUXB_PIN  |
+ 728:../../../init/rev5/init.c ****                         PRESSURE_MUXC_PIN   , 
+ 729:../../../init/rev5/init.c ****                         GPIO_PIN_RESET 
+ 730:../../../init/rev5/init.c ****                         );
+ 731:../../../init/rev5/init.c **** GPIO_InitStruct.Pin   = PRESSURE_MUXA_PIN  |
+ 1738              		.loc 1 731 1 view .LVU618
+ 1739              		.loc 1 731 23 is_stmt 0 view .LVU619
+ 1740 017a 4FF46063 		mov	r3, #3584
+ 1741 017e 0793     		str	r3, [sp, #28]
+ 732:../../../init/rev5/init.c ****                         PRESSURE_MUXB_PIN  |
+ 733:../../../init/rev5/init.c ****                         PRESSURE_MUXC_PIN;
+ 734:../../../init/rev5/init.c **** GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+ 1742              		.loc 1 734 1 is_stmt 1 view .LVU620
+ 1743              		.loc 1 734 23 is_stmt 0 view .LVU621
+ 1744 0180 0895     		str	r5, [sp, #32]
+ 735:../../../init/rev5/init.c **** GPIO_InitStruct.Pull  = GPIO_NOPULL;
+ 1745              		.loc 1 735 1 is_stmt 1 view .LVU622
+ 1746              		.loc 1 735 23 is_stmt 0 view .LVU623
+ 1747 0182 0994     		str	r4, [sp, #36]
+ 736:../../../init/rev5/init.c **** GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+ 1748              		.loc 1 736 1 is_stmt 1 view .LVU624
+ 1749              		.loc 1 736 23 is_stmt 0 view .LVU625
+ 1750 0184 0323     		movs	r3, #3
+ 1751 0186 0A93     		str	r3, [sp, #40]
+ 737:../../../init/rev5/init.c **** HAL_GPIO_Init( PRESSURE_GPIO_PORT, &GPIO_InitStruct );
+ 1752              		.loc 1 737 1 is_stmt 1 view .LVU626
+ 1753 0188 07A9     		add	r1, sp, #28
+ 1754 018a 3046     		mov	r0, r6
+ 1755 018c FFF7FEFF 		bl	HAL_GPIO_Init
+ 1756              	.LVL75:
+ 738:../../../init/rev5/init.c **** 
+ 739:../../../init/rev5/init.c **** 
+ 740:../../../init/rev5/init.c **** /*----------------------------- THERMOCOUPLE PINS ----------------------------*/
+ARM GAS  /tmp/ccAEaq5Q.s 			page 45
+
+
+ 741:../../../init/rev5/init.c **** 
+ 742:../../../init/rev5/init.c **** /* Thermocouple alert pins */
+ 743:../../../init/rev5/init.c **** GPIO_InitStruct.Pin  = THERMO_ALERT_PIN | THERMO_OC_PIN | THERMO_SC_PIN;
+ 1757              		.loc 1 743 1 view .LVU627
+ 1758              		.loc 1 743 22 is_stmt 0 view .LVU628
+ 1759 0190 4FF46043 		mov	r3, #57344
+ 1760 0194 0793     		str	r3, [sp, #28]
+ 744:../../../init/rev5/init.c **** GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+ 1761              		.loc 1 744 1 is_stmt 1 view .LVU629
+ 1762              		.loc 1 744 22 is_stmt 0 view .LVU630
+ 1763 0196 0894     		str	r4, [sp, #32]
+ 745:../../../init/rev5/init.c **** GPIO_InitStruct.Pull = GPIO_NOPULL;
+ 1764              		.loc 1 745 1 is_stmt 1 view .LVU631
+ 1765              		.loc 1 745 22 is_stmt 0 view .LVU632
+ 1766 0198 0994     		str	r4, [sp, #36]
+ 746:../../../init/rev5/init.c **** HAL_GPIO_Init( THERMO_ALERT_GPIO_PORT, &GPIO_InitStruct );
+ 1767              		.loc 1 746 1 is_stmt 1 view .LVU633
+ 1768 019a 07A9     		add	r1, sp, #28
+ 1769 019c 3846     		mov	r0, r7
+ 1770 019e FFF7FEFF 		bl	HAL_GPIO_Init
+ 1771              	.LVL76:
+ 747:../../../init/rev5/init.c **** 
+ 748:../../../init/rev5/init.c **** /*--------------------------------- USB PINS --------------------------------*/
+ 749:../../../init/rev5/init.c **** 
+ 750:../../../init/rev5/init.c **** /*  USB Detect Pin */
+ 751:../../../init/rev5/init.c **** GPIO_InitStruct.Pin = USB_DETECT_PIN;
+ 1772              		.loc 1 751 1 view .LVU634
+ 1773              		.loc 1 751 21 is_stmt 0 view .LVU635
+ 1774 01a2 0795     		str	r5, [sp, #28]
+ 752:../../../init/rev5/init.c **** GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+ 1775              		.loc 1 752 1 is_stmt 1 view .LVU636
+ 1776              		.loc 1 752 22 is_stmt 0 view .LVU637
+ 1777 01a4 0894     		str	r4, [sp, #32]
+ 753:../../../init/rev5/init.c **** GPIO_InitStruct.Pull = GPIO_NOPULL;
+ 1778              		.loc 1 753 1 is_stmt 1 view .LVU638
+ 1779              		.loc 1 753 22 is_stmt 0 view .LVU639
+ 1780 01a6 0994     		str	r4, [sp, #36]
+ 754:../../../init/rev5/init.c **** HAL_GPIO_Init( USB_DETECT_GPIO_PORT, &GPIO_InitStruct );
+ 1781              		.loc 1 754 1 is_stmt 1 view .LVU640
+ 1782 01a8 07A9     		add	r1, sp, #28
+ 1783 01aa 3046     		mov	r0, r6
+ 1784 01ac FFF7FEFF 		bl	HAL_GPIO_Init
+ 1785              	.LVL77:
+ 755:../../../init/rev5/init.c **** 
+ 756:../../../init/rev5/init.c **** } /* GPIO_Init */
+ 1786              		.loc 1 756 1 is_stmt 0 view .LVU641
+ 1787 01b0 0CB0     		add	sp, sp, #48
+ 1788              	.LCFI27:
+ 1789              		.cfi_def_cfa_offset 24
+ 1790              		@ sp needed
+ 1791 01b2 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 1792              	.L101:
+ 1793 01b6 00BF     		.align	2
+ 1794              	.L100:
+ 1795 01b8 00440258 		.word	1476543488
+ 1796 01bc 00100258 		.word	1476530176
+ 1797 01c0 00040258 		.word	1476527104
+ARM GAS  /tmp/ccAEaq5Q.s 			page 46
+
+
+ 1798              		.cfi_endproc
+ 1799              	.LFE343:
+ 1801              		.text
+ 1802              	.Letext0:
+ 1803              		.file 2 "/usr/lib/gcc/arm-none-eabi/12.2.1/include/stdint.h"
+ 1804              		.file 3 "../../../lib/Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h750xx.h"
+ 1805              		.file 4 "../../../lib/Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h7xx.h"
+ 1806              		.file 5 "../../../lib/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h"
+ 1807              		.file 6 "../../../lib/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc.h"
+ 1808              		.file 7 "../../../lib/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc_ex.h"
+ 1809              		.file 8 "../../../lib/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_gpio.h"
+ 1810              		.file 9 "../../../lib/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma.h"
+ 1811              		.file 10 "../../../lib/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_adc.h"
+ 1812              		.file 11 "../../../lib/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_adc_ex.h"
+ 1813              		.file 12 "../../../lib/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_i2c.h"
+ 1814              		.file 13 "../../../lib/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_spi.h"
+ 1815              		.file 14 "../../../lib/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h"
+ 1816              		.file 15 "../../../lib/sdr_pin_defines_L0002.h"
+ 1817              		.file 16 "../../../lib/util/sdr_error.h"
+ 1818              		.file 17 "../../../lib/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h"
+ 1819              		.file 18 "../../../lib/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_i2c_ex.h"
+ 1820              		.file 19 "../../../lib/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pwr_ex.h"
+ 1821              		.file 20 "<built-in>"
+ARM GAS  /tmp/ccAEaq5Q.s 			page 47
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 init.c
+     /tmp/ccAEaq5Q.s:20     .text.SystemClock_Config:0000000000000000 $t
+     /tmp/ccAEaq5Q.s:26     .text.SystemClock_Config:0000000000000000 SystemClock_Config
+     /tmp/ccAEaq5Q.s:211    .text.SystemClock_Config:00000000000000c0 $d
+     /tmp/ccAEaq5Q.s:217    .text.PeriphCommonClock_Config:0000000000000000 $t
+     /tmp/ccAEaq5Q.s:223    .text.PeriphCommonClock_Config:0000000000000000 PeriphCommonClock_Config
+     /tmp/ccAEaq5Q.s:300    .text.PRESSURE_ADC_Init:0000000000000000 $t
+     /tmp/ccAEaq5Q.s:306    .text.PRESSURE_ADC_Init:0000000000000000 PRESSURE_ADC_Init
+     /tmp/ccAEaq5Q.s:494    .text.PRESSURE_ADC_Init:00000000000000b4 $d
+     /tmp/ccAEaq5Q.s:502    .text.LOADCELL_ADC_Init:0000000000000000 $t
+     /tmp/ccAEaq5Q.s:508    .text.LOADCELL_ADC_Init:0000000000000000 LOADCELL_ADC_Init
+     /tmp/ccAEaq5Q.s:671    .text.LOADCELL_ADC_Init:000000000000009c $d
+     /tmp/ccAEaq5Q.s:680    .text.PRESSURE5_ADC_Init:0000000000000000 $t
+     /tmp/ccAEaq5Q.s:686    .text.PRESSURE5_ADC_Init:0000000000000000 PRESSURE5_ADC_Init
+     /tmp/ccAEaq5Q.s:849    .text.PRESSURE5_ADC_Init:000000000000009c $d
+     /tmp/ccAEaq5Q.s:857    .text.Thermocouple_I2C_Init:0000000000000000 $t
+     /tmp/ccAEaq5Q.s:863    .text.Thermocouple_I2C_Init:0000000000000000 Thermocouple_I2C_Init
+     /tmp/ccAEaq5Q.s:957    .text.Thermocouple_I2C_Init:000000000000005c $d
+     /tmp/ccAEaq5Q.s:963    .text.FLASH_SPI_Init:0000000000000000 $t
+     /tmp/ccAEaq5Q.s:969    .text.FLASH_SPI_Init:0000000000000000 FLASH_SPI_Init
+     /tmp/ccAEaq5Q.s:1072   .text.FLASH_SPI_Init:0000000000000054 $d
+     /tmp/ccAEaq5Q.s:1078   .text.USB_UART_Init:0000000000000000 $t
+     /tmp/ccAEaq5Q.s:1084   .text.USB_UART_Init:0000000000000000 USB_UART_Init
+     /tmp/ccAEaq5Q.s:1196   .text.USB_UART_Init:0000000000000068 $d
+     /tmp/ccAEaq5Q.s:1202   .text.Valve_UART_Init:0000000000000000 $t
+     /tmp/ccAEaq5Q.s:1208   .text.Valve_UART_Init:0000000000000000 Valve_UART_Init
+     /tmp/ccAEaq5Q.s:1320   .text.Valve_UART_Init:0000000000000068 $d
+     /tmp/ccAEaq5Q.s:1326   .text.Wireless_UART_Init:0000000000000000 $t
+     /tmp/ccAEaq5Q.s:1332   .text.Wireless_UART_Init:0000000000000000 Wireless_UART_Init
+     /tmp/ccAEaq5Q.s:1444   .text.Wireless_UART_Init:0000000000000068 $d
+     /tmp/ccAEaq5Q.s:1450   .text.GPIO_Init:0000000000000000 $t
+     /tmp/ccAEaq5Q.s:1456   .text.GPIO_Init:0000000000000000 GPIO_Init
+     /tmp/ccAEaq5Q.s:1795   .text.GPIO_Init:00000000000001b8 $d
+
+UNDEFINED SYMBOLS
+memset
+HAL_PWREx_ConfigSupply
+HAL_RCC_OscConfig
+HAL_RCC_ClockConfig
+Error_Handler
+HAL_RCCEx_PeriphCLKConfig
+HAL_ADC_Init
+HAL_ADCEx_MultiModeConfigChannel
+HAL_ADC_ConfigChannel
+hadc1
+hadc2
+hadc3
+HAL_I2C_Init
+HAL_I2CEx_ConfigAnalogFilter
+HAL_I2CEx_ConfigDigitalFilter
+hi2c1
+HAL_SPI_Init
+hspi2
+HAL_UART_Init
+HAL_UARTEx_SetTxFifoThreshold
+HAL_UARTEx_SetRxFifoThreshold
+ARM GAS  /tmp/ccAEaq5Q.s 			page 48
+
+
+HAL_UARTEx_DisableFifoMode
+huart1
+huart2
+huart4
+HAL_GPIO_WritePin
+HAL_GPIO_Init

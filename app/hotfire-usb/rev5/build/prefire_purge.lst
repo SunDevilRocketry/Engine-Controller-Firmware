@@ -1,0 +1,193 @@
+ARM GAS  /tmp/ccMNJJX2.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"prefire_purge.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "prefire_purge.c"
+  19              		.section	.text.run_pre_fire_purge_state,"ax",%progbits
+  20              		.align	1
+  21              		.global	run_pre_fire_purge_state
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	run_pre_fire_purge_state:
+  27              	.LFB333:
+   1:prefire_purge.c **** /*******************************************************************************
+   2:prefire_purge.c **** *
+   3:prefire_purge.c **** * FILE: 
+   4:prefire_purge.c **** * 		prefire_purge.c
+   5:prefire_purge.c **** *
+   6:prefire_purge.c **** * DESCRIPTION: 
+   7:prefire_purge.c **** * 	    Performs an purge of the engine in order to remove air from tanks and 
+   8:prefire_purge.c **** *       propellant feed plumbing 
+   9:prefire_purge.c **** *
+  10:prefire_purge.c **** *******************************************************************************/
+  11:prefire_purge.c **** 
+  12:prefire_purge.c **** 
+  13:prefire_purge.c **** /*------------------------------------------------------------------------------
+  14:prefire_purge.c ****  Standard Includes                                                              
+  15:prefire_purge.c **** ------------------------------------------------------------------------------*/
+  16:prefire_purge.c **** 
+  17:prefire_purge.c **** 
+  18:prefire_purge.c **** /*------------------------------------------------------------------------------
+  19:prefire_purge.c ****  Project Includes                                                              
+  20:prefire_purge.c **** ------------------------------------------------------------------------------*/
+  21:prefire_purge.c **** #include "main.h"
+  22:prefire_purge.c **** #include "valve_control.h"
+  23:prefire_purge.c **** 
+  24:prefire_purge.c **** 
+  25:prefire_purge.c **** /*------------------------------------------------------------------------------
+  26:prefire_purge.c ****  Global Variables 
+  27:prefire_purge.c **** ------------------------------------------------------------------------------*/
+  28:prefire_purge.c **** extern volatile FSM_STATE fsm_state; /* Hotfire State */
+  29:prefire_purge.c **** 
+  30:prefire_purge.c **** 
+  31:prefire_purge.c **** /*------------------------------------------------------------------------------
+ARM GAS  /tmp/ccMNJJX2.s 			page 2
+
+
+  32:prefire_purge.c ****  Public Functions 
+  33:prefire_purge.c **** ------------------------------------------------------------------------------*/
+  34:prefire_purge.c **** 
+  35:prefire_purge.c **** 
+  36:prefire_purge.c **** /*******************************************************************************
+  37:prefire_purge.c **** *                                                                              *
+  38:prefire_purge.c **** * PROCEDURE:                                                                   *
+  39:prefire_purge.c **** * 		run_pre_fire_purge_state                                               *
+  40:prefire_purge.c **** *                                                                              *
+  41:prefire_purge.c **** * DESCRIPTION:                                                                 *
+  42:prefire_purge.c **** *       Performs a pre-hotfire engine purge                                    *
+  43:prefire_purge.c **** *                                                                              *
+  44:prefire_purge.c **** *******************************************************************************/
+  45:prefire_purge.c **** FSM_STATE run_pre_fire_purge_state 
+  46:prefire_purge.c ****     (
+  47:prefire_purge.c ****     void
+  48:prefire_purge.c ****     )
+  49:prefire_purge.c **** {
+  28              		.loc 1 49 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32 0000 08B5     		push	{r3, lr}
+  33              	.LCFI0:
+  34              		.cfi_def_cfa_offset 8
+  35              		.cfi_offset 3, -8
+  36              		.cfi_offset 14, -4
+  50:prefire_purge.c **** /* Close vent solenoids */
+  51:prefire_purge.c **** vc_close_solenoids( SOLENOID_LOX_VENT | SOLENOID_FUEL_VENT );
+  37              		.loc 1 51 1 view .LVU1
+  38 0002 0C20     		movs	r0, #12
+  39 0004 FFF7FEFF 		bl	vc_close_solenoids
+  40              	.LVL0:
+  52:prefire_purge.c **** HAL_Delay( VENT_PRESS_DELAY );
+  41              		.loc 1 52 1 view .LVU2
+  42 0008 4FF4FA60 		mov	r0, #2000
+  43 000c FFF7FEFF 		bl	HAL_Delay
+  44              	.LVL1:
+  53:prefire_purge.c **** 
+  54:prefire_purge.c **** /* Crack Main valves */
+  55:prefire_purge.c **** vc_crack_main_valves( MAIN_VALVE_BOTH_MAINS );
+  45              		.loc 1 55 1 view .LVU3
+  46 0010 0220     		movs	r0, #2
+  47 0012 FFF7FEFF 		bl	vc_crack_main_valves
+  48              	.LVL2:
+  56:prefire_purge.c **** 
+  57:prefire_purge.c **** /* Open pressurization valves */
+  58:prefire_purge.c **** vc_open_solenoids( SOLENOID_LOX_PRESS | SOLENOID_FUEL_PRESS );
+  49              		.loc 1 58 1 view .LVU4
+  50 0016 0320     		movs	r0, #3
+  51 0018 FFF7FEFF 		bl	vc_open_solenoids
+  52              	.LVL3:
+  59:prefire_purge.c **** 
+  60:prefire_purge.c **** /* Purge Duration */
+  61:prefire_purge.c **** HAL_Delay( PREFIRE_PURGE_DURATION );
+  53              		.loc 1 61 1 view .LVU5
+  54 001c 4FF4FA50 		mov	r0, #8000
+ARM GAS  /tmp/ccMNJJX2.s 			page 3
+
+
+  55 0020 FFF7FEFF 		bl	HAL_Delay
+  56              	.LVL4:
+  62:prefire_purge.c **** 
+  63:prefire_purge.c **** /* Stop the purge */
+  64:prefire_purge.c **** vc_close_solenoids( SOLENOID_LOX_PRESS | SOLENOID_FUEL_PRESS );
+  57              		.loc 1 64 1 view .LVU6
+  58 0024 0320     		movs	r0, #3
+  59 0026 FFF7FEFF 		bl	vc_close_solenoids
+  60              	.LVL5:
+  65:prefire_purge.c **** vc_close_main_valves( MAIN_VALVE_BOTH_MAINS );
+  61              		.loc 1 65 1 view .LVU7
+  62 002a 0220     		movs	r0, #2
+  63 002c FFF7FEFF 		bl	vc_close_main_valves
+  64              	.LVL6:
+  66:prefire_purge.c **** HAL_Delay( VENT_PRESS_DELAY );
+  65              		.loc 1 66 1 view .LVU8
+  66 0030 4FF4FA60 		mov	r0, #2000
+  67 0034 FFF7FEFF 		bl	HAL_Delay
+  68              	.LVL7:
+  67:prefire_purge.c **** vc_open_solenoids( SOLENOID_LOX_VENT | SOLENOID_FUEL_VENT );
+  69              		.loc 1 67 1 view .LVU9
+  70 0038 0C20     		movs	r0, #12
+  71 003a FFF7FEFF 		bl	vc_open_solenoids
+  72              	.LVL8:
+  68:prefire_purge.c **** 
+  69:prefire_purge.c **** /* Wait for fill and chill command */
+  70:prefire_purge.c **** while ( fsm_state != FSM_FILL_CHILL_STATE ){}
+  73              		.loc 1 70 1 view .LVU10
+  74              	.L2:
+  75              		.loc 1 70 45 discriminator 1 view .LVU11
+  76              		.loc 1 70 19 discriminator 1 view .LVU12
+  77 003e 034B     		ldr	r3, .L4
+  78 0040 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+  79 0042 DBB2     		uxtb	r3, r3
+  80 0044 032B     		cmp	r3, #3
+  81 0046 FAD1     		bne	.L2
+  71:prefire_purge.c **** return FSM_FILL_CHILL_STATE;
+  82              		.loc 1 71 1 view .LVU13
+  72:prefire_purge.c **** } /* run_pre_fire_purge_state */
+  83              		.loc 1 72 1 is_stmt 0 view .LVU14
+  84 0048 0320     		movs	r0, #3
+  85 004a 08BD     		pop	{r3, pc}
+  86              	.L5:
+  87              		.align	2
+  88              	.L4:
+  89 004c 00000000 		.word	fsm_state
+  90              		.cfi_endproc
+  91              	.LFE333:
+  93              		.text
+  94              	.Letext0:
+  95              		.file 2 "/usr/lib/gcc/arm-none-eabi/12.2.1/include/stdint.h"
+  96              		.file 3 "main.h"
+  97              		.file 4 "valve_control.h"
+  98              		.file 5 "../../../lib/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h"
+ARM GAS  /tmp/ccMNJJX2.s 			page 4
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 prefire_purge.c
+     /tmp/ccMNJJX2.s:20     .text.run_pre_fire_purge_state:0000000000000000 $t
+     /tmp/ccMNJJX2.s:26     .text.run_pre_fire_purge_state:0000000000000000 run_pre_fire_purge_state
+     /tmp/ccMNJJX2.s:89     .text.run_pre_fire_purge_state:000000000000004c $d
+
+UNDEFINED SYMBOLS
+vc_close_solenoids
+HAL_Delay
+vc_crack_main_valves
+vc_open_solenoids
+vc_close_main_valves
+fsm_state

@@ -1,0 +1,381 @@
+ARM GAS  /tmp/cccFDgmW.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"fire.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "fire.c"
+  19              		.section	.text.run_fire_state,"ax",%progbits
+  20              		.align	1
+  21              		.global	run_fire_state
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	run_fire_state:
+  27              	.LFB333:
+   1:fire.c        **** /*******************************************************************************
+   2:fire.c        **** *
+   3:fire.c        **** * FILE: 
+   4:fire.c        **** * 		fire.c
+   5:fire.c        **** *
+   6:fire.c        **** * DESCRIPTION: 
+   7:fire.c        **** * 	    Control the engine during hotfire 
+   8:fire.c        **** *
+   9:fire.c        **** *******************************************************************************/
+  10:fire.c        **** 
+  11:fire.c        **** 
+  12:fire.c        **** /*------------------------------------------------------------------------------
+  13:fire.c        ****  Standard Includes                                                              
+  14:fire.c        **** ------------------------------------------------------------------------------*/
+  15:fire.c        **** #include <stdbool.h>
+  16:fire.c        **** #include <string.h>
+  17:fire.c        **** 
+  18:fire.c        **** 
+  19:fire.c        **** /*------------------------------------------------------------------------------
+  20:fire.c        ****  Project Includes                                                              
+  21:fire.c        **** ------------------------------------------------------------------------------*/
+  22:fire.c        **** #include "main.h"
+  23:fire.c        **** #include "valve_control.h"
+  24:fire.c        **** #include "data_logger.h"
+  25:fire.c        **** #include "ignition.h"
+  26:fire.c        **** 
+  27:fire.c        **** 
+  28:fire.c        **** /*------------------------------------------------------------------------------
+  29:fire.c        ****  Global Variables 
+  30:fire.c        **** ------------------------------------------------------------------------------*/
+  31:fire.c        **** extern FSM_STATE fsm_state;         /* State of the engine hotfire */
+ARM GAS  /tmp/cccFDgmW.s 			page 2
+
+
+  32:fire.c        **** extern bool      stop_hotfire_flag; /* Manual Hotfire termination  */
+  33:fire.c        **** extern bool      stop_purge_flag;   /* Manual purge termination    */
+  34:fire.c        **** 
+  35:fire.c        **** 
+  36:fire.c        **** /*------------------------------------------------------------------------------
+  37:fire.c        ****  Public Functions 
+  38:fire.c        **** ------------------------------------------------------------------------------*/
+  39:fire.c        **** 
+  40:fire.c        **** 
+  41:fire.c        **** /*******************************************************************************
+  42:fire.c        **** *                                                                              *
+  43:fire.c        **** * PROCEDURE:                                                                   *
+  44:fire.c        **** * 		run_fire_state                                                         *
+  45:fire.c        **** *                                                                              *
+  46:fire.c        **** * DESCRIPTION:                                                                 *
+  47:fire.c        **** *       Fire the engine and log sensor data                                    *
+  48:fire.c        **** *                                                                              *
+  49:fire.c        **** *******************************************************************************/
+  50:fire.c        **** FSM_STATE run_fire_state 
+  51:fire.c        ****     (
+  52:fire.c        ****     void
+  53:fire.c        ****     )
+  54:fire.c        **** {
+  28              		.loc 1 54 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 48
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32 0000 10B5     		push	{r4, lr}
+  33              	.LCFI0:
+  34              		.cfi_def_cfa_offset 8
+  35              		.cfi_offset 4, -8
+  36              		.cfi_offset 14, -4
+  37 0002 94B0     		sub	sp, sp, #80
+  38              	.LCFI1:
+  39              		.cfi_def_cfa_offset 88
+  55:fire.c        **** /*------------------------------------------------------------------------------
+  56:fire.c        ****  Local Variables  
+  57:fire.c        **** ------------------------------------------------------------------------------*/
+  58:fire.c        **** uint32_t            burn_time;         /* Time engine has been burning   */
+  40              		.loc 1 58 1 view .LVU1
+  59:fire.c        **** DATA_LOG_DATA_FRAME sensor_data;       /* Data from engine sensors       */
+  41              		.loc 1 59 1 view .LVU2
+  60:fire.c        **** 
+  61:fire.c        **** 
+  62:fire.c        **** /*------------------------------------------------------------------------------
+  63:fire.c        ****  Initializations 
+  64:fire.c        **** ------------------------------------------------------------------------------*/
+  65:fire.c        **** memset( &sensor_data, 0, sizeof( sensor_data ) );
+  42              		.loc 1 65 1 view .LVU3
+  43 0004 2C22     		movs	r2, #44
+  44 0006 0021     		movs	r1, #0
+  45 0008 09A8     		add	r0, sp, #36
+  46 000a FFF7FEFF 		bl	memset
+  47              	.LVL0:
+  66:fire.c        **** 
+  67:fire.c        **** 
+  68:fire.c        **** /*------------------------------------------------------------------------------
+ARM GAS  /tmp/cccFDgmW.s 			page 3
+
+
+  69:fire.c        ****  Engine Fire Sequence 
+  70:fire.c        **** ------------------------------------------------------------------------------*/
+  71:fire.c        **** 
+  72:fire.c        **** 
+  73:fire.c        **** /* Close the vent solenoids */
+  74:fire.c        **** vc_close_solenoids( SOLENOID_LOX_VENT | SOLENOID_FUEL_VENT );
+  48              		.loc 1 74 1 view .LVU4
+  49 000e 0C20     		movs	r0, #12
+  50 0010 FFF7FEFF 		bl	vc_close_solenoids
+  51              	.LVL1:
+  75:fire.c        **** HAL_Delay( VENT_PRESS_DELAY );
+  52              		.loc 1 75 1 view .LVU5
+  53 0014 4FF4FA60 		mov	r0, #2000
+  54 0018 FFF7FEFF 		bl	HAL_Delay
+  55              	.LVL2:
+  76:fire.c        **** 
+  77:fire.c        **** /* Pressurize the LOX tank */
+  78:fire.c        **** vc_open_solenoids( SOLENOID_LOX_PRESS );
+  56              		.loc 1 78 1 view .LVU6
+  57 001c 0120     		movs	r0, #1
+  58 001e FFF7FEFF 		bl	vc_open_solenoids
+  59              	.LVL3:
+  79:fire.c        **** HAL_Delay( TANK_PRESS_DELAY );
+  60              		.loc 1 79 1 view .LVU7
+  61 0022 4FF4FA50 		mov	r0, #8000
+  62 0026 FFF7FEFF 		bl	HAL_Delay
+  63              	.LVL4:
+  80:fire.c        **** 
+  81:fire.c        **** /* Pressurize the fuel tank */
+  82:fire.c        **** vc_open_solenoids( SOLENOID_FUEL_PRESS );
+  64              		.loc 1 82 1 view .LVU8
+  65 002a 0220     		movs	r0, #2
+  66 002c FFF7FEFF 		bl	vc_open_solenoids
+  67              	.LVL5:
+  83:fire.c        **** HAL_Delay( TANK_PRESS_DELAY );
+  68              		.loc 1 83 1 view .LVU9
+  69 0030 4FF4FA50 		mov	r0, #8000
+  70 0034 FFF7FEFF 		bl	HAL_Delay
+  71              	.LVL6:
+  84:fire.c        **** 
+  85:fire.c        **** /* Crack the main LOX valve */
+  86:fire.c        **** vc_crack_main_valves( MAIN_VALVE_LOX_MAIN );
+  72              		.loc 1 86 1 view .LVU10
+  73 0038 0020     		movs	r0, #0
+  74 003a FFF7FEFF 		bl	vc_crack_main_valves
+  75              	.LVL7:
+  87:fire.c        **** HAL_Delay( LOX_CRACK_DURATION );
+  76              		.loc 1 87 1 view .LVU11
+  77 003e 40F6AC50 		movw	r0, #3500
+  78 0042 FFF7FEFF 		bl	HAL_Delay
+  79              	.LVL8:
+  88:fire.c        **** vc_close_main_valves( MAIN_VALVE_LOX_MAIN );
+  80              		.loc 1 88 1 view .LVU12
+  81 0046 0020     		movs	r0, #0
+  82 0048 FFF7FEFF 		bl	vc_close_main_valves
+  83              	.LVL9:
+  89:fire.c        **** HAL_Delay( LOX_POSTCRACK_DELAY ); // Some lox in the system and we need to boil out LOX in the syst
+ARM GAS  /tmp/cccFDgmW.s 			page 4
+
+
+  84              		.loc 1 89 1 view .LVU13
+  85 004c 41F28830 		movw	r0, #5000
+  86 0050 FFF7FEFF 		bl	HAL_Delay
+  87              	.LVL10:
+  90:fire.c        **** 
+  91:fire.c        **** /* Ignite the engine */
+  92:fire.c        **** ign_ignite();
+  88              		.loc 1 92 1 view .LVU14
+  89 0054 FFF7FEFF 		bl	ign_ignite
+  90              	.LVL11:
+  93:fire.c        **** HAL_Delay( ENGINE_IGNITION_DELAY );
+  91              		.loc 1 93 1 view .LVU15
+  92 0058 4FF47A60 		mov	r0, #4000
+  93 005c FFF7FEFF 		bl	HAL_Delay
+  94              	.LVL12:
+  94:fire.c        **** 
+  95:fire.c        **** /* Open the main valves */
+  96:fire.c        **** vc_open_main_valves( MAIN_VALVE_BOTH_MAINS ); // Open the valves slowly so the propellants come in 
+  95              		.loc 1 96 1 view .LVU16
+  96 0060 0220     		movs	r0, #2
+  97 0062 FFF7FEFF 		bl	vc_open_main_valves
+  98              	.LVL13:
+  97:fire.c        **** 
+  98:fire.c        **** /* Engine Burn */
+  99:fire.c        **** data_logger_init_timer();
+  99              		.loc 1 99 1 view .LVU17
+ 100 0066 FFF7FEFF 		bl	data_logger_init_timer
+ 101              	.LVL14:
+ 100:fire.c        **** burn_time = data_logger_get_time();
+ 102              		.loc 1 100 1 view .LVU18
+ 103              		.loc 1 100 13 is_stmt 0 view .LVU19
+ 104 006a FFF7FEFF 		bl	data_logger_get_time
+ 105              	.LVL15:
+ 101:fire.c        **** while ( burn_time < ENGINE_BURN_DURATION )
+ 106              		.loc 1 101 1 is_stmt 1 view .LVU20
+ 107              		.loc 1 101 7 is_stmt 0 view .LVU21
+ 108 006e 14E0     		b	.L2
+ 109              	.LVL16:
+ 110              	.L7:
+ 102:fire.c        ****     {
+ 103:fire.c        ****     /* Poll for abort */
+ 104:fire.c        ****     if ( fsm_state == FSM_ABORT_STATE )
+ 105:fire.c        ****         {
+ 106:fire.c        ****         return FSM_ABORT_STATE;
+ 107:fire.c        ****         }
+ 108:fire.c        **** 
+ 109:fire.c        ****     /* Poll for stop fire command */
+ 110:fire.c        ****     if ( stop_hotfire_flag )
+ 111:fire.c        ****         {
+ 112:fire.c        ****         break;
+ 113:fire.c        ****         }
+ 114:fire.c        ****     
+ 115:fire.c        ****     /* Log Data */
+ 116:fire.c        ****     data_logger_get_data( &sensor_data );
+ 111              		.loc 1 116 5 is_stmt 1 view .LVU22
+ 112 0070 09AC     		add	r4, sp, #36
+ 113 0072 2046     		mov	r0, r4
+ARM GAS  /tmp/cccFDgmW.s 			page 5
+
+
+ 114 0074 FFF7FEFF 		bl	data_logger_get_data
+ 115              	.LVL17:
+ 117:fire.c        ****     data_logger_log_data( sensor_data  );
+ 116              		.loc 1 117 5 view .LVU23
+ 117 0078 EC46     		mov	ip, sp
+ 118 007a 0DF1340E 		add	lr, sp, #52
+ 119 007e BEE80F00 		ldmia	lr!, {r0, r1, r2, r3}
+ 120 0082 ACE80F00 		stmia	ip!, {r0, r1, r2, r3}
+ 121 0086 9EE80700 		ldm	lr, {r0, r1, r2}
+ 122 008a 8CE80700 		stm	ip, {r0, r1, r2}
+ 123 008e 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 124 0092 FFF7FEFF 		bl	data_logger_log_data
+ 125              	.LVL18:
+ 118:fire.c        **** 
+ 119:fire.c        **** 
+ 120:fire.c        ****     /* Update timer */
+ 121:fire.c        ****     burn_time = data_logger_get_time();
+ 126              		.loc 1 121 5 view .LVU24
+ 127              		.loc 1 121 17 is_stmt 0 view .LVU25
+ 128 0096 FFF7FEFF 		bl	data_logger_get_time
+ 129              	.LVL19:
+ 130              	.L2:
+ 101:fire.c        ****     {
+ 131              		.loc 1 101 19 is_stmt 1 view .LVU26
+ 132 009a 41F28733 		movw	r3, #4999
+ 133 009e 9842     		cmp	r0, r3
+ 134 00a0 07D8     		bhi	.L4
+ 104:fire.c        ****         {
+ 135              		.loc 1 104 5 view .LVU27
+ 104:fire.c        ****         {
+ 136              		.loc 1 104 20 is_stmt 0 view .LVU28
+ 137 00a2 0C4B     		ldr	r3, .L8
+ 138 00a4 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 139              	.LVL20:
+ 104:fire.c        ****         {
+ 140              		.loc 1 104 8 view .LVU29
+ 141 00a6 0928     		cmp	r0, #9
+ 142 00a8 11D0     		beq	.L3
+ 110:fire.c        ****         {
+ 143              		.loc 1 110 5 is_stmt 1 view .LVU30
+ 110:fire.c        ****         {
+ 144              		.loc 1 110 10 is_stmt 0 view .LVU31
+ 145 00aa 0B4B     		ldr	r3, .L8+4
+ 146 00ac 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 110:fire.c        ****         {
+ 147              		.loc 1 110 8 view .LVU32
+ 148 00ae 002B     		cmp	r3, #0
+ 149 00b0 DED0     		beq	.L7
+ 150              	.L4:
+ 122:fire.c        ****     }
+ 123:fire.c        **** 
+ 124:fire.c        **** /* Close the main valves */
+ 125:fire.c        **** vc_close_main_valves( MAIN_VALVE_BOTH_MAINS );
+ 151              		.loc 1 125 1 is_stmt 1 view .LVU33
+ 152 00b2 0220     		movs	r0, #2
+ 153 00b4 FFF7FEFF 		bl	vc_close_main_valves
+ 154              	.LVL21:
+ARM GAS  /tmp/cccFDgmW.s 			page 6
+
+
+ 126:fire.c        **** 
+ 127:fire.c        **** /* Close the pressuriztion solenoids */
+ 128:fire.c        **** vc_close_solenoids( SOLENOID_LOX_PRESS | SOLENOID_FUEL_PRESS );
+ 155              		.loc 1 128 1 view .LVU34
+ 156 00b8 0320     		movs	r0, #3
+ 157 00ba FFF7FEFF 		bl	vc_close_solenoids
+ 158              	.LVL22:
+ 129:fire.c        **** 
+ 130:fire.c        **** /* Open the purge solenoids */
+ 131:fire.c        **** vc_open_solenoids( SOLENOID_LOX_PURGE | SOLENOID_FUEL_PURGE );
+ 159              		.loc 1 131 1 view .LVU35
+ 160 00be 3020     		movs	r0, #48
+ 161 00c0 FFF7FEFF 		bl	vc_open_solenoids
+ 162              	.LVL23:
+ 132:fire.c        **** 
+ 133:fire.c        **** /* Wait for stop purge command or timeout */
+ 134:fire.c        **** HAL_Delay( POSTFIRE_PURGE_DURATION );
+ 163              		.loc 1 134 1 view .LVU36
+ 164 00c4 4FF4FA50 		mov	r0, #8000
+ 165 00c8 FFF7FEFF 		bl	HAL_Delay
+ 166              	.LVL24:
+ 135:fire.c        **** 
+ 136:fire.c        **** /* Transition to disarm state */
+ 137:fire.c        **** return FSM_DISARM_STATE;
+ 167              		.loc 1 137 1 view .LVU37
+ 168              		.loc 1 137 8 is_stmt 0 view .LVU38
+ 169 00cc 0620     		movs	r0, #6
+ 170              	.L3:
+ 138:fire.c        **** } /* run_fire_state */
+ 171              		.loc 1 138 1 view .LVU39
+ 172 00ce 14B0     		add	sp, sp, #80
+ 173              	.LCFI2:
+ 174              		.cfi_def_cfa_offset 8
+ 175              		@ sp needed
+ 176 00d0 10BD     		pop	{r4, pc}
+ 177              	.L9:
+ 178 00d2 00BF     		.align	2
+ 179              	.L8:
+ 180 00d4 00000000 		.word	fsm_state
+ 181 00d8 00000000 		.word	stop_hotfire_flag
+ 182              		.cfi_endproc
+ 183              	.LFE333:
+ 185              		.text
+ 186              	.Letext0:
+ 187              		.file 2 "/usr/lib/gcc/arm-none-eabi/12.2.1/include/stddef.h"
+ 188              		.file 3 "/usr/lib/gcc/arm-none-eabi/12.2.1/include/stdint.h"
+ 189              		.file 4 "../../../mod/sensor/sensor.h"
+ 190              		.file 5 "main.h"
+ 191              		.file 6 "valve_control.h"
+ 192              		.file 7 "data_logger.h"
+ 193              		.file 8 "../../../mod/ignition/ignition.h"
+ 194              		.file 9 "/usr/include/newlib/string.h"
+ 195              		.file 10 "../../../lib/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h"
+ 196              		.file 11 "<built-in>"
+ARM GAS  /tmp/cccFDgmW.s 			page 7
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 fire.c
+     /tmp/cccFDgmW.s:20     .text.run_fire_state:0000000000000000 $t
+     /tmp/cccFDgmW.s:26     .text.run_fire_state:0000000000000000 run_fire_state
+     /tmp/cccFDgmW.s:180    .text.run_fire_state:00000000000000d4 $d
+
+UNDEFINED SYMBOLS
+memset
+vc_close_solenoids
+HAL_Delay
+vc_open_solenoids
+vc_crack_main_valves
+vc_close_main_valves
+ign_ignite
+vc_open_main_valves
+data_logger_init_timer
+data_logger_get_time
+data_logger_get_data
+data_logger_log_data
+fsm_state
+stop_hotfire_flag

@@ -1,0 +1,115 @@
+ARM GAS  /tmp/cciXwGNu.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"post_fire.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "post_fire.c"
+  19              		.section	.text.run_post_fire_state,"ax",%progbits
+  20              		.align	1
+  21              		.global	run_post_fire_state
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	run_post_fire_state:
+  27              	.LFB333:
+   1:post_fire.c   **** /*******************************************************************************
+   2:post_fire.c   **** *
+   3:post_fire.c   **** * FILE: 
+   4:post_fire.c   **** * 		postfire.c
+   5:post_fire.c   **** *
+   6:post_fire.c   **** * DESCRIPTION: 
+   7:post_fire.c   **** * 	    Contains the run_post_fire_state functions which finalizes engine 
+   8:post_fire.c   **** *       controller resources after a hot fire	
+   9:post_fire.c   **** *
+  10:post_fire.c   **** *******************************************************************************/
+  11:post_fire.c   **** 
+  12:post_fire.c   **** 
+  13:post_fire.c   **** /*------------------------------------------------------------------------------
+  14:post_fire.c   ****  Standard Includes                                                              
+  15:post_fire.c   **** ------------------------------------------------------------------------------*/
+  16:post_fire.c   **** 
+  17:post_fire.c   **** 
+  18:post_fire.c   **** /*------------------------------------------------------------------------------
+  19:post_fire.c   ****  Project Includes                                                              
+  20:post_fire.c   **** ------------------------------------------------------------------------------*/
+  21:post_fire.c   **** #include "main.h"
+  22:post_fire.c   **** #include "led.h"
+  23:post_fire.c   **** 
+  24:post_fire.c   **** 
+  25:post_fire.c   **** /*------------------------------------------------------------------------------
+  26:post_fire.c   ****  Public Functions 
+  27:post_fire.c   **** ------------------------------------------------------------------------------*/
+  28:post_fire.c   **** 
+  29:post_fire.c   **** 
+  30:post_fire.c   **** /*******************************************************************************
+  31:post_fire.c   **** *                                                                              *
+ARM GAS  /tmp/cciXwGNu.s 			page 2
+
+
+  32:post_fire.c   **** * PROCEDURE:                                                                   *
+  33:post_fire.c   **** * 		run_post_fire_state                                                    *
+  34:post_fire.c   **** *                                                                              *
+  35:post_fire.c   **** * DESCRIPTION:                                                                 *
+  36:post_fire.c   **** *       Manages engine controller resources after hotfire                      *
+  37:post_fire.c   **** *                                                                              *
+  38:post_fire.c   **** *******************************************************************************/
+  39:post_fire.c   **** FSM_STATE run_post_fire_state
+  40:post_fire.c   ****     (
+  41:post_fire.c   ****     void
+  42:post_fire.c   ****     )
+  43:post_fire.c   **** {
+  28              		.loc 1 43 1 view -0
+  29              		.cfi_startproc
+  30              		@ Volatile: function does not return.
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33 0000 08B5     		push	{r3, lr}
+  34              	.LCFI0:
+  35              		.cfi_def_cfa_offset 8
+  36              		.cfi_offset 3, -8
+  37              		.cfi_offset 14, -4
+  44:post_fire.c   **** led_set_color( LED_WHITE );
+  38              		.loc 1 44 1 view .LVU1
+  39 0002 0720     		movs	r0, #7
+  40 0004 FFF7FEFF 		bl	led_set_color
+  41              	.LVL0:
+  42              	.L2:
+  45:post_fire.c   **** while ( 1 )
+  43              		.loc 1 45 1 discriminator 1 view .LVU2
+  46:post_fire.c   ****     {
+  47:post_fire.c   ****     }
+  44              		.loc 1 47 5 discriminator 1 view .LVU3
+  45:post_fire.c   **** while ( 1 )
+  45              		.loc 1 45 7 discriminator 1 view .LVU4
+  46 0008 FEE7     		b	.L2
+  47              		.cfi_endproc
+  48              	.LFE333:
+  50              		.text
+  51              	.Letext0:
+  52              		.file 2 "main.h"
+  53              		.file 3 "../../../mod/led/led.h"
+ARM GAS  /tmp/cciXwGNu.s 			page 3
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 post_fire.c
+     /tmp/cciXwGNu.s:20     .text.run_post_fire_state:0000000000000000 $t
+     /tmp/cciXwGNu.s:26     .text.run_post_fire_state:0000000000000000 run_post_fire_state
+
+UNDEFINED SYMBOLS
+led_set_color

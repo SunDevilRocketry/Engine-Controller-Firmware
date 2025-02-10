@@ -16,6 +16,7 @@
 #ifdef HOTFIRE
     #include "protocol.h"
 #endif
+#include "usb.h"
 #include "rs485.h"
 #include "stm32h7xx_it.h"
 
@@ -23,6 +24,7 @@
 /*------------------------------------------------------------------------------
  Global Variables 
 ------------------------------------------------------------------------------*/
+extern UART_HandleTypeDef huart1;     /* USB */
 extern UART_HandleTypeDef huart4;     /* Wireless/RS485 UART     */
 extern uint8_t            gs_command; /* Ground station commands */
 
@@ -224,6 +226,12 @@ void USART1_IRQHandler(void)
   /* USER CODE END USART1_IRQn 0 */
   HAL_UART_IRQHandler(&huart1);
   /* USER CODE BEGIN USART1_IRQn 1 */
+
+  /* Process the ground station command */
+    protocol_command_handler( gs_command );
+
+    /* Continue listening when done */
+    usb_receive_IT( &gs_command, sizeof( gs_command) );
 
   /* USER CODE END USART1_IRQn 1 */
 }

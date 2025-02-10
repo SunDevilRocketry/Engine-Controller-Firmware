@@ -1,0 +1,1137 @@
+ARM GAS  /tmp/ccujUzpn.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"terminal.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "terminal.c"
+  19              		.section	.text.terminal_exec_cmd,"ax",%progbits
+  20              		.align	1
+  21              		.global	terminal_exec_cmd
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	terminal_exec_cmd:
+  27              	.LVL0:
+  28              	.LFB333:
+   1:terminal.c    **** /*******************************************************************************
+   2:terminal.c    **** *
+   3:terminal.c    **** * FILE: 
+   4:terminal.c    **** * 		terminal.c
+   5:terminal.c    **** *
+   6:terminal.c    **** * DESCRIPTION: 
+   7:terminal.c    **** * 	    Contains the pre-processing, execution, and post-processing of terminal
+   8:terminal.c    **** *       commands and data for the hotfire firmware 
+   9:terminal.c    **** *
+  10:terminal.c    **** *******************************************************************************/
+  11:terminal.c    **** 
+  12:terminal.c    **** 
+  13:terminal.c    **** /*------------------------------------------------------------------------------
+  14:terminal.c    ****  Standard Includes                                                              
+  15:terminal.c    **** ------------------------------------------------------------------------------*/
+  16:terminal.c    **** #include <string.h>
+  17:terminal.c    **** #include <stdbool.h>
+  18:terminal.c    **** 
+  19:terminal.c    **** 
+  20:terminal.c    **** /*------------------------------------------------------------------------------
+  21:terminal.c    ****  Project Includes                                                               
+  22:terminal.c    **** ------------------------------------------------------------------------------*/
+  23:terminal.c    **** 
+  24:terminal.c    **** /* Application Layer */
+  25:terminal.c    **** #include "main.h"
+  26:terminal.c    **** #include "sdr_pin_defines_L0002.h"
+  27:terminal.c    **** #include "init.h"
+  28:terminal.c    **** #include "sdr_error.h"
+  29:terminal.c    **** #include "terminal.h"
+  30:terminal.c    **** 
+ARM GAS  /tmp/ccujUzpn.s 			page 2
+
+
+  31:terminal.c    **** /* Low-level modules */
+  32:terminal.c    **** #include "commands.h"
+  33:terminal.c    **** #include "ignition.h"
+  34:terminal.c    **** #include "flash.h"
+  35:terminal.c    **** #include "led.h"
+  36:terminal.c    **** #include "power.h"
+  37:terminal.c    **** #include "pressure.h"
+  38:terminal.c    **** #include "rs485.h"
+  39:terminal.c    **** #include "sensor.h"
+  40:terminal.c    **** #include "solenoid.h"
+  41:terminal.c    **** #include "temp.h"
+  42:terminal.c    **** #include "usb.h"
+  43:terminal.c    **** #include "valve.h"
+  44:terminal.c    **** #include "wireless.h"
+  45:terminal.c    **** 
+  46:terminal.c    **** 
+  47:terminal.c    **** /*------------------------------------------------------------------------------
+  48:terminal.c    ****  Global Variables 
+  49:terminal.c    **** ------------------------------------------------------------------------------*/
+  50:terminal.c    **** 
+  51:terminal.c    **** 
+  52:terminal.c    **** /*------------------------------------------------------------------------------
+  53:terminal.c    ****  Procedures 
+  54:terminal.c    **** ------------------------------------------------------------------------------*/
+  55:terminal.c    **** 
+  56:terminal.c    **** 
+  57:terminal.c    **** /*******************************************************************************
+  58:terminal.c    **** *                                                                              *
+  59:terminal.c    **** * PROCEDURE:                                                                   *
+  60:terminal.c    **** * 		terminal_exec_cmd                                                      *
+  61:terminal.c    **** *                                                                              *
+  62:terminal.c    **** * DESCRIPTION:                                                                 *
+  63:terminal.c    **** * 		Executes a terminal command                                            *
+  64:terminal.c    **** *                                                                              *
+  65:terminal.c    **** *******************************************************************************/
+  66:terminal.c    **** TERMINAL_STATUS terminal_exec_cmd
+  67:terminal.c    ****     (
+  68:terminal.c    ****     uint8_t command
+  69:terminal.c    ****     )
+  70:terminal.c    **** {
+  29              		.loc 1 70 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 48
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		.loc 1 70 1 is_stmt 0 view .LVU1
+  34 0000 10B5     		push	{r4, lr}
+  35              	.LCFI0:
+  36              		.cfi_def_cfa_offset 8
+  37              		.cfi_offset 4, -8
+  38              		.cfi_offset 14, -4
+  39 0002 8CB0     		sub	sp, sp, #48
+  40              	.LCFI1:
+  41              		.cfi_def_cfa_offset 56
+  42 0004 8DF80700 		strb	r0, [sp, #7]
+  71:terminal.c    **** /*------------------------------------------------------------------------------
+  72:terminal.c    ****  Local Variables                                                                
+  73:terminal.c    **** ------------------------------------------------------------------------------*/
+ARM GAS  /tmp/ccujUzpn.s 			page 3
+
+
+  74:terminal.c    **** uint8_t           subcommand;       /* subcommand code                        */
+  43              		.loc 1 74 1 is_stmt 1 view .LVU2
+  75:terminal.c    **** uint8_t           pwr_source;       /* Power source code                      */
+  44              		.loc 1 75 1 view .LVU3
+  76:terminal.c    **** uint8_t           response;         /* Response to PC                         */
+  45              		.loc 1 76 1 view .LVU4
+  77:terminal.c    **** 
+  78:terminal.c    **** /* Flash */
+  79:terminal.c    **** HFLASH_BUFFER     flash_handle;                    /* Flash API buffer handle */
+  46              		.loc 1 79 1 view .LVU5
+  80:terminal.c    **** uint8_t           flash_buffer[ DEF_BUFFER_SIZE ]; /* Flash data buffer       */
+  47              		.loc 1 80 1 view .LVU6
+  81:terminal.c    **** 
+  82:terminal.c    **** /* Solenoids */
+  83:terminal.c    **** SOL_STATE         sol_state;         /* State of solenoids        */
+  48              		.loc 1 83 1 view .LVU7
+  84:terminal.c    **** MAIN_VALVE_STATES main_valve_states; /* States of the main valves */
+  49              		.loc 1 84 1 view .LVU8
+  85:terminal.c    **** 
+  86:terminal.c    **** /* Module return codes */
+  87:terminal.c    **** FLASH_STATUS      flash_status;     /* Status of flash operations             */
+  50              		.loc 1 87 1 view .LVU9
+  88:terminal.c    **** IGN_STATUS        ign_status;       /* Ignition status code                   */
+  51              		.loc 1 88 1 view .LVU10
+  89:terminal.c    **** USB_STATUS        usb_status;       /* Status of USB operations               */
+  52              		.loc 1 89 1 view .LVU11
+  90:terminal.c    **** VALVE_STATUS      valve_status;     /* Valve API return codes                 */
+  53              		.loc 1 90 1 view .LVU12
+  91:terminal.c    **** 
+  92:terminal.c    **** 
+  93:terminal.c    **** /*------------------------------------------------------------------------------
+  94:terminal.c    ****  Initializations 
+  95:terminal.c    **** ------------------------------------------------------------------------------*/
+  96:terminal.c    **** 
+  97:terminal.c    **** /* Flash Buffer */
+  98:terminal.c    **** flash_handle.write_protected       = FLASH_WP_WRITE_ENABLED;
+  54              		.loc 1 98 1 view .LVU13
+  55              		.loc 1 98 36 is_stmt 0 view .LVU14
+  56 0008 0023     		movs	r3, #0
+  57 000a 8DF82830 		strb	r3, [sp, #40]
+  99:terminal.c    **** flash_handle.num_bytes             = 0;
+  58              		.loc 1 99 1 is_stmt 1 view .LVU15
+  59              		.loc 1 99 36 is_stmt 0 view .LVU16
+  60 000e 0793     		str	r3, [sp, #28]
+ 100:terminal.c    **** flash_handle.address               = 0;
+  61              		.loc 1 100 1 is_stmt 1 view .LVU17
+  62              		.loc 1 100 36 is_stmt 0 view .LVU18
+  63 0010 0893     		str	r3, [sp, #32]
+ 101:terminal.c    **** flash_handle.pbuffer               = &flash_buffer[0];
+  64              		.loc 1 101 1 is_stmt 1 view .LVU19
+  65              		.loc 1 101 36 is_stmt 0 view .LVU20
+  66 0012 03AA     		add	r2, sp, #12
+  67 0014 0992     		str	r2, [sp, #36]
+ 102:terminal.c    **** flash_handle.status_register       = 0xFF;
+  68              		.loc 1 102 1 is_stmt 1 view .LVU21
+  69              		.loc 1 102 36 is_stmt 0 view .LVU22
+  70 0016 FF22     		movs	r2, #255
+ARM GAS  /tmp/ccujUzpn.s 			page 4
+
+
+  71 0018 8DF82B20 		strb	r2, [sp, #43]
+ 103:terminal.c    **** flash_handle.bpl_bits              = FLASH_BPL_NONE;
+  72              		.loc 1 103 1 is_stmt 1 view .LVU23
+  73              		.loc 1 103 36 is_stmt 0 view .LVU24
+  74 001c C322     		movs	r2, #195
+  75 001e 8DF82920 		strb	r2, [sp, #41]
+ 104:terminal.c    **** flash_handle.bpl_write_protect     = FLASH_BPL_READ_WRITE;
+  76              		.loc 1 104 1 is_stmt 1 view .LVU25
+  77              		.loc 1 104 36 is_stmt 0 view .LVU26
+  78 0022 8DF82A30 		strb	r3, [sp, #42]
+ 105:terminal.c    **** 
+ 106:terminal.c    **** /* Solenoids */
+ 107:terminal.c    **** sol_state                          = 0;
+  79              		.loc 1 107 1 is_stmt 1 view .LVU27
+  80              		.loc 1 107 36 is_stmt 0 view .LVU28
+  81 0026 8DF80B30 		strb	r3, [sp, #11]
+ 108:terminal.c    **** main_valve_states                  = 0;
+  82              		.loc 1 108 1 is_stmt 1 view .LVU29
+  83              		.loc 1 108 36 is_stmt 0 view .LVU30
+  84 002a 8DF80A30 		strb	r3, [sp, #10]
+ 109:terminal.c    **** 
+ 110:terminal.c    **** /* Module return codes */
+ 111:terminal.c    **** flash_status                       = FLASH_OK;
+  85              		.loc 1 111 1 is_stmt 1 view .LVU31
+  86              		.loc 1 111 36 is_stmt 0 view .LVU32
+  87 002e 8DF80930 		strb	r3, [sp, #9]
+ 112:terminal.c    **** usb_status                         = USB_OK;
+  88              		.loc 1 112 1 is_stmt 1 view .LVU33
+  89              	.LVL1:
+ 113:terminal.c    **** valve_status                       = VALVE_OK;
+  90              		.loc 1 113 1 view .LVU34
+ 114:terminal.c    **** 
+ 115:terminal.c    **** 
+ 116:terminal.c    **** /*------------------------------------------------------------------------------
+ 117:terminal.c    ****  Execute SDEC Command 
+ 118:terminal.c    **** ------------------------------------------------------------------------------*/
+ 119:terminal.c    **** switch( command )
+  91              		.loc 1 119 1 view .LVU35
+  92 0032 C3B2     		uxtb	r3, r0
+  93 0034 222B     		cmp	r3, #34
+  94 0036 2BD8     		bhi	.L2
+  95 0038 5AB2     		sxtb	r2, r3
+  96 003a 002A     		cmp	r2, #0
+  97 003c 00F01881 		beq	.L26
+  98 0040 013B     		subs	r3, r3, #1
+  99 0042 212B     		cmp	r3, #33
+ 100 0044 00F21681 		bhi	.L27
+ 101 0048 DFE813F0 		tbh	[pc, r3, lsl #1]
+ 102              	.L5:
+ 103 004c 4800     		.2byte	(.L10-.L5)/2
+ 104 004e 5400     		.2byte	(.L9-.L5)/2
+ 105 0050 A200     		.2byte	(.L8-.L5)/2
+ 106 0052 1401     		.2byte	(.L27-.L5)/2
+ 107 0054 1401     		.2byte	(.L27-.L5)/2
+ 108 0056 1401     		.2byte	(.L27-.L5)/2
+ 109 0058 1401     		.2byte	(.L27-.L5)/2
+ 110 005a 1401     		.2byte	(.L27-.L5)/2
+ARM GAS  /tmp/ccujUzpn.s 			page 5
+
+
+ 111 005c 1401     		.2byte	(.L27-.L5)/2
+ 112 005e 1401     		.2byte	(.L27-.L5)/2
+ 113 0060 1401     		.2byte	(.L27-.L5)/2
+ 114 0062 1401     		.2byte	(.L27-.L5)/2
+ 115 0064 1401     		.2byte	(.L27-.L5)/2
+ 116 0066 1401     		.2byte	(.L27-.L5)/2
+ 117 0068 1401     		.2byte	(.L27-.L5)/2
+ 118 006a 1401     		.2byte	(.L27-.L5)/2
+ 119 006c 1401     		.2byte	(.L27-.L5)/2
+ 120 006e 1401     		.2byte	(.L27-.L5)/2
+ 121 0070 1401     		.2byte	(.L27-.L5)/2
+ 122 0072 1401     		.2byte	(.L27-.L5)/2
+ 123 0074 1401     		.2byte	(.L27-.L5)/2
+ 124 0076 1401     		.2byte	(.L27-.L5)/2
+ 125 0078 1401     		.2byte	(.L27-.L5)/2
+ 126 007a 1401     		.2byte	(.L27-.L5)/2
+ 127 007c 1401     		.2byte	(.L27-.L5)/2
+ 128 007e 1401     		.2byte	(.L27-.L5)/2
+ 129 0080 1401     		.2byte	(.L27-.L5)/2
+ 130 0082 1401     		.2byte	(.L27-.L5)/2
+ 131 0084 1401     		.2byte	(.L27-.L5)/2
+ 132 0086 1401     		.2byte	(.L27-.L5)/2
+ 133 0088 1401     		.2byte	(.L27-.L5)/2
+ 134 008a 6000     		.2byte	(.L7-.L5)/2
+ 135 008c 7900     		.2byte	(.L6-.L5)/2
+ 136 008e 8800     		.2byte	(.L4-.L5)/2
+ 137              		.p2align 1
+ 138              	.L2:
+ 139 0090 512B     		cmp	r3, #81
+ 140 0092 00F0AE80 		beq	.L11
+ 141 0096 522B     		cmp	r3, #82
+ 142 0098 1ED1     		bne	.L31
+ 120:terminal.c    ****     {
+ 121:terminal.c    ****     /*-----------------------------------------------------------------
+ 122:terminal.c    ****         PING Command	
+ 123:terminal.c    ****     ------------------------------------------------------------------*/
+ 124:terminal.c    ****     case PING_OP:
+ 125:terminal.c    ****         {
+ 126:terminal.c    ****         response = PING_RESPONSE_CODE;
+ 127:terminal.c    ****         HAL_UART_Transmit( &( USB_HUART ), 
+ 128:terminal.c    ****                            &response, 
+ 129:terminal.c    ****                            sizeof( response ), 
+ 130:terminal.c    ****                            HAL_DEFAULT_TIMEOUT );
+ 131:terminal.c    ****         break;
+ 132:terminal.c    ****         } /* PING_OP */
+ 133:terminal.c    **** 
+ 134:terminal.c    ****     /*-----------------------------------------------------------------
+ 135:terminal.c    ****         CONNECT Command	
+ 136:terminal.c    ****     ------------------------------------------------------------------*/
+ 137:terminal.c    ****     case CONNECT_OP:
+ 138:terminal.c    ****         {
+ 139:terminal.c    ****         response = PING_RESPONSE_CODE;
+ 140:terminal.c    ****         HAL_UART_Transmit( &( USB_HUART ), 
+ 141:terminal.c    ****                            &response, 
+ 142:terminal.c    ****                            sizeof( response ), 
+ 143:terminal.c    ****                            HAL_DEFAULT_TIMEOUT );
+ 144:terminal.c    ****         break;
+ARM GAS  /tmp/ccujUzpn.s 			page 6
+
+
+ 145:terminal.c    ****         } /* CONNECT_OP */
+ 146:terminal.c    **** 
+ 147:terminal.c    ****     /*-----------------------------------------------------------------
+ 148:terminal.c    ****         IGNITE Command	
+ 149:terminal.c    ****     ------------------------------------------------------------------*/
+ 150:terminal.c    ****     case IGNITE_OP:
+ 151:terminal.c    ****         {
+ 152:terminal.c    ****         /* Recieve ignition subcommand over USB */
+ 153:terminal.c    ****         usb_status = usb_receive( &subcommand         , 
+ 154:terminal.c    ****                                     sizeof( subcommand ), 
+ 155:terminal.c    ****                                     HAL_DEFAULT_TIMEOUT );
+ 156:terminal.c    **** 
+ 157:terminal.c    ****         /* Execute subcommand */
+ 158:terminal.c    ****         if ( usb_status != USB_TIMEOUT )
+ 159:terminal.c    ****             {
+ 160:terminal.c    ****             /* Execute subcommand*/
+ 161:terminal.c    ****             ign_status = ign_cmd_execute( subcommand );
+ 162:terminal.c    ****             }
+ 163:terminal.c    ****         else
+ 164:terminal.c    ****             {
+ 165:terminal.c    ****             /* Error: no subcommand recieved */
+ 166:terminal.c    ****             Error_Handler( ERROR_IGN_CMD_ERROR );
+ 167:terminal.c    ****             }
+ 168:terminal.c    **** 
+ 169:terminal.c    ****         /* Return response code to terminal */
+ 170:terminal.c    ****         usb_transmit( &ign_status         , 
+ 171:terminal.c    ****                         sizeof( ign_status ), 
+ 172:terminal.c    ****                         HAL_DEFAULT_TIMEOUT );
+ 173:terminal.c    ****         break;
+ 174:terminal.c    ****         } /* IGNITE_OP */
+ 175:terminal.c    **** 
+ 176:terminal.c    ****     /*-----------------------------------------------------------------
+ 177:terminal.c    ****         POWER Command	
+ 178:terminal.c    ****     ------------------------------------------------------------------*/
+ 179:terminal.c    ****     case POWER_OP:
+ 180:terminal.c    ****         {
+ 181:terminal.c    ****         /* Determine power source */
+ 182:terminal.c    ****         pwr_source = pwr_get_source();
+ 183:terminal.c    **** 
+ 184:terminal.c    ****         /* Convert to response code and transmit to PC */
+ 185:terminal.c    ****         pwr_source += 1;
+ 186:terminal.c    ****         usb_transmit( &pwr_source         , 
+ 187:terminal.c    ****                         sizeof( pwr_source ), 
+ 188:terminal.c    ****                         HAL_DEFAULT_TIMEOUT );
+ 189:terminal.c    ****         break;
+ 190:terminal.c    ****         } /* POWER_OP */
+ 191:terminal.c    **** 
+ 192:terminal.c    ****     /*-----------------------------------------------------------------
+ 193:terminal.c    ****      FLASH Command	
+ 194:terminal.c    ****     ------------------------------------------------------------------*/
+ 195:terminal.c    ****     case FLASH_OP:
+ 196:terminal.c    ****         {
+ 197:terminal.c    ****         /* Recieve flash subcommand over USB */
+ 198:terminal.c    ****         usb_status = usb_receive( &subcommand         , 
+ 199:terminal.c    ****                                     sizeof( subcommand ), 
+ 200:terminal.c    ****                                     HAL_DEFAULT_TIMEOUT );
+ 201:terminal.c    ****     
+ARM GAS  /tmp/ccujUzpn.s 			page 7
+
+
+ 202:terminal.c    ****         /* Execute subcommand */
+ 203:terminal.c    ****         if ( usb_status == USB_OK )
+ 204:terminal.c    ****             {
+ 205:terminal.c    ****             flash_status = flash_cmd_execute( subcommand   , 
+ 206:terminal.c    ****                                                 &flash_handle );
+ 207:terminal.c    ****             }
+ 208:terminal.c    ****         else
+ 209:terminal.c    ****             {
+ 210:terminal.c    ****             /* Subcommand code not recieved */
+ 211:terminal.c    ****             Error_Handler( ERROR_FLASH_CMD_ERROR );
+ 212:terminal.c    ****             }
+ 213:terminal.c    **** 
+ 214:terminal.c    ****         /* Transmit status code to PC */
+ 215:terminal.c    ****         usb_transmit( &flash_status, 
+ 216:terminal.c    ****                         sizeof( flash_status ), 
+ 217:terminal.c    ****                         HAL_DEFAULT_TIMEOUT );
+ 218:terminal.c    ****         break;
+ 219:terminal.c    ****         } /* FLASH_OP */
+ 220:terminal.c    **** 
+ 221:terminal.c    ****     /*-----------------------------------------------------------------
+ 222:terminal.c    ****      SENSOR Command	
+ 223:terminal.c    ****     ------------------------------------------------------------------*/
+ 224:terminal.c    ****     case SENSOR_OP:
+ 225:terminal.c    ****         {
+ 226:terminal.c    ****         /* Recieve subcommand from USB */
+ 227:terminal.c    ****         usb_status = usb_receive( &subcommand         ,
+ 228:terminal.c    ****                                     sizeof( subcommand ),
+ 229:terminal.c    ****                                     HAL_DEFAULT_TIMEOUT );
+ 230:terminal.c    **** 
+ 231:terminal.c    ****         /* Execute subcommand */
+ 232:terminal.c    ****         if ( usb_status != USB_OK )
+ 233:terminal.c    ****             {
+ 234:terminal.c    ****             /* Subcommand not recieved */
+ 235:terminal.c    ****             Error_Handler( ERROR_SENSOR_CMD_ERROR );
+ 236:terminal.c    ****             }
+ 237:terminal.c    ****         else
+ 238:terminal.c    ****             {
+ 239:terminal.c    ****             sensor_cmd_execute( subcommand ); 
+ 240:terminal.c    ****             }
+ 241:terminal.c    **** 
+ 242:terminal.c    ****         break;
+ 243:terminal.c    ****         } /* SENSOR_OP */
+ 244:terminal.c    **** 
+ 245:terminal.c    ****     /*-----------------------------------------------------------------
+ 246:terminal.c    ****      VALVE Command	
+ 247:terminal.c    ****     ------------------------------------------------------------------*/
+ 248:terminal.c    ****     case VALVE_OP:
+ 249:terminal.c    ****         {
+ 250:terminal.c    ****         /* Get subcommand */
+ 251:terminal.c    ****         usb_status = usb_receive( &subcommand         ,
+ 143              		.loc 1 251 9 view .LVU36
+ 144              		.loc 1 251 22 is_stmt 0 view .LVU37
+ 145 009a 0A22     		movs	r2, #10
+ 146 009c 0121     		movs	r1, #1
+ 147 009e 0DF12F00 		add	r0, sp, #47
+ 148              	.LVL2:
+ 149              		.loc 1 251 22 view .LVU38
+ARM GAS  /tmp/ccujUzpn.s 			page 8
+
+
+ 150 00a2 FFF7FEFF 		bl	usb_receive
+ 151              	.LVL3:
+ 252:terminal.c    ****                                     sizeof( subcommand ),
+ 253:terminal.c    ****                                     HAL_DEFAULT_TIMEOUT );
+ 254:terminal.c    ****         if ( usb_status != USB_OK )
+ 152              		.loc 1 254 9 is_stmt 1 view .LVU39
+ 153              		.loc 1 254 12 is_stmt 0 view .LVU40
+ 154 00a6 0028     		cmp	r0, #0
+ 155 00a8 40F08480 		bne	.L32
+ 156              	.LVL4:
+ 157              	.L18:
+ 255:terminal.c    ****             {
+ 256:terminal.c    ****             Error_Handler( ERROR_VALVE_CMD_ERROR );
+ 257:terminal.c    ****             }
+ 258:terminal.c    ****         
+ 259:terminal.c    ****         /* Pass on command and subcommand to valve controller */
+ 260:terminal.c    ****         valve_status = valve_transmit( &command         , 
+ 158              		.loc 1 260 9 is_stmt 1 view .LVU41
+ 159              		.loc 1 260 24 is_stmt 0 view .LVU42
+ 160 00ac 0A22     		movs	r2, #10
+ 161 00ae 0121     		movs	r1, #1
+ 162 00b0 0DF10700 		add	r0, sp, #7
+ 163 00b4 FFF7FEFF 		bl	valve_transmit
+ 164              	.LVL5:
+ 261:terminal.c    ****                                         sizeof( command ), 
+ 262:terminal.c    ****                                         HAL_DEFAULT_TIMEOUT );
+ 263:terminal.c    ****         if ( valve_status != VALVE_OK )
+ 165              		.loc 1 263 9 is_stmt 1 view .LVU43
+ 166              		.loc 1 263 12 is_stmt 0 view .LVU44
+ 167 00b8 0028     		cmp	r0, #0
+ 168 00ba 7FD1     		bne	.L33
+ 169              	.LVL6:
+ 170              	.L19:
+ 264:terminal.c    ****             {
+ 265:terminal.c    ****             Error_Handler( ERROR_VALVE_CMD_ERROR );
+ 266:terminal.c    ****             }
+ 267:terminal.c    ****         valve_status = valve_transmit( &subcommand, 
+ 171              		.loc 1 267 9 is_stmt 1 view .LVU45
+ 172              		.loc 1 267 24 is_stmt 0 view .LVU46
+ 173 00bc 0A22     		movs	r2, #10
+ 174 00be 0121     		movs	r1, #1
+ 175 00c0 0DF12F00 		add	r0, sp, #47
+ 176 00c4 FFF7FEFF 		bl	valve_transmit
+ 177              	.LVL7:
+ 268:terminal.c    ****                                         sizeof( command ),
+ 269:terminal.c    ****                                         HAL_DEFAULT_TIMEOUT );
+ 270:terminal.c    ****         if ( valve_status != VALVE_OK )
+ 178              		.loc 1 270 9 is_stmt 1 view .LVU47
+ 179              		.loc 1 270 12 is_stmt 0 view .LVU48
+ 180 00c8 0028     		cmp	r0, #0
+ 181 00ca 7BD1     		bne	.L34
+ 182              	.LVL8:
+ 183              	.L20:
+ 271:terminal.c    ****             {
+ 272:terminal.c    ****             Error_Handler( ERROR_VALVE_CMD_ERROR );
+ 273:terminal.c    ****             }
+ 274:terminal.c    **** 
+ARM GAS  /tmp/ccujUzpn.s 			page 9
+
+
+ 275:terminal.c    ****         /* Pass on state if valve getstate command */
+ 276:terminal.c    ****         if ( subcommand == VALVE_GETSTATE_CODE )
+ 184              		.loc 1 276 9 is_stmt 1 view .LVU49
+ 185              		.loc 1 276 25 is_stmt 0 view .LVU50
+ 186 00cc 9DF82F30 		ldrb	r3, [sp, #47]	@ zero_extendqisi2
+ 187              		.loc 1 276 12 view .LVU51
+ 188 00d0 142B     		cmp	r3, #20
+ 189 00d2 7BD0     		beq	.L35
+ 277:terminal.c    ****             {
+ 278:terminal.c    ****             valve_status = valve_receive( &main_valve_states, 
+ 279:terminal.c    ****                                             sizeof( main_valve_states ), 
+ 280:terminal.c    ****                                             HAL_DEFAULT_TIMEOUT );
+ 281:terminal.c    ****             if ( valve_status != VALVE_OK )
+ 282:terminal.c    ****                 {
+ 283:terminal.c    ****                 Error_Handler( ERROR_VALVE_CMD_ERROR );
+ 284:terminal.c    ****                 }
+ 285:terminal.c    ****             
+ 286:terminal.c    ****             usb_transmit( &main_valve_states, 
+ 287:terminal.c    ****                             sizeof( main_valve_states ), 
+ 288:terminal.c    ****                             HAL_DEFAULT_TIMEOUT );
+ 289:terminal.c    ****             }
+ 290:terminal.c    ****         break;
+ 291:terminal.c    ****         } /* VALVE_OP */
+ 292:terminal.c    **** 
+ 293:terminal.c    ****     /*-----------------------------------------------------------------
+ 294:terminal.c    ****      SOL Command 
+ 295:terminal.c    ****     ------------------------------------------------------------------*/
+ 296:terminal.c    ****     case SOL_OP:
+ 297:terminal.c    ****         {
+ 298:terminal.c    ****         /* Get Subcommand */
+ 299:terminal.c    ****         usb_status = usb_receive( &subcommand, 
+ 300:terminal.c    ****                         sizeof( subcommand ), 
+ 301:terminal.c    ****                         HAL_DEFAULT_TIMEOUT );
+ 302:terminal.c    ****         if ( usb_status != USB_OK )
+ 303:terminal.c    ****             {
+ 304:terminal.c    ****             Error_Handler( ERROR_SOL_CMD_ERROR );
+ 305:terminal.c    ****             }
+ 306:terminal.c    **** 
+ 307:terminal.c    ****         /* Pass on command and subcommand to valve controller */
+ 308:terminal.c    ****         valve_status = valve_transmit( &command         , 
+ 309:terminal.c    ****                                         sizeof( command ), 
+ 310:terminal.c    ****                                         HAL_DEFAULT_TIMEOUT );
+ 311:terminal.c    ****         if ( valve_status != VALVE_OK )
+ 312:terminal.c    ****             {
+ 313:terminal.c    ****             Error_Handler( ERROR_SOL_CMD_ERROR );
+ 314:terminal.c    ****             }
+ 315:terminal.c    ****         valve_status = valve_transmit( &subcommand      , 
+ 316:terminal.c    ****                                         sizeof( command ),
+ 317:terminal.c    ****                                         HAL_DEFAULT_TIMEOUT );
+ 318:terminal.c    ****         if ( valve_status != VALVE_OK )
+ 319:terminal.c    ****             {
+ 320:terminal.c    ****             Error_Handler( ERROR_SOL_CMD_ERROR );
+ 321:terminal.c    ****             }
+ 322:terminal.c    **** 
+ 323:terminal.c    ****         /* Pass on valve state if sol getstate command */
+ 324:terminal.c    ****         if ( subcommand == SOL_GETSTATE_CODE )
+ 325:terminal.c    ****             {
+ARM GAS  /tmp/ccujUzpn.s 			page 10
+
+
+ 326:terminal.c    ****             valve_status = valve_receive( &sol_state, 
+ 327:terminal.c    ****                                             sizeof( sol_state ), 
+ 328:terminal.c    ****                                             HAL_DEFAULT_TIMEOUT );
+ 329:terminal.c    ****             if ( valve_status != VALVE_OK )
+ 330:terminal.c    ****                 {
+ 331:terminal.c    ****                 Error_Handler( ERROR_SOL_CMD_ERROR );
+ 332:terminal.c    ****                 }
+ 333:terminal.c    ****             usb_status = usb_transmit( &sol_state,
+ 334:terminal.c    ****                                         sizeof( sol_state ),
+ 335:terminal.c    ****                                         HAL_DEFAULT_TIMEOUT );
+ 336:terminal.c    ****             if ( usb_status != USB_OK )
+ 337:terminal.c    ****                 {
+ 338:terminal.c    ****                 Error_Handler( ERROR_SOL_CMD_ERROR );
+ 339:terminal.c    ****                 }
+ 340:terminal.c    ****             }
+ 341:terminal.c    ****         break;
+ 342:terminal.c    ****         } /* SOL_OP */
+ 343:terminal.c    **** 
+ 344:terminal.c    **** 
+ 345:terminal.c    ****     /*------------------------ Unrecognized Command ---------------------------*/
+ 346:terminal.c    ****     default:
+ 347:terminal.c    ****         {
+ 348:terminal.c    ****         /* Unsupported command code flash the red LED */
+ 349:terminal.c    ****         return TERMINAL_UNRECOGNIZED_CMD;
+ 350:terminal.c    ****         }
+ 351:terminal.c    **** 
+ 352:terminal.c    ****     } /* case( command ) */
+ 353:terminal.c    **** return TERMINAL_OK;
+ 190              		.loc 1 353 8 view .LVU52
+ 191 00d4 0024     		movs	r4, #0
+ 192 00d6 CEE0     		b	.L3
+ 193              	.LVL9:
+ 194              	.L31:
+ 119:terminal.c    ****     {
+ 195              		.loc 1 119 1 view .LVU53
+ 196 00d8 0424     		movs	r4, #4
+ 197 00da CCE0     		b	.L3
+ 198              	.L10:
+ 126:terminal.c    ****         HAL_UART_Transmit( &( USB_HUART ), 
+ 199              		.loc 1 126 9 is_stmt 1 view .LVU54
+ 126:terminal.c    ****         HAL_UART_Transmit( &( USB_HUART ), 
+ 200              		.loc 1 126 18 is_stmt 0 view .LVU55
+ 201 00dc 0823     		movs	r3, #8
+ 202 00de 8DF82D30 		strb	r3, [sp, #45]
+ 127:terminal.c    ****                            &response, 
+ 203              		.loc 1 127 9 is_stmt 1 view .LVU56
+ 204 00e2 0A23     		movs	r3, #10
+ 205 00e4 0122     		movs	r2, #1
+ 206 00e6 0DF12D01 		add	r1, sp, #45
+ 207 00ea 6448     		ldr	r0, .L42
+ 208              	.LVL10:
+ 127:terminal.c    ****                            &response, 
+ 209              		.loc 1 127 9 is_stmt 0 view .LVU57
+ 210 00ec FFF7FEFF 		bl	HAL_UART_Transmit
+ 211              	.LVL11:
+ 131:terminal.c    ****         } /* PING_OP */
+ 212              		.loc 1 131 9 is_stmt 1 view .LVU58
+ARM GAS  /tmp/ccujUzpn.s 			page 11
+
+
+ 213              		.loc 1 353 8 is_stmt 0 view .LVU59
+ 214 00f0 0024     		movs	r4, #0
+ 131:terminal.c    ****         } /* PING_OP */
+ 215              		.loc 1 131 9 view .LVU60
+ 216 00f2 C0E0     		b	.L3
+ 217              	.LVL12:
+ 218              	.L9:
+ 139:terminal.c    ****         HAL_UART_Transmit( &( USB_HUART ), 
+ 219              		.loc 1 139 9 is_stmt 1 view .LVU61
+ 139:terminal.c    ****         HAL_UART_Transmit( &( USB_HUART ), 
+ 220              		.loc 1 139 18 is_stmt 0 view .LVU62
+ 221 00f4 0823     		movs	r3, #8
+ 222 00f6 8DF82D30 		strb	r3, [sp, #45]
+ 140:terminal.c    ****                            &response, 
+ 223              		.loc 1 140 9 is_stmt 1 view .LVU63
+ 224 00fa 0A23     		movs	r3, #10
+ 225 00fc 0122     		movs	r2, #1
+ 226 00fe 0DF12D01 		add	r1, sp, #45
+ 227 0102 5E48     		ldr	r0, .L42
+ 228              	.LVL13:
+ 140:terminal.c    ****                            &response, 
+ 229              		.loc 1 140 9 is_stmt 0 view .LVU64
+ 230 0104 FFF7FEFF 		bl	HAL_UART_Transmit
+ 231              	.LVL14:
+ 144:terminal.c    ****         } /* CONNECT_OP */
+ 232              		.loc 1 144 9 is_stmt 1 view .LVU65
+ 233              		.loc 1 353 8 is_stmt 0 view .LVU66
+ 234 0108 0024     		movs	r4, #0
+ 144:terminal.c    ****         } /* CONNECT_OP */
+ 235              		.loc 1 144 9 view .LVU67
+ 236 010a B4E0     		b	.L3
+ 237              	.LVL15:
+ 238              	.L7:
+ 153:terminal.c    ****                                     sizeof( subcommand ), 
+ 239              		.loc 1 153 9 is_stmt 1 view .LVU68
+ 153:terminal.c    ****                                     sizeof( subcommand ), 
+ 240              		.loc 1 153 22 is_stmt 0 view .LVU69
+ 241 010c 0A22     		movs	r2, #10
+ 242 010e 0121     		movs	r1, #1
+ 243 0110 0DF12F00 		add	r0, sp, #47
+ 244              	.LVL16:
+ 153:terminal.c    ****                                     sizeof( subcommand ), 
+ 245              		.loc 1 153 22 view .LVU70
+ 246 0114 FFF7FEFF 		bl	usb_receive
+ 247              	.LVL17:
+ 158:terminal.c    ****             {
+ 248              		.loc 1 158 9 is_stmt 1 view .LVU71
+ 158:terminal.c    ****             {
+ 249              		.loc 1 158 12 is_stmt 0 view .LVU72
+ 250 0118 0228     		cmp	r0, #2
+ 251 011a 0CD0     		beq	.L13
+ 161:terminal.c    ****             }
+ 252              		.loc 1 161 13 is_stmt 1 view .LVU73
+ 161:terminal.c    ****             }
+ 253              		.loc 1 161 26 is_stmt 0 view .LVU74
+ 254 011c 9DF82F00 		ldrb	r0, [sp, #47]	@ zero_extendqisi2
+ 255              	.LVL18:
+ARM GAS  /tmp/ccujUzpn.s 			page 12
+
+
+ 161:terminal.c    ****             }
+ 256              		.loc 1 161 26 view .LVU75
+ 257 0120 FFF7FEFF 		bl	ign_cmd_execute
+ 258              	.LVL19:
+ 161:terminal.c    ****             }
+ 259              		.loc 1 161 24 view .LVU76
+ 260 0124 8DF80800 		strb	r0, [sp, #8]
+ 261              	.L14:
+ 170:terminal.c    ****                         sizeof( ign_status ), 
+ 262              		.loc 1 170 9 is_stmt 1 view .LVU77
+ 263 0128 0A22     		movs	r2, #10
+ 264 012a 0121     		movs	r1, #1
+ 265 012c 02A8     		add	r0, sp, #8
+ 266 012e FFF7FEFF 		bl	usb_transmit
+ 267              	.LVL20:
+ 173:terminal.c    ****         } /* IGNITE_OP */
+ 268              		.loc 1 173 9 view .LVU78
+ 269              		.loc 1 353 8 is_stmt 0 view .LVU79
+ 270 0132 0024     		movs	r4, #0
+ 173:terminal.c    ****         } /* IGNITE_OP */
+ 271              		.loc 1 173 9 view .LVU80
+ 272 0134 9FE0     		b	.L3
+ 273              	.LVL21:
+ 274              	.L13:
+ 166:terminal.c    ****             }
+ 275              		.loc 1 166 13 is_stmt 1 view .LVU81
+ 276 0136 2020     		movs	r0, #32
+ 277              	.LVL22:
+ 166:terminal.c    ****             }
+ 278              		.loc 1 166 13 is_stmt 0 view .LVU82
+ 279 0138 FFF7FEFF 		bl	Error_Handler
+ 280              	.LVL23:
+ 281 013c F4E7     		b	.L14
+ 282              	.LVL24:
+ 283              	.L6:
+ 182:terminal.c    **** 
+ 284              		.loc 1 182 9 is_stmt 1 view .LVU83
+ 182:terminal.c    **** 
+ 285              		.loc 1 182 22 is_stmt 0 view .LVU84
+ 286 013e FFF7FEFF 		bl	pwr_get_source
+ 287              	.LVL25:
+ 182:terminal.c    **** 
+ 288              		.loc 1 182 20 view .LVU85
+ 289 0142 8DF82E00 		strb	r0, [sp, #46]
+ 185:terminal.c    ****         usb_transmit( &pwr_source         , 
+ 290              		.loc 1 185 9 is_stmt 1 view .LVU86
+ 185:terminal.c    ****         usb_transmit( &pwr_source         , 
+ 291              		.loc 1 185 20 is_stmt 0 view .LVU87
+ 292 0146 0130     		adds	r0, r0, #1
+ 293 0148 8DF82E00 		strb	r0, [sp, #46]
+ 186:terminal.c    ****                         sizeof( pwr_source ), 
+ 294              		.loc 1 186 9 is_stmt 1 view .LVU88
+ 295 014c 0A22     		movs	r2, #10
+ 296 014e 0121     		movs	r1, #1
+ 297 0150 0DF12E00 		add	r0, sp, #46
+ 298 0154 FFF7FEFF 		bl	usb_transmit
+ 299              	.LVL26:
+ARM GAS  /tmp/ccujUzpn.s 			page 13
+
+
+ 189:terminal.c    ****         } /* POWER_OP */
+ 300              		.loc 1 189 9 view .LVU89
+ 301              		.loc 1 353 8 is_stmt 0 view .LVU90
+ 302 0158 0024     		movs	r4, #0
+ 189:terminal.c    ****         } /* POWER_OP */
+ 303              		.loc 1 189 9 view .LVU91
+ 304 015a 8CE0     		b	.L3
+ 305              	.LVL27:
+ 306              	.L4:
+ 198:terminal.c    ****                                     sizeof( subcommand ), 
+ 307              		.loc 1 198 9 is_stmt 1 view .LVU92
+ 198:terminal.c    ****                                     sizeof( subcommand ), 
+ 308              		.loc 1 198 22 is_stmt 0 view .LVU93
+ 309 015c 0A22     		movs	r2, #10
+ 310 015e 0121     		movs	r1, #1
+ 311 0160 0DF12F00 		add	r0, sp, #47
+ 312              	.LVL28:
+ 198:terminal.c    ****                                     sizeof( subcommand ), 
+ 313              		.loc 1 198 22 view .LVU94
+ 314 0164 FFF7FEFF 		bl	usb_receive
+ 315              	.LVL29:
+ 203:terminal.c    ****             {
+ 316              		.loc 1 203 9 is_stmt 1 view .LVU95
+ 203:terminal.c    ****             {
+ 317              		.loc 1 203 12 is_stmt 0 view .LVU96
+ 318 0168 70B9     		cbnz	r0, .L15
+ 205:terminal.c    ****                                                 &flash_handle );
+ 319              		.loc 1 205 13 is_stmt 1 view .LVU97
+ 205:terminal.c    ****                                                 &flash_handle );
+ 320              		.loc 1 205 28 is_stmt 0 view .LVU98
+ 321 016a 07A9     		add	r1, sp, #28
+ 322 016c 9DF82F00 		ldrb	r0, [sp, #47]	@ zero_extendqisi2
+ 323              	.LVL30:
+ 205:terminal.c    ****                                                 &flash_handle );
+ 324              		.loc 1 205 28 view .LVU99
+ 325 0170 FFF7FEFF 		bl	flash_cmd_execute
+ 326              	.LVL31:
+ 205:terminal.c    ****                                                 &flash_handle );
+ 327              		.loc 1 205 26 view .LVU100
+ 328 0174 8DF80900 		strb	r0, [sp, #9]
+ 329              	.L16:
+ 215:terminal.c    ****                         sizeof( flash_status ), 
+ 330              		.loc 1 215 9 is_stmt 1 view .LVU101
+ 331 0178 0A22     		movs	r2, #10
+ 332 017a 0121     		movs	r1, #1
+ 333 017c 0DF10900 		add	r0, sp, #9
+ 334 0180 FFF7FEFF 		bl	usb_transmit
+ 335              	.LVL32:
+ 218:terminal.c    ****         } /* FLASH_OP */
+ 336              		.loc 1 218 9 view .LVU102
+ 337              		.loc 1 353 8 is_stmt 0 view .LVU103
+ 338 0184 0024     		movs	r4, #0
+ 218:terminal.c    ****         } /* FLASH_OP */
+ 339              		.loc 1 218 9 view .LVU104
+ 340 0186 76E0     		b	.L3
+ 341              	.LVL33:
+ 342              	.L15:
+ARM GAS  /tmp/ccujUzpn.s 			page 14
+
+
+ 211:terminal.c    ****             }
+ 343              		.loc 1 211 13 is_stmt 1 view .LVU105
+ 344 0188 2120     		movs	r0, #33
+ 345              	.LVL34:
+ 211:terminal.c    ****             }
+ 346              		.loc 1 211 13 is_stmt 0 view .LVU106
+ 347 018a FFF7FEFF 		bl	Error_Handler
+ 348              	.LVL35:
+ 349 018e F3E7     		b	.L16
+ 350              	.LVL36:
+ 351              	.L8:
+ 227:terminal.c    ****                                     sizeof( subcommand ),
+ 352              		.loc 1 227 9 is_stmt 1 view .LVU107
+ 227:terminal.c    ****                                     sizeof( subcommand ),
+ 353              		.loc 1 227 22 is_stmt 0 view .LVU108
+ 354 0190 0A22     		movs	r2, #10
+ 355 0192 0121     		movs	r1, #1
+ 356 0194 0DF12F00 		add	r0, sp, #47
+ 357              	.LVL37:
+ 227:terminal.c    ****                                     sizeof( subcommand ),
+ 358              		.loc 1 227 22 view .LVU109
+ 359 0198 FFF7FEFF 		bl	usb_receive
+ 360              	.LVL38:
+ 232:terminal.c    ****             {
+ 361              		.loc 1 232 9 is_stmt 1 view .LVU110
+ 232:terminal.c    ****             {
+ 362              		.loc 1 232 12 is_stmt 0 view .LVU111
+ 363 019c 0446     		mov	r4, r0
+ 364 019e 20B1     		cbz	r0, .L17
+ 235:terminal.c    ****             }
+ 365              		.loc 1 235 13 is_stmt 1 view .LVU112
+ 366 01a0 2220     		movs	r0, #34
+ 367              	.LVL39:
+ 235:terminal.c    ****             }
+ 368              		.loc 1 235 13 is_stmt 0 view .LVU113
+ 369 01a2 FFF7FEFF 		bl	Error_Handler
+ 370              	.LVL40:
+ 371              		.loc 1 353 8 view .LVU114
+ 372 01a6 0024     		movs	r4, #0
+ 373 01a8 65E0     		b	.L3
+ 374              	.LVL41:
+ 375              	.L17:
+ 239:terminal.c    ****             }
+ 376              		.loc 1 239 13 is_stmt 1 view .LVU115
+ 377 01aa 9DF82F00 		ldrb	r0, [sp, #47]	@ zero_extendqisi2
+ 378              	.LVL42:
+ 239:terminal.c    ****             }
+ 379              		.loc 1 239 13 is_stmt 0 view .LVU116
+ 380 01ae FFF7FEFF 		bl	sensor_cmd_execute
+ 381              	.LVL43:
+ 382 01b2 60E0     		b	.L3
+ 383              	.LVL44:
+ 384              	.L32:
+ 256:terminal.c    ****             }
+ 385              		.loc 1 256 13 is_stmt 1 view .LVU117
+ 386 01b4 2320     		movs	r0, #35
+ 387              	.LVL45:
+ARM GAS  /tmp/ccujUzpn.s 			page 15
+
+
+ 256:terminal.c    ****             }
+ 388              		.loc 1 256 13 is_stmt 0 view .LVU118
+ 389 01b6 FFF7FEFF 		bl	Error_Handler
+ 390              	.LVL46:
+ 391 01ba 77E7     		b	.L18
+ 392              	.LVL47:
+ 393              	.L33:
+ 265:terminal.c    ****             }
+ 394              		.loc 1 265 13 is_stmt 1 view .LVU119
+ 395 01bc 2320     		movs	r0, #35
+ 396              	.LVL48:
+ 265:terminal.c    ****             }
+ 397              		.loc 1 265 13 is_stmt 0 view .LVU120
+ 398 01be FFF7FEFF 		bl	Error_Handler
+ 399              	.LVL49:
+ 400 01c2 7BE7     		b	.L19
+ 401              	.LVL50:
+ 402              	.L34:
+ 272:terminal.c    ****             }
+ 403              		.loc 1 272 13 is_stmt 1 view .LVU121
+ 404 01c4 2320     		movs	r0, #35
+ 405              	.LVL51:
+ 272:terminal.c    ****             }
+ 406              		.loc 1 272 13 is_stmt 0 view .LVU122
+ 407 01c6 FFF7FEFF 		bl	Error_Handler
+ 408              	.LVL52:
+ 409 01ca 7FE7     		b	.L20
+ 410              	.L35:
+ 278:terminal.c    ****                                             sizeof( main_valve_states ), 
+ 411              		.loc 1 278 13 is_stmt 1 view .LVU123
+ 278:terminal.c    ****                                             sizeof( main_valve_states ), 
+ 412              		.loc 1 278 28 is_stmt 0 view .LVU124
+ 413 01cc 0A22     		movs	r2, #10
+ 414 01ce 0121     		movs	r1, #1
+ 415 01d0 0DEB0200 		add	r0, sp, r2
+ 416 01d4 FFF7FEFF 		bl	valve_receive
+ 417              	.LVL53:
+ 281:terminal.c    ****                 {
+ 418              		.loc 1 281 13 is_stmt 1 view .LVU125
+ 281:terminal.c    ****                 {
+ 419              		.loc 1 281 16 is_stmt 0 view .LVU126
+ 420 01d8 38B9     		cbnz	r0, .L36
+ 421              	.LVL54:
+ 422              	.L21:
+ 286:terminal.c    ****                             sizeof( main_valve_states ), 
+ 423              		.loc 1 286 13 is_stmt 1 view .LVU127
+ 424 01da 0A22     		movs	r2, #10
+ 425 01dc 0121     		movs	r1, #1
+ 426 01de 0DEB0200 		add	r0, sp, r2
+ 427 01e2 FFF7FEFF 		bl	usb_transmit
+ 428              	.LVL55:
+ 429              		.loc 1 353 8 is_stmt 0 view .LVU128
+ 430 01e6 0024     		movs	r4, #0
+ 431 01e8 45E0     		b	.L3
+ 432              	.LVL56:
+ 433              	.L36:
+ 283:terminal.c    ****                 }
+ARM GAS  /tmp/ccujUzpn.s 			page 16
+
+
+ 434              		.loc 1 283 17 is_stmt 1 view .LVU129
+ 435 01ea 2320     		movs	r0, #35
+ 436              	.LVL57:
+ 283:terminal.c    ****                 }
+ 437              		.loc 1 283 17 is_stmt 0 view .LVU130
+ 438 01ec FFF7FEFF 		bl	Error_Handler
+ 439              	.LVL58:
+ 440 01f0 F3E7     		b	.L21
+ 441              	.LVL59:
+ 442              	.L11:
+ 299:terminal.c    ****                         sizeof( subcommand ), 
+ 443              		.loc 1 299 9 is_stmt 1 view .LVU131
+ 299:terminal.c    ****                         sizeof( subcommand ), 
+ 444              		.loc 1 299 22 is_stmt 0 view .LVU132
+ 445 01f2 0A22     		movs	r2, #10
+ 446 01f4 0121     		movs	r1, #1
+ 447 01f6 0DF12F00 		add	r0, sp, #47
+ 448              	.LVL60:
+ 299:terminal.c    ****                         sizeof( subcommand ), 
+ 449              		.loc 1 299 22 view .LVU133
+ 450 01fa FFF7FEFF 		bl	usb_receive
+ 451              	.LVL61:
+ 302:terminal.c    ****             {
+ 452              		.loc 1 302 9 is_stmt 1 view .LVU134
+ 302:terminal.c    ****             {
+ 453              		.loc 1 302 12 is_stmt 0 view .LVU135
+ 454 01fe 98B9     		cbnz	r0, .L37
+ 455              	.LVL62:
+ 456              	.L22:
+ 308:terminal.c    ****                                         sizeof( command ), 
+ 457              		.loc 1 308 9 is_stmt 1 view .LVU136
+ 308:terminal.c    ****                                         sizeof( command ), 
+ 458              		.loc 1 308 24 is_stmt 0 view .LVU137
+ 459 0200 0A22     		movs	r2, #10
+ 460 0202 0121     		movs	r1, #1
+ 461 0204 0DF10700 		add	r0, sp, #7
+ 462 0208 FFF7FEFF 		bl	valve_transmit
+ 463              	.LVL63:
+ 311:terminal.c    ****             {
+ 464              		.loc 1 311 9 is_stmt 1 view .LVU138
+ 311:terminal.c    ****             {
+ 465              		.loc 1 311 12 is_stmt 0 view .LVU139
+ 466 020c 80B9     		cbnz	r0, .L38
+ 467              	.LVL64:
+ 468              	.L23:
+ 315:terminal.c    ****                                         sizeof( command ),
+ 469              		.loc 1 315 9 is_stmt 1 view .LVU140
+ 315:terminal.c    ****                                         sizeof( command ),
+ 470              		.loc 1 315 24 is_stmt 0 view .LVU141
+ 471 020e 0A22     		movs	r2, #10
+ 472 0210 0121     		movs	r1, #1
+ 473 0212 0DF12F00 		add	r0, sp, #47
+ 474 0216 FFF7FEFF 		bl	valve_transmit
+ 475              	.LVL65:
+ 318:terminal.c    ****             {
+ 476              		.loc 1 318 9 is_stmt 1 view .LVU142
+ 318:terminal.c    ****             {
+ARM GAS  /tmp/ccujUzpn.s 			page 17
+
+
+ 477              		.loc 1 318 12 is_stmt 0 view .LVU143
+ 478 021a 68B9     		cbnz	r0, .L39
+ 479              	.LVL66:
+ 480              	.L24:
+ 324:terminal.c    ****             {
+ 481              		.loc 1 324 9 is_stmt 1 view .LVU144
+ 324:terminal.c    ****             {
+ 482              		.loc 1 324 25 is_stmt 0 view .LVU145
+ 483 021c 9DF82F30 		ldrb	r3, [sp, #47]	@ zero_extendqisi2
+ 324:terminal.c    ****             {
+ 484              		.loc 1 324 12 view .LVU146
+ 485 0220 202B     		cmp	r3, #32
+ 486 0222 0DD0     		beq	.L40
+ 487              		.loc 1 353 8 view .LVU147
+ 488 0224 0024     		movs	r4, #0
+ 489 0226 26E0     		b	.L3
+ 490              	.LVL67:
+ 491              	.L37:
+ 304:terminal.c    ****             }
+ 492              		.loc 1 304 13 is_stmt 1 view .LVU148
+ 493 0228 2C20     		movs	r0, #44
+ 494              	.LVL68:
+ 304:terminal.c    ****             }
+ 495              		.loc 1 304 13 is_stmt 0 view .LVU149
+ 496 022a FFF7FEFF 		bl	Error_Handler
+ 497              	.LVL69:
+ 498 022e E7E7     		b	.L22
+ 499              	.LVL70:
+ 500              	.L38:
+ 313:terminal.c    ****             }
+ 501              		.loc 1 313 13 is_stmt 1 view .LVU150
+ 502 0230 2C20     		movs	r0, #44
+ 503              	.LVL71:
+ 313:terminal.c    ****             }
+ 504              		.loc 1 313 13 is_stmt 0 view .LVU151
+ 505 0232 FFF7FEFF 		bl	Error_Handler
+ 506              	.LVL72:
+ 507 0236 EAE7     		b	.L23
+ 508              	.LVL73:
+ 509              	.L39:
+ 320:terminal.c    ****             }
+ 510              		.loc 1 320 13 is_stmt 1 view .LVU152
+ 511 0238 2C20     		movs	r0, #44
+ 512              	.LVL74:
+ 320:terminal.c    ****             }
+ 513              		.loc 1 320 13 is_stmt 0 view .LVU153
+ 514 023a FFF7FEFF 		bl	Error_Handler
+ 515              	.LVL75:
+ 516 023e EDE7     		b	.L24
+ 517              	.L40:
+ 326:terminal.c    ****                                             sizeof( sol_state ), 
+ 518              		.loc 1 326 13 is_stmt 1 view .LVU154
+ 326:terminal.c    ****                                             sizeof( sol_state ), 
+ 519              		.loc 1 326 28 is_stmt 0 view .LVU155
+ 520 0240 0A22     		movs	r2, #10
+ 521 0242 0121     		movs	r1, #1
+ 522 0244 0DF10B00 		add	r0, sp, #11
+ARM GAS  /tmp/ccujUzpn.s 			page 18
+
+
+ 523 0248 FFF7FEFF 		bl	valve_receive
+ 524              	.LVL76:
+ 329:terminal.c    ****                 {
+ 525              		.loc 1 329 13 is_stmt 1 view .LVU156
+ 329:terminal.c    ****                 {
+ 526              		.loc 1 329 16 is_stmt 0 view .LVU157
+ 527 024c 60B9     		cbnz	r0, .L41
+ 528              	.LVL77:
+ 529              	.L25:
+ 333:terminal.c    ****                                         sizeof( sol_state ),
+ 530              		.loc 1 333 13 is_stmt 1 view .LVU158
+ 333:terminal.c    ****                                         sizeof( sol_state ),
+ 531              		.loc 1 333 26 is_stmt 0 view .LVU159
+ 532 024e 0A22     		movs	r2, #10
+ 533 0250 0121     		movs	r1, #1
+ 534 0252 0DF10B00 		add	r0, sp, #11
+ 535 0256 FFF7FEFF 		bl	usb_transmit
+ 536              	.LVL78:
+ 336:terminal.c    ****                 {
+ 537              		.loc 1 336 13 is_stmt 1 view .LVU160
+ 336:terminal.c    ****                 {
+ 538              		.loc 1 336 16 is_stmt 0 view .LVU161
+ 539 025a 0446     		mov	r4, r0
+ 540 025c 58B1     		cbz	r0, .L3
+ 338:terminal.c    ****                 }
+ 541              		.loc 1 338 17 is_stmt 1 view .LVU162
+ 542 025e 2C20     		movs	r0, #44
+ 543              	.LVL79:
+ 338:terminal.c    ****                 }
+ 544              		.loc 1 338 17 is_stmt 0 view .LVU163
+ 545 0260 FFF7FEFF 		bl	Error_Handler
+ 546              	.LVL80:
+ 547              		.loc 1 353 8 view .LVU164
+ 548 0264 0024     		movs	r4, #0
+ 549 0266 06E0     		b	.L3
+ 550              	.LVL81:
+ 551              	.L41:
+ 331:terminal.c    ****                 }
+ 552              		.loc 1 331 17 is_stmt 1 view .LVU165
+ 553 0268 2C20     		movs	r0, #44
+ 554              	.LVL82:
+ 331:terminal.c    ****                 }
+ 555              		.loc 1 331 17 is_stmt 0 view .LVU166
+ 556 026a FFF7FEFF 		bl	Error_Handler
+ 557              	.LVL83:
+ 558 026e EEE7     		b	.L25
+ 559              	.LVL84:
+ 560              	.L26:
+ 119:terminal.c    ****     {
+ 561              		.loc 1 119 1 view .LVU167
+ 562 0270 0424     		movs	r4, #4
+ 563 0272 00E0     		b	.L3
+ 564              	.L27:
+ 565 0274 0424     		movs	r4, #4
+ 566              	.LVL85:
+ 567              	.L3:
+ 354:terminal.c    **** } /* terminal_exec_cmd */
+ARM GAS  /tmp/ccujUzpn.s 			page 19
+
+
+ 568              		.loc 1 354 1 view .LVU168
+ 569 0276 2046     		mov	r0, r4
+ 570 0278 0CB0     		add	sp, sp, #48
+ 571              	.LCFI2:
+ 572              		.cfi_def_cfa_offset 8
+ 573              		@ sp needed
+ 574 027a 10BD     		pop	{r4, pc}
+ 575              	.L43:
+ 576              		.align	2
+ 577              	.L42:
+ 578 027c 00000000 		.word	huart1
+ 579              		.cfi_endproc
+ 580              	.LFE333:
+ 582              		.text
+ 583              	.Letext0:
+ 584              		.file 2 "/usr/lib/gcc/arm-none-eabi/12.2.1/include/stddef.h"
+ 585              		.file 3 "/usr/lib/gcc/arm-none-eabi/12.2.1/include/stdint.h"
+ 586              		.file 4 "../../../lib/Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h750xx.h"
+ 587              		.file 5 "../../../lib/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h"
+ 588              		.file 6 "../../../lib/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma.h"
+ 589              		.file 7 "../../../lib/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h"
+ 590              		.file 8 "../../../mod/sensor/sensor.h"
+ 591              		.file 9 "../../../lib/util/sdr_error.h"
+ 592              		.file 10 "terminal.h"
+ 593              		.file 11 "../../../mod/ignition/ignition.h"
+ 594              		.file 12 "../../../mod/flash/flash.h"
+ 595              		.file 13 "../../../mod/power/power.h"
+ 596              		.file 14 "../../../mod/solenoid/solenoid.h"
+ 597              		.file 15 "../../../mod/usb/usb.h"
+ 598              		.file 16 "../../../mod/valve/valve.h"
+ 599              		.file 17 "../../../lib/sdr_pin_defines_L0002.h"
+ARM GAS  /tmp/ccujUzpn.s 			page 20
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 terminal.c
+     /tmp/ccujUzpn.s:20     .text.terminal_exec_cmd:0000000000000000 $t
+     /tmp/ccujUzpn.s:26     .text.terminal_exec_cmd:0000000000000000 terminal_exec_cmd
+     /tmp/ccujUzpn.s:103    .text.terminal_exec_cmd:000000000000004c $d
+     /tmp/ccujUzpn.s:137    .text.terminal_exec_cmd:0000000000000090 $t
+     /tmp/ccujUzpn.s:578    .text.terminal_exec_cmd:000000000000027c $d
+
+UNDEFINED SYMBOLS
+usb_receive
+valve_transmit
+HAL_UART_Transmit
+ign_cmd_execute
+usb_transmit
+Error_Handler
+pwr_get_source
+flash_cmd_execute
+sensor_cmd_execute
+valve_receive
+huart1

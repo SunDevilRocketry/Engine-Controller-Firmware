@@ -1,0 +1,138 @@
+ARM GAS  /tmp/ccDESHiH.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"standby.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "standby.c"
+  19              		.section	.text.run_standby_state,"ax",%progbits
+  20              		.align	1
+  21              		.global	run_standby_state
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	run_standby_state:
+  27              	.LFB333:
+   1:standby.c     **** /*******************************************************************************
+   2:standby.c     **** *
+   3:standby.c     **** * FILE: 
+   4:standby.c     **** * 		standby.c
+   5:standby.c     **** *
+   6:standby.c     **** * DESCRIPTION: 
+   7:standby.c     **** * 	    Waits for the fire engine signal from ground station 
+   8:standby.c     **** *
+   9:standby.c     **** *******************************************************************************/
+  10:standby.c     **** 
+  11:standby.c     **** 
+  12:standby.c     **** /*------------------------------------------------------------------------------
+  13:standby.c     ****  Standard Includes                                                              
+  14:standby.c     **** ------------------------------------------------------------------------------*/
+  15:standby.c     **** 
+  16:standby.c     **** 
+  17:standby.c     **** /*------------------------------------------------------------------------------
+  18:standby.c     ****  Project Includes                                                              
+  19:standby.c     **** ------------------------------------------------------------------------------*/
+  20:standby.c     **** #include "main.h"
+  21:standby.c     **** #include "flash.h"
+  22:standby.c     **** #include "data_logger.h"
+  23:standby.c     **** 
+  24:standby.c     **** 
+  25:standby.c     **** /*------------------------------------------------------------------------------
+  26:standby.c     ****  Global Variables 
+  27:standby.c     **** ------------------------------------------------------------------------------*/
+  28:standby.c     **** extern volatile FSM_STATE fsm_state; /* Hotfire State */
+  29:standby.c     **** 
+  30:standby.c     **** 
+  31:standby.c     **** /*------------------------------------------------------------------------------
+ARM GAS  /tmp/ccDESHiH.s 			page 2
+
+
+  32:standby.c     ****  Public Functions 
+  33:standby.c     **** ------------------------------------------------------------------------------*/
+  34:standby.c     **** 
+  35:standby.c     **** 
+  36:standby.c     **** /*******************************************************************************
+  37:standby.c     **** *                                                                              *
+  38:standby.c     **** * PROCEDURE:                                                                   *
+  39:standby.c     **** * 		run_standby_state                                                      *
+  40:standby.c     **** *                                                                              *
+  41:standby.c     **** * DESCRIPTION:                                                                 *
+  42:standby.c     **** *       Awaits engine fire signal                                              *
+  43:standby.c     **** *                                                                              *
+  44:standby.c     **** *******************************************************************************/
+  45:standby.c     **** FSM_STATE run_standby_state 
+  46:standby.c     ****     (
+  47:standby.c     ****     void
+  48:standby.c     ****     )
+  49:standby.c     **** {
+  28              		.loc 1 49 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32 0000 08B5     		push	{r3, lr}
+  33              	.LCFI0:
+  34              		.cfi_def_cfa_offset 8
+  35              		.cfi_offset 3, -8
+  36              		.cfi_offset 14, -4
+  50:standby.c     **** /* Erase flash memory */
+  51:standby.c     **** data_logger_erase_flash();
+  37              		.loc 1 51 1 view .LVU1
+  38 0002 FFF7FEFF 		bl	data_logger_erase_flash
+  39              	.LVL0:
+  52:standby.c     **** 
+  53:standby.c     **** /* Wait for the fire command */
+  54:standby.c     **** while ( fsm_state != FSM_FIRE_STATE ){}
+  40              		.loc 1 54 1 view .LVU2
+  41              	.L2:
+  42              		.loc 1 54 39 discriminator 1 view .LVU3
+  43              		.loc 1 54 19 discriminator 1 view .LVU4
+  44 0006 034B     		ldr	r3, .L4
+  45 0008 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+  46 000a DBB2     		uxtb	r3, r3
+  47 000c 052B     		cmp	r3, #5
+  48 000e FAD1     		bne	.L2
+  55:standby.c     **** return FSM_FIRE_STATE;
+  49              		.loc 1 55 1 view .LVU5
+  56:standby.c     **** } /* run_standby_state */
+  50              		.loc 1 56 1 is_stmt 0 view .LVU6
+  51 0010 0520     		movs	r0, #5
+  52 0012 08BD     		pop	{r3, pc}
+  53              	.L5:
+  54              		.align	2
+  55              	.L4:
+  56 0014 00000000 		.word	fsm_state
+  57              		.cfi_endproc
+  58              	.LFE333:
+  60              		.text
+ARM GAS  /tmp/ccDESHiH.s 			page 3
+
+
+  61              	.Letext0:
+  62              		.file 2 "main.h"
+  63              		.file 3 "data_logger.h"
+ARM GAS  /tmp/ccDESHiH.s 			page 4
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 standby.c
+     /tmp/ccDESHiH.s:20     .text.run_standby_state:0000000000000000 $t
+     /tmp/ccDESHiH.s:26     .text.run_standby_state:0000000000000000 run_standby_state
+     /tmp/ccDESHiH.s:56     .text.run_standby_state:0000000000000014 $d
+
+UNDEFINED SYMBOLS
+data_logger_erase_flash
+fsm_state
