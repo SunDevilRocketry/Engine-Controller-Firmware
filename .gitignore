@@ -8,6 +8,7 @@ unit_tests/terminal/rev4/mod/sensor/build/*
 app/demo/pts/rev4/build/*
 app/hotfire/rev4/build/*
 app/hotfire/rev5/build/*
+app/hotfire-usb/rev5/build/*
 app/ping/rev5/build/*
 
 # Visual Studio Code Artifacts

@@ -29,7 +29,7 @@
 /* Module level */
 #include "commands.h"
 #include "led.h"
-#include "rs485.h"
+#include "usb.h"
 #include "sensor.h"
 #include "solenoid.h"
 #include "valve.h"
@@ -85,16 +85,17 @@ uint8_t          subcommand;                  /* SDEC subcommand              */
 uint8_t          sol_state;                   /* State of solenoids           */
 SENSOR_DATA      sensor_data;                 /* Data from engine sensors     */
 uint8_t          sensor_data_bytes[ sizeof( SENSOR_DATA ) ]; 
-RS485_STATUS     rs485_status;                /* RS485 return codes           */
+// RS485_STATUS     rs485_status;                /* RS485 return codes           */
 VALVE_STATUS     valve_status;                /* Valve module return codes    */
 TANK_SAFE_STATES tanks_state;                 /* State of tank pressures      */
 VALVE_STATES     valve_states;                /* Open/close state of valves   */
-
+USB_STATUS      usb_status;
 
 /*------------------------------------------------------------------------------
  Initializations 
 ------------------------------------------------------------------------------*/
-rs485_status  = RS485_OK;
+// rs485_status  = RS485_OK;
+usb_status = USB_OK;
 valve_status  = VALVE_OK;
 valve_states  = 0;
 sol_state     = 0;
@@ -131,10 +132,10 @@ switch( command )
     case SOL_OP:
         {
         /* Get subcommand */
-        rs485_status = rs485_receive( &subcommand         , 
+        usb_status = usb_receive( &subcommand         , 
                                       sizeof( subcommand ), 
-                                      RS485_DEFAULT_TIMEOUT );
-        if ( rs485_status != RS485_OK )
+                                      20 );
+        if ( usb_status != USB_OK )
             {
             led_set_color( LED_YELLOW );
             break;
@@ -155,7 +156,7 @@ switch( command )
                 led_set_color( LED_YELLOW );
                 break;
                 }
-            rs485_transmit( &sol_state, sizeof( sol_state ), HAL_DEFAULT_TIMEOUT );
+            usb_transmit( &sol_state, sizeof( sol_state ), HAL_DEFAULT_TIMEOUT );
             }
         break;
         } /* SOL_OP */
@@ -166,10 +167,10 @@ switch( command )
     case VALVE_OP:
         {
         /* Get subcommand */
-        rs485_status = rs485_receive( &subcommand         , 
+        usb_status = usb_receive( &subcommand         , 
                                       sizeof( subcommand ), 
-                                      RS485_DEFAULT_TIMEOUT );
-        if ( rs485_status != RS485_OK )
+                                      20 );
+        if ( usb_status != USB_OK )
             {
             led_set_color( LED_YELLOW );
             break;
@@ -211,12 +212,12 @@ switch( command )
         vc_getstate( &valve_states );
 
         /* Transmit the sensor and valve data */
-        rs485_transmit( &sensor_data_bytes[0], 
+        usb_transmit( &sensor_data_bytes[0], 
                         sizeof( SENSOR_DATA ), 
-                        RS485_DEFAULT_TIMEOUT*sizeof( SENSOR_DATA ));
-        rs485_transmit( &valve_states         , 
+                        20*sizeof( SENSOR_DATA ));
+        usb_transmit( &valve_states         , 
                         sizeof( valve_states ), 
-                        RS485_DEFAULT_TIMEOUT );
+                        20 );
         break;
         } /* TELREQ_OP */
 
@@ -291,7 +292,7 @@ switch( command )
     case HOTFIRE_GETSTATE_OP:
         {
         /* Send the finite state machine state back to the ground station */
-        rs485_transmit( (void*) &fsm_state, sizeof( fsm_state ), RS485_DEFAULT_TIMEOUT );
+        usb_transmit( (void*) &fsm_state, sizeof( fsm_state ), 20 );
         break;
         } /* HOTFIRE_GETSTATE_OP */
 
@@ -350,7 +351,7 @@ switch( command )
             }
         
         /* Send response */
-        rs485_transmit( &tanks_state, sizeof( tanks_state ), RS485_DEFAULT_TIMEOUT );
+        usb_transmit( &tanks_state, sizeof( tanks_state ), 20 );
         break;
         }
 
@@ -400,7 +401,8 @@ PROTOCOL_STATUS protocol_send_frame
 #ifdef USE_RS485
     RS485_STATUS rs485_status;
 #else
-    RF_STATUS    rf_status;
+    // RF_STATUS    rf_status;
+    USB_STATUS      usb_status;
 #endif
 
 
@@ -410,7 +412,8 @@ PROTOCOL_STATUS protocol_send_frame
 #ifdef USE_RS485
     rs485_status = RS485_OK;
 #else
-    rf_status    = RF_OK;
+    // rf_status    = RF_OK;
+    usb_status = USB_OK;
 #endif
 
 
@@ -430,15 +433,27 @@ PROTOCOL_STATUS protocol_send_frame
         return PROTOCOL_ERROR;
         }
 #else
-    rf_status = rf_xbee_transmit( &frame, sizeof( frame ) );
-    if ( rf_status == RF_TIMEOUT )
-        {
-        return PROTOCOL_TIMEOUT;
-        }
-    else if ( rf_status != RF_OK )
-        {
-        return RF_ERROR;
-        }
+    // rf_status = rf_xbee_transmit( &frame, sizeof( frame ) );
+    // if ( rf_status == RF_TIMEOUT )
+    //     {
+    //     return PROTOCOL_TIMEOUT;
+    //     }
+    // else if ( rf_status != RF_OK )
+    //     {
+    //     return RF_ERROR;
+    //     }
+
+    usb_status = usb_transmit( &frame, 
+        sizeof( frame ), 
+        20*sizeof( frame ) );
+    if ( usb_status == USB_TIMEOUT )
+    {
+    return PROTOCOL_TIMEOUT;
+    }
+    else if ( usb_status != USB_OK )
+    {
+    return PROTOCOL_ERROR;
+    }
 #endif
 
 return PROTOCOL_OK;
@@ -465,7 +480,8 @@ PROTOCOL_STATUS protocol_get_frame
 #ifdef USE_RS485
     RS485_STATUS rs485_status;
 #else
-    RF_STATUS    rf_status;
+    // RF_STATUS    rf_status;
+    USB_STATUS      usb_status;
 #endif
 
 
@@ -475,7 +491,8 @@ PROTOCOL_STATUS protocol_get_frame
 #ifdef USE_RS485
     rs485_status = RS485_OK;
 #else
-    rf_status    = RF_OK;
+    // rf_status    = RF_OK;
+    usb_status = USB_OK;
 #endif
 
 
@@ -495,15 +512,27 @@ PROTOCOL_STATUS protocol_get_frame
         return PROTOCOL_ERROR;
         }
 #else
-    rf_status = rf_xbee_receive( frame_ptr, sizeof( PROTOCOL_FRAME ) );
-    if ( rf_status == RF_TIMEOUT )
-        {
-        return PROTOCOL_TIMEOUT;
-        }
-    else if ( rf_status != RF_OK )
-        {
-        return RF_ERROR;
-        }
+    // rf_status = rf_xbee_receive( frame_ptr, sizeof( PROTOCOL_FRAME ) );
+    // if ( rf_status == RF_TIMEOUT )
+    //     {
+    //     return PROTOCOL_TIMEOUT;
+    //     }
+    // else if ( rf_status != RF_OK )
+    //     {
+    //     return RF_ERROR;
+    //     }
+
+    usb_status = usb_receive( frame_ptr, 
+        sizeof( PROTOCOL_FRAME ), 
+        20*sizeof( PROTOCOL_FRAME) );
+    if ( usb_status == USB_TIMEOUT )
+    {
+    return PROTOCOL_TIMEOUT;
+    }
+    else if ( usb_status != USB_OK )
+    {
+    return PROTOCOL_ERROR;
+    }
 #endif
 
 return PROTOCOL_OK;
@@ -530,7 +559,7 @@ static void send_ack
 
 { 
 uint8_t response = ACK_OP; 
-rs485_transmit( &response, sizeof( response ), RS485_DEFAULT_TIMEOUT );
+usb_transmit( &response, sizeof( response ), 20 );
 } /* send_no_ack */
 
 
