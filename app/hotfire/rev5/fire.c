@@ -68,28 +68,47 @@ memset( &sensor_data, 0, sizeof( sensor_data ) );
 /*------------------------------------------------------------------------------
  Engine Fire Sequence 
 ------------------------------------------------------------------------------*/
-
+rs485_transmit_byte(IGN_HOT_FIRE_START);
 
 /* Close the vent solenoids */
-vc_close_solenoids( SOLENOID_LOX_VENT | SOLENOID_FUEL_VENT );
+if (vc_close_solenoids( SOLENOID_LOX_VENT | SOLENOID_FUEL_VENT ) == VC_OK){
+    rs485_transmit_byte(IGN_HOT_FIRE_FAIL);
+    return FSM_ABORT_STATE;
+};
 HAL_Delay( VENT_PRESS_DELAY );
 
 /* Pressurize the LOX tank */
-vc_open_solenoids( SOLENOID_LOX_PRESS );
+if (vc_open_solenoids( SOLENOID_LOX_PRESS ) == VC_OK){
+    rs485_transmit_byte(IGN_HOT_FIRE_FAIL);
+    return FSM_ABORT_STATE;
+};
 HAL_Delay( TANK_PRESS_DELAY );
 
 /* Pressurize the fuel tank */
-vc_open_solenoids( SOLENOID_FUEL_PRESS );
+if (vc_open_solenoids( SOLENOID_FUEL_PRESS ) == VC_OK){
+    rs485_transmit_byte(IGN_HOT_FIRE_FAIL);
+    return FSM_ABORT_STATE;
+};
 HAL_Delay( TANK_PRESS_DELAY );
 
 /* Crack the main LOX valve */
-vc_crack_main_valves( MAIN_VALVE_LOX_MAIN );
+if (vc_crack_main_valves( MAIN_VALVE_LOX_MAIN ) == VC_OK){
+    rs485_transmit_byte(IGN_HOT_FIRE_FAIL);
+    return FSM_ABORT_STATE;
+};
 HAL_Delay( LOX_CRACK_DURATION );
-vc_close_main_valves( MAIN_VALVE_LOX_MAIN );
+
+if (vc_close_main_valves( MAIN_VALVE_LOX_MAIN ) == VC_OK){
+    rs485_transmit_byte(IGN_HOT_FIRE_FAIL);
+    return FSM_ABORT_STATE;
+};
 HAL_Delay( LOX_POSTCRACK_DELAY );
 
 /* Ignite the engine */
-ign_ignite();
+if (ign_ignite() == VC_OK){
+    rs485_transmit_byte(IGN_HOT_FIRE_FAIL);
+    return FSM_ABORT_STATE;
+}
 HAL_Delay( ENGINE_IGNITION_DELAY );
 
 /* Open the main valves */
@@ -122,17 +141,28 @@ while ( burn_time < ENGINE_BURN_DURATION )
     }
 
 /* Close the main valves */
-vc_close_main_valves( MAIN_VALVE_BOTH_MAINS );
+if (vc_close_main_valves( MAIN_VALVE_BOTH_MAINS ) == VC_OK){
+    rs485_transmit_byte(IGN_HOT_FIRE_FAIL);
+    return FSM_ABORT_STATE;
+}
 
 /* Close the pressuriztion solenoids */
-vc_close_solenoids( SOLENOID_LOX_PRESS | SOLENOID_FUEL_PRESS );
+if (vc_close_solenoids( SOLENOID_LOX_PRESS | SOLENOID_FUEL_PRESS ) == VC_OK){
+    rs485_transmit_byte(IGN_HOT_FIRE_FAIL);
+    return FSM_ABORT_STATE;
+}
 
 /* Open the purge solenoids */
-vc_open_solenoids( SOLENOID_LOX_PURGE | SOLENOID_FUEL_PURGE );
+if (vc_open_solenoids( SOLENOID_LOX_PURGE | SOLENOID_FUEL_PURGE ) == VC_OK){
+    rs485_transmit_byte(IGN_HOT_FIRE_FAIL);
+    return FSM_ABORT_STATE;
+}
 
 /* Wait for stop purge command or timeout */
 HAL_Delay( POSTFIRE_PURGE_DURATION );
 
+
+rs485_transmit_byte(IGN_HOT_FIRE_DONE);
 /* Transition to disarm state */
 return FSM_DISARM_STATE;
 } /* run_fire_state */
