@@ -50,8 +50,11 @@ FSM_STATE run_standby_state
 /* Erase flash memory */
 data_logger_erase_flash();
 
+
 /* Wait for the fire command */
-while ( fsm_state != FSM_FIRE_STATE ){}
+rs485_transmit_byte(IGN_STAND_BY_START);
+while ( fsm_state != FSM_FIRE_STATE ){
+}
 return FSM_FIRE_STATE;
 } /* run_standby_state */
 

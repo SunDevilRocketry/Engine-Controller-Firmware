@@ -72,7 +72,7 @@ memset( &sensor_data, 0, sizeof( SENSOR_DATA ) );
 /*------------------------------------------------------------------------------
  Implementation 
 ------------------------------------------------------------------------------*/
-
+rs485_transmit_byte(GN_FILL_CHILL_START);
 /* Stop the engine purge */
 vc_close_solenoids( SOLENOID_LOX_PRESS | SOLENOID_FUEL_PRESS );
 vc_close_main_valves( MAIN_VALVE_BOTH_MAINS );
@@ -107,10 +107,12 @@ while ( fsm_state != FSM_STANDBY_STATE )
         {
         /* Send Warning Indication to ground station */
         tanks_safe_flag = false;
+        rs485_transmit_byte(IGN_FILL_CHILL_DONE);
         }
     else
         {
         tanks_safe_flag = true;
+        rs485_transmit_byte(IGN_FILL_CHILL_START);
         }
     }
 

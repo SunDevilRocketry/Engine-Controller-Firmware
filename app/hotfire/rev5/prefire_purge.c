@@ -71,7 +71,7 @@ VC_STATUS open_solenoid_vent =  vc_open_solenoids( SOLENOID_LOX_VENT | SOLENOID_
 
 if(closed_vents_success + cracked_main + open_press + closed_press + close_valves + open_solenoid_vent == 0)
 {
-rs485_transmit_byte(IGN_PRE_FIRE_DONE); 
+    rs485_transmit_byte(IGN_PRE_FIRE_DONE); 
 } else{
     rs485_transmit_byte(IGN_PRE_FIRE_FAIL);
 }
