@@ -71,13 +71,15 @@ memset( &sensor_data, 0, sizeof( sensor_data ) );
 ------------------------------------------------------------------------------*/
 
 
-/* Open LOx Vent and LOx Pressurization Valve */
-vc_open_solenoids( SOLENOID_LOX_VENT | SOLENOID_LOX_PRESS );
+/* Close LOx Vent and Open LOx Pressurization Valve */
+vc_close_solenoids( SOLENOID_LOX_VENT );
+vc_open_solenoids( SOLENOID_LOX_PRESS );
 HAL_Delay( 8000 );
 
-/* Open Fuel Press Valve */
+/* Close Fuel Vent and Open Fuel Press Valve */
+vc_close_solenoids( SOLENOID_FUEL_VENT );
 vc_open_solenoids( SOLENOID_FUEL_PRESS );
-HAL_Delay( 2000 );
+HAL_Delay( 8000 );
 
 /* Ignite the solid propellant Ignitor */
 ign_ignite();
@@ -90,7 +92,32 @@ HAL_Delay( 750 );
 /* Gradually Open Fuel Main Valve */
 // TODO
 vc_open_main_valves( MAIN_VALVE_FUEL_MAIN );
-HAL_Delay( 2250 );
+// HAL_Delay( 2250 );
+/* Engine Burn */
+data_logger_init_timer();
+burn_time = data_logger_get_time();
+while ( burn_time < 2250 )
+    {
+    /* Poll for abort */
+    if ( fsm_state == FSM_ABORT_STATE )
+        {
+        return FSM_ABORT_STATE;
+        }
+
+    /* Poll for stop fire command */
+    if ( stop_hotfire_flag )
+        {
+        break;
+        }
+    
+    /* Log Data */
+    data_logger_get_data( &sensor_data );
+    data_logger_log_data( sensor_data  );
+
+
+    /* Update timer */
+    burn_time = data_logger_get_time();
+    }
 
 /* Full speed Close Fuel Main Valve */
 vc_close_main_valves( MAIN_VALVE_FUEL_MAIN );
@@ -98,16 +125,20 @@ HAL_Delay( 500 );
 
 /* Close LOx Main Valve */
 vc_close_main_valves( MAIN_VALVE_LOX_MAIN );
+/* Delay before Fuel and LOx Purge*/
+HAL_Delay( 1000 );
 /* Open Fuel and LOx Purge */
 vc_open_solenoids( SOLENOID_FUEL_PURGE | SOLENOID_LOX_PURGE );
 /* Close Fuel and LOx Press */
 vc_close_solenoids( SOLENOID_FUEL_PRESS | SOLENOID_LOX_PRESS );
+/* Open Fuel and LOx Vent */
+vc_open_solenoids( SOLENOID_FUEL_VENT | SOLENOID_LOX_VENT );
+/* Purge Duration*/
 HAL_Delay( 10000 );
 
 /* Close Fuel and LOx Purge */
 vc_close_solenoids( SOLENOID_FUEL_PURGE | SOLENOID_LOX_PURGE );
-/* Open Fuel and LOx Vent */
-vc_open_solenoids( SOLENOID_FUEL_VENT | SOLENOID_LOX_VENT );
+
 
 
 
