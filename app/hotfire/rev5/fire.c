@@ -96,7 +96,7 @@ vc_open_main_valves( MAIN_VALVE_FUEL_MAIN );
 /* Engine Burn */
 data_logger_init_timer();
 burn_time = data_logger_get_time();
-while ( burn_time < 2250 )
+while ( burn_time < 2000 )
     {
     /* Poll for abort */
     if ( fsm_state == FSM_ABORT_STATE )
@@ -119,16 +119,16 @@ while ( burn_time < 2250 )
     burn_time = data_logger_get_time();
     }
 
-/* Full speed Close Fuel Main Valve */
-vc_close_main_valves( MAIN_VALVE_FUEL_MAIN );
-HAL_Delay( 500 );
-
-/* Close LOx Main Valve */
+/* Close LOx Main Valve and Open LOx Purge*/
 vc_close_main_valves( MAIN_VALVE_LOX_MAIN );
-/* Delay before Fuel and LOx Purge*/
+vc_open_solenoids( SOLENOID_LOX_PURGE );
+HAL_Delay( 250 );
+
+/* Close Fuel Main Valve and Open Fuel Purge*/
+vc_close_main_valves( MAIN_VALVE_FUEL_MAIN );
+vc_open_solenoids( SOLENOID_FUEL_PURGE );
 HAL_Delay( 1000 );
-/* Open Fuel and LOx Purge */
-vc_open_solenoids( SOLENOID_FUEL_PURGE | SOLENOID_LOX_PURGE );
+
 /* Close Fuel and LOx Press */
 vc_close_solenoids( SOLENOID_FUEL_PRESS | SOLENOID_LOX_PRESS );
 /* Open Fuel and LOx Vent */
@@ -138,8 +138,6 @@ HAL_Delay( 10000 );
 
 /* Close Fuel and LOx Purge */
 vc_close_solenoids( SOLENOID_FUEL_PURGE | SOLENOID_LOX_PURGE );
-
-
 
 
 // /* Engine Burn */
