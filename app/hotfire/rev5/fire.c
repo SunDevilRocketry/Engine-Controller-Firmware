@@ -122,7 +122,7 @@ while ( burn_time < 2000 )
 /* Close LOx Main Valve and Open LOx Purge*/
 vc_close_main_valves( MAIN_VALVE_LOX_MAIN );
 vc_open_solenoids( SOLENOID_LOX_PURGE );
-HAL_Delay( 250 );
+HAL_Delay( 400 );
 
 /* Close Fuel Main Valve and Open Fuel Purge*/
 vc_close_main_valves( MAIN_VALVE_FUEL_MAIN );
