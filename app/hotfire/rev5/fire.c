@@ -73,21 +73,22 @@ memset( &sensor_data, 0, sizeof( sensor_data ) );
 
 /* Close LOx Vent and Open LOx Pressurization Valve */
 vc_close_solenoids( SOLENOID_LOX_VENT );
+HAL_Delay( 500 );
 vc_open_solenoids( SOLENOID_LOX_PRESS );
 HAL_Delay( 8000 );
 
 /* Close Fuel Vent and Open Fuel Press Valve */
 vc_close_solenoids( SOLENOID_FUEL_VENT );
 vc_open_solenoids( SOLENOID_FUEL_PRESS );
-HAL_Delay( 8000 );
+HAL_Delay( 12000 );
 
 /* Ignite the solid propellant Ignitor */
 ign_ignite();
-HAL_Delay( 2000 );
+HAL_Delay( 1000 );
 
 /* Full Speed Open LOx Main Valve */
 vc_open_main_valves( MAIN_VALVE_LOX_MAIN );
-HAL_Delay( 750 );
+HAL_Delay( 500 );
 
 /* Gradually Open Fuel Main Valve */
 // TODO
@@ -122,19 +123,19 @@ while ( burn_time < 2000 )
 /* Close LOx Main Valve and Open LOx Purge*/
 vc_close_main_valves( MAIN_VALVE_LOX_MAIN );
 vc_open_solenoids( SOLENOID_LOX_PURGE );
-HAL_Delay( 400 );
+HAL_Delay( 150 );
 
 /* Close Fuel Main Valve and Open Fuel Purge*/
 vc_close_main_valves( MAIN_VALVE_FUEL_MAIN );
+HAL_Delay( 1500 );
 vc_open_solenoids( SOLENOID_FUEL_PURGE );
-HAL_Delay( 1000 );
-
 /* Close Fuel and LOx Press */
 vc_close_solenoids( SOLENOID_FUEL_PRESS | SOLENOID_LOX_PRESS );
 /* Open Fuel and LOx Vent */
 vc_open_solenoids( SOLENOID_FUEL_VENT | SOLENOID_LOX_VENT );
 /* Purge Duration*/
-HAL_Delay( 10000 );
+HAL_Delay( 5000 );
+
 
 /* Close Fuel and LOx Purge */
 vc_close_solenoids( SOLENOID_FUEL_PURGE | SOLENOID_LOX_PURGE );
