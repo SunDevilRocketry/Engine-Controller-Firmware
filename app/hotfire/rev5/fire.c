@@ -84,7 +84,7 @@ HAL_Delay( 12000 );
 
 /* Ignite the solid propellant Ignitor */
 ign_ignite();
-HAL_Delay( 1000 );
+HAL_Delay( 500 );
 
 /* Full Speed Open LOx Main Valve */
 vc_open_main_valves( MAIN_VALVE_LOX_MAIN );
