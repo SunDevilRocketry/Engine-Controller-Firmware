@@ -78,6 +78,10 @@ $(MOD_DIR)/wireless/wireless.c                                       \
 $(INIT_DIR)/config/Src/stm32h7xx_it.c                                \
 $(INIT_DIR)/config/Src/stm32h7xx_hal_msp.c                           \
 $(INIT_DIR)/config/Src/system_stm32h7xx.c                            \
+$(INIT_DIR)/config/Src/freertos.c                            		 \
+$(INIT_DIR)/config/Src/stm32h7xx_hal_timebase_tim.c					 \
+$(INIT_DIR)/config/Src/sysmem.c										 \
+$(INIT_DIR)/config/Src/syscalls.c									 \
 $(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc.c      \
 $(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c   \
 $(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.c   \
@@ -101,7 +105,17 @@ $(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.c     \
 $(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim.c      \
 $(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim_ex.c   \
 $(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c     \
-$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart_ex.c
+$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart_ex.c	 \
+$(LIB_DIR)/Middlewares/Third_Party/FreeRTOS/Source/croutine.c \
+$(LIB_DIR)/Middlewares/Third_Party/FreeRTOS/Source/event_groups.c \
+$(LIB_DIR)/Middlewares/Third_Party/FreeRTOS/Source/list.c \
+$(LIB_DIR)/Middlewares/Third_Party/FreeRTOS/Source/queue.c \
+$(LIB_DIR)/Middlewares/Third_Party/FreeRTOS/Source/stream_buffer.c \
+$(LIB_DIR)/Middlewares/Third_Party/FreeRTOS/Source/tasks.c \
+$(LIB_DIR)/Middlewares/Third_Party/FreeRTOS/Source/timers.c \
+$(LIB_DIR)/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c \
+$(LIB_DIR)/Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c \
+$(LIB_DIR)/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c 
 
 # ASM sources
 ASM_SOURCES =  \
@@ -174,6 +188,9 @@ C_INCLUDES =                                           \
 -I$(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Inc/Legacy   \
 -I$(LIB_DIR)/Drivers/CMSIS/Device/ST/STM32H7xx/Include \
 -I$(LIB_DIR)/Drivers/CMSIS/Include                     \
+-I$(LIB_DIR)/Middlewares/Third_Party/FreeRTOS/Source/include \
+-I$(LIB_DIR)/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 \
+-I$(LIB_DIR)/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F \
 -I$(MOD_DIR)/commands                                  \
 -I$(MOD_DIR)/ignition                                  \
 -I$(MOD_DIR)/flash                                     \
