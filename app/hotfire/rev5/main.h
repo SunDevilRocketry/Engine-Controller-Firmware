@@ -84,6 +84,14 @@ typedef struct _SENSOR_DATA_PING_PONG
 	uint8_t     current_index;
 	} SENSOR_DATA_PING_PONG;
 
+
+/*------------------------------------------------------------------------------
+ RTOS Task Functions 
+------------------------------------------------------------------------------*/
+void startControlTask(void *argument);
+void startTelemetryTask(void *argument);
+void startLedTask(void *argument);
+
 /*------------------------------------------------------------------------------
  State Run Functions 
 ------------------------------------------------------------------------------*/

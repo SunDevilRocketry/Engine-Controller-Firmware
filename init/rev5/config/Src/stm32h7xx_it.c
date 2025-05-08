@@ -132,21 +132,21 @@ while (1)
 } /* UsageFault_Handler */
 
 
-/*******************************************************************************
-*                                                                              *
-* PROCEDURE:                                                                   *
-* 		SVC_Handler                                                            *
-*                                                                              *
-* DESCRIPTION:                                                                 *
-*       Handles system service call via SWI instruction                        *
-*                                                                              *
-*******************************************************************************/
-void SVC_Handler
-    (
-    void
-    )
-{
-} /* SVC_Handler */
+// /*******************************************************************************
+// *                                                                              *
+// * PROCEDURE:                                                                   *
+// * 		SVC_Handler                                                            *
+// *                                                                              *
+// * DESCRIPTION:                                                                 *
+// *       Handles system service call via SWI instruction                        *
+// *                                                                              *
+// *******************************************************************************/
+// void SVC_Handler
+//     (
+//     void
+//     )
+// {
+// } /* SVC_Handler */
 
 
 /*******************************************************************************
@@ -166,39 +166,39 @@ void DebugMon_Handler
 } /* DebugMon_Handler */
 
 
-/*******************************************************************************
-*                                                                              *
-* PROCEDURE:                                                                   *
-* 		PendSV_Handler                                                         *
-*                                                                              *
-* DESCRIPTION:                                                                 *
-*       Handles pendable request for system service                            *
-*                                                                              *
-*******************************************************************************/
-void PendSV_Handler
-    (
-    void
-    )
-{
-} /* PendSV_Handler */
+// /*******************************************************************************
+// *                                                                              *
+// * PROCEDURE:                                                                   *
+// * 		PendSV_Handler                                                         *
+// *                                                                              *
+// * DESCRIPTION:                                                                 *
+// *       Handles pendable request for system service                            *
+// *                                                                              *
+// *******************************************************************************/
+// void PendSV_Handler
+//     (
+//     void
+//     )
+// {
+// } /* PendSV_Handler */
 
 
-/*******************************************************************************
-*                                                                              *
-* PROCEDURE:                                                                   *
-* 		SysTick_Handler                                                        *
-*                                                                              *
-* DESCRIPTION:                                                                 *
-*       Handles system tick timer                                              *
-*                                                                              *
-*******************************************************************************/
-void SysTick_Handler
-    (
-    void
-    )
-{
-HAL_IncTick();
-} /* SysTick_Handler */
+// /*******************************************************************************
+// *                                                                              *
+// * PROCEDURE:                                                                   *
+// * 		SysTick_Handler                                                        *
+// *                                                                              *
+// * DESCRIPTION:                                                                 *
+// *       Handles system tick timer                                              *
+// *                                                                              *
+// *******************************************************************************/
+// void SysTick_Handler
+//     (
+//     void
+//     )
+// {
+// HAL_IncTick();
+// } /* SysTick_Handler */
 
 /******************************************************************************/
 /* STM32H7xx Peripheral Interrupt Handlers                                    */
@@ -228,8 +228,8 @@ HAL_UART_IRQHandler( &huart4 );
 /* Process the ground station command */
 protocol_command_handler( gs_command );
 
-/* Continue listening when done */
-rs485_receive_IT( &gs_command, sizeof( gs_command) );
+// /* Continue listening when done */
+// rs485_receive_IT( &gs_command, sizeof( gs_command) );
 } /* UART4_IRQHandler */
 #endif
 

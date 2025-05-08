@@ -28,6 +28,10 @@
 #include "valve_control.h"
 #include "terminal.h"
 
+/* RTOS Application */
+#include "cmsis_os.h"
+
+
 /* Low-level modules */
 #include "commands.h"
 #include "ignition.h"
@@ -42,6 +46,7 @@
 #include "valve.h"
 #include "wireless.h"
 
+#include "protocol.h"
 
 /*------------------------------------------------------------------------------
  MCU Peripheral Handles 
@@ -71,10 +76,37 @@ volatile bool telreq_wait_flag    = false;      /* Controller busy            */
 /* Sensor data */
 SENSOR_DATA_PING_PONG sensor_ping_pong_buffer = {0};
 
+/*------------------------------------------------------------------------------
+ RTOS Task Definitions   
+------------------------------------------------------------------------------*/
+/* Control Task */
+osThreadId_t controlTaskHandle;
+const osThreadAttr_t controlTask_attributes = {
+  .name = "controlTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityHigh,
+};
+
+/* Definitions for telemetryTask */
+osThreadId_t telemetryTaskHandle;
+const osThreadAttr_t telemetryTask_attributes = {
+  .name = "telemetryTask",
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+
+/* Definitions for telemetryTask */
+osThreadId_t ledTaskHandle;
+const osThreadAttr_t ledTask_attributes = {
+  .name = "ledTask",
+  .stack_size = 128 * 2,
+  .priority = (osPriority_t) osPriorityLow,
+};
 
 /*------------------------------------------------------------------------------
  Application entry point                                                      
 ------------------------------------------------------------------------------*/
+RS485_STATUS    rs485_status;     /* RS485 Module return codes                  */
 int main
 	(
  	void
@@ -97,7 +129,6 @@ uint8_t         terminal_cmd;     /* Terminal command */
 /* Module return codes */
 FLASH_STATUS    flash_status;     /* Status of flash operations                 */
 THERMO_STATUS   thermo_status;    /* Thermocouple status code                   */
-RS485_STATUS    rs485_status;     /* RS485 Module return codes                  */
 TERMINAL_STATUS terminal_status;  /* Return codes from SDEC terminal            */
 USB_STATUS      usb_status;       /* Return codes from usb module               */
 
@@ -238,13 +269,21 @@ if ( vc_reset_solenoids() != VC_OK )
 /* Enter the READY state                */
 fsm_state = FSM_READY_STATE;
 
-/* Start listening for commands from the ground station */
-rs485_status = rs485_receive_IT( (void*) &gs_command, sizeof( gs_command ) );
-if ( rs485_status != RS485_OK )
-	{
-	Error_Handler( ERROR_RS485_UART_ERROR );
-	}
+/* Init scheduler */
+osKernelInitialize();
 
+/* creation of controlTask */
+controlTaskHandle = osThreadNew(startControlTask, NULL, &controlTask_attributes);
+
+/* creation of telemetryTask */
+telemetryTaskHandle = osThreadNew(startTelemetryTask, NULL, &telemetryTask_attributes);
+
+/* creation of ledTask */
+ledTaskHandle = osThreadNew(startLedTask, NULL, &ledTask_attributes);
+
+
+/* Start scheduler */
+osKernelStart();
 
 /*------------------------------------------------------------------------------
  Hotfire Sequencing 
@@ -257,8 +296,15 @@ if ( rs485_status != RS485_OK )
 						   DISARM     > MANUAL */
 while (1)
 	{
-	/* Run the current state */
-	switch ( fsm_state )
+	}
+} /* main */
+
+void startControlTask(void *argument)
+{
+	while(1)
+	{
+		/* Run the current state */
+		switch ( fsm_state )
 		{
 		/* READY state */
 		case FSM_READY_STATE:
@@ -331,8 +377,31 @@ while (1)
 		
 		} /* case ( fsm_state ) */
 	}
-} /* main */
+} /* startControlTask */
 
+void startTelemetryTask(void *argument)
+{
+	while(1)
+	{
+		rs485_status = rs485_receive_IT( (void*) &gs_command, sizeof( gs_command ) );
+		if ( rs485_status != RS485_OK )
+			{
+			Error_Handler( ERROR_RS485_UART_ERROR );
+			}
+		osDelay(1);
+	}
+} /* startTelemetryTask */
+
+void startLedTask(void *argument)
+{
+	while(1)
+	{
+		led_set_color(LED_BLUE);
+		osDelay(1000);
+		led_set_color(LED_WHITE);
+		osDelay(1000);
+	}
+} /* startLedTask */
 
 /*******************************************************************************
 * END OF FILE                                                                  *
