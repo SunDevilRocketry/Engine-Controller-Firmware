@@ -48,6 +48,10 @@ UART_HandleTypeDef huart1; /* USB UART handler struct          */
 UART_HandleTypeDef huart2; /* Valve controller UART handle     */
 UART_HandleTypeDef huart4; /* Wireless interface UART handle   */
 
+/* Timing */
+volatile uint32_t previous_time;
+volatile uint32_t tdelta;
+
 
 /*------------------------------------------------------------------------------
 Application entry point                                                      

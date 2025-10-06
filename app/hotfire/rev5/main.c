@@ -71,6 +71,10 @@ volatile bool telreq_wait_flag    = false;      /* Controller busy            */
 /* Sensor data */
 SENSOR_DATA_PING_PONG sensor_ping_pong_buffer = {0};
 
+/* Timing */
+volatile uint32_t previous_time;
+volatile uint32_t tdelta;
+
 
 /*------------------------------------------------------------------------------
  Application entry point                                                      

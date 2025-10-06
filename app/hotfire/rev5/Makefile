@@ -63,6 +63,7 @@ terminal.c                                                           \
 $(INIT_DIR)/init.c                                                   \
 $(UTIL_DIR)/sdr_error.c                                              \
 $(MOD_DIR)/commands/commands.c                                       \
+$(MOD_DIR)/common/common.c											 \
 $(MOD_DIR)/ignition/ignition.c                                       \
 $(MOD_DIR)/led/led.c                                                 \
 $(MOD_DIR)/power/power.c                                             \
@@ -175,6 +176,7 @@ C_INCLUDES =                                           \
 -I$(LIB_DIR)/Drivers/CMSIS/Device/ST/STM32H7xx/Include \
 -I$(LIB_DIR)/Drivers/CMSIS/Include                     \
 -I$(MOD_DIR)/commands                                  \
+-I$(MOD_DIR)/common									   \
 -I$(MOD_DIR)/ignition                                  \
 -I$(MOD_DIR)/flash                                     \
 -I$(MOD_DIR)/led                                       \

@@ -73,6 +73,7 @@ $(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim.c      \
 $(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim_ex.c   \
 $(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c     \
 $(LIB_DIR)/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart_ex.c  \
+$(MOD_DIR)/common/common.c 											 \
 $(MOD_DIR)/led/led.c                                                 \
 $(MOD_DIR)/rs485/rs485.c                                             \
 $(MOD_DIR)/usb/usb.c                                                 \
@@ -145,6 +146,7 @@ C_INCLUDES =                                           \
 -I$(INIT_DIR)/config/Inc                               \
 -I$(LIB_DIR)                                           \
 -I$(MOD_DIR)/commands                                  \
+-I$(MOD_DIR)/common									   \
 -I$(MOD_DIR)/led                                       \
 -I$(MOD_DIR)/rs485                                     \
 -I$(MOD_DIR)/usb                                       \
