@@ -1,4 +1,4 @@
-name: FCF Stability Check
+name: Liquids (ENGINE) Stability Check
 run-name: ${{ github.actor }} is verifying build stability 🚀
 on: 
   pull_request:
