@@ -47,13 +47,15 @@ UTIL_DIR = $(LIB_DIR)/util
 C_SOURCES =                                                          \
 main.c                                                               \
 $(INIT_DIR)/init.c                                                   \
-$(UTIL_DIR)/sdr_error.c                                              \
+$(MOD_DIR)/common/common.c                                       	 \
+$(MOD_DIR)/error_sdr/error_sdr.c                                     \
 $(MOD_DIR)/commands/commands.c                                       \
 $(MOD_DIR)/ignition/ignition.c                                       \
 $(MOD_DIR)/led/led.c                                                 \
 $(MOD_DIR)/power/power.c                                             \
 $(MOD_DIR)/flash/flash.c                                             \
 $(MOD_DIR)/loadcell/loadcell.c                                       \
+$(MOD_DIR)/math_sdr/math_sdr.c                                       \
 $(MOD_DIR)/pressure/pressure.c                                       \
 $(MOD_DIR)/rs485/rs485.c                                             \
 $(MOD_DIR)/sensor/sensor.c                                           \
@@ -160,10 +162,13 @@ C_INCLUDES =                                           \
 -I$(LIB_DIR)/Drivers/CMSIS/Device/ST/STM32H7xx/Include \
 -I$(LIB_DIR)/Drivers/CMSIS/Include                     \
 -I$(MOD_DIR)/commands                                  \
+-I$(MOD_DIR)/common	                                   \
+-I$(MOD_DIR)/error_sdr                                 \
 -I$(MOD_DIR)/ignition                                  \
 -I$(MOD_DIR)/flash                                     \
 -I$(MOD_DIR)/led                                       \
 -I$(MOD_DIR)/loadcell                                  \
+-I$(MOD_DIR)/math_sdr                                  \
 -I$(MOD_DIR)/power                                     \
 -I$(MOD_DIR)/pressure                                  \
 -I$(MOD_DIR)/rs485                                     \

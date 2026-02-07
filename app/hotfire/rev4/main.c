@@ -24,7 +24,7 @@
 #include "main.h"
 #include "init.h"
 #include "sdr_pin_defines_L0002.h"
-#include "sdr_error.h"
+#include "error_sdr.h"
 #include "valve_control.h"
 
 /* Low-level modules */

@@ -25,7 +25,7 @@
 #include "main.h"
 #include "sdr_pin_defines_L0002.h"
 #include "init.h"
-#include "sdr_error.h"
+#include "error_sdr.h"
 #include "terminal.h"
 
 /* Low-level modules */

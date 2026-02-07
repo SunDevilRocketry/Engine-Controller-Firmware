@@ -24,7 +24,7 @@
 #include "main.h"
 #include "sdr_pin_defines_L0002.h"
 #include "init.h"
-#include "sdr_error.h"
+#include "error_sdr.h"
 
 /* Low-level modules */
 #include "commands.h"
@@ -53,6 +53,9 @@ SPI_HandleTypeDef  hspi2;  /* Flash SPI handle                 */
 UART_HandleTypeDef huart1; /* USB UART handler struct          */
 UART_HandleTypeDef huart2; /* Valve controller UART handle     */
 UART_HandleTypeDef huart4; /* Wireless interface UART handle   */
+
+/* Sensor */
+volatile uint32_t tdelta, previous_time;
 
 
 /*------------------------------------------------------------------------------
@@ -88,6 +91,9 @@ RS485_STATUS      rs485_status;     /* Status codes from RS485 module         */
 THERMO_STATUS     thermo_status;    /* Thermocouple status code               */
 USB_STATUS        usb_status;       /* Status of USB operations               */
 VALVE_STATUS      valve_status;     /* Valve API return codes                 */
+
+/* Sensor */
+tdelta, previous_time = 0;
 
 
 /*------------------------------------------------------------------------------

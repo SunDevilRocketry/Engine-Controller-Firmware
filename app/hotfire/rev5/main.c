@@ -24,7 +24,7 @@
 #include "main.h"
 #include "init.h"
 #include "sdr_pin_defines_L0002.h"
-#include "sdr_error.h"
+#include "error_sdr.h"
 #include "valve_control.h"
 #include "terminal.h"
 
@@ -67,6 +67,7 @@ volatile bool lox_purge_flag      = false;      /* LOX tank purge             */
 volatile bool kbottle_closed_flag = false;      /* KBottle is closed          */
 volatile bool tanks_safe_flag     = false;      /* Tanks are safe             */
 volatile bool telreq_wait_flag    = false;      /* Controller busy            */
+volatile uint32_t tdelta, previous_time; /* Sensor timing			  */
 
 /* Sensor data */
 SENSOR_DATA_PING_PONG sensor_ping_pong_buffer = {0};
@@ -156,6 +157,10 @@ flash_status                       = FLASH_OK;
 thermo_status                      = THERMO_OK;
 terminal_status                    = TERMINAL_OK;
 
+/* Sensor */
+tdelta = 0;
+previous_time = 0;
+
 
 /*------------------------------------------------------------------------------
  External Hardware Initializations 
@@ -211,29 +216,29 @@ while ( usb_detect() )
 ------------------------------------------------------------------------------*/
 
 /* Connect to the valve controller             */
-if ( vc_connect() != VC_OK )
-	{
-	Error_Handler( ERROR_VC_OFFLINE_ERROR );
-	}
+// if ( vc_connect() != VC_OK )
+// 	{
+// 	Error_Handler( ERROR_VC_OFFLINE_ERROR );
+// 	}
 
-/* Enable the main valve stepper motor drivers */
-if ( vc_enable_main_valves() != VC_OK )
-	{
-	Error_Handler( ERROR_VC_INIT_ERROR );
-	}
+// /* Enable the main valve stepper motor drivers */
+// if ( vc_enable_main_valves() != VC_OK )
+// 	{
+// 	Error_Handler( ERROR_VC_INIT_ERROR );
+// 	}
 
-/* Calibrate the main propellant valves        */
-if ( vc_calibrate_main_valves() != VC_OK )
-	{
-	Error_Handler( ERROR_VC_INIT_ERROR );
-	}
-HAL_Delay( VALVE_CALIBRATION_TIME ); /* Wait for calibration to finish */
+// /* Calibrate the main propellant valves        */
+// if ( vc_calibrate_main_valves() != VC_OK )
+// 	{
+// 	Error_Handler( ERROR_VC_INIT_ERROR );
+// 	}
+// HAL_Delay( VALVE_CALIBRATION_TIME ); /* Wait for calibration to finish */
 
-/* Reset solenoid positions                    */
-if ( vc_reset_solenoids() != VC_OK )
-	{
-	Error_Handler( ERROR_VC_INIT_ERROR );
-	}
+// /* Reset solenoid positions                    */
+// if ( vc_reset_solenoids() != VC_OK )
+// 	{
+// 	Error_Handler( ERROR_VC_INIT_ERROR );
+// 	}
 
 /* Enter the READY state                */
 fsm_state = FSM_READY_STATE;
