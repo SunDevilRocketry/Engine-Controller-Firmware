@@ -1,9 +1,9 @@
-[submodule "test"]
-	path = test
-	url = https://github.com/SunDevilRocketry/test.git
 [submodule "mod"]
 	path = mod
 	url = https://github.com/SunDevilRocketry/mod.git
 [submodule "lib"]
 	path = lib
 	url = https://github.com/SunDevilRocketry/lib.git
+[submodule "test"]
+	path = test
+	url = https://github.com/SunDevilRocketry/test.git
