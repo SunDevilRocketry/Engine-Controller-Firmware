@@ -58,6 +58,9 @@ extern volatile bool      tanks_safe_flag;     /* Safe tank pressures         */
 extern volatile bool      telreq_wait_flag;    /* Wait flag for telreq cmds   */
 extern SENSOR_DATA_PING_PONG sensor_ping_pong_buffer;
 
+static uint8_t tx_buf_size = 1 + sizeof( SENSOR_DATA ) + sizeof( VALVE_STATES );
+static uint8_t rs485_tx_buf[ tx_buf_size ];
+
 
 /*------------------------------------------------------------------------------
  Public Functions 
@@ -155,7 +158,7 @@ switch( command )
                 led_set_color( LED_YELLOW );
                 break;
                 }
-            rs485_transmit_IT( &sol_state, sizeof( sol_state ) );
+            rs485_transmit( &sol_state, sizeof( sol_state ), HAL_DEFAULT_TIMEOUT );
             }
         break;
         } /* SOL_OP */
@@ -200,8 +203,6 @@ switch( command )
     --------------------------------------------------------------------------*/
     case TELREQ_OP:
         {
-        uint8_t tx_buf_size = 1 + sizeof( SENSOR_DATA ) + sizeof( valve_states );
-        uint8_t rs485_tx_buf[ tx_buf_size ];
         /* set ACK */
         rs485_tx_buf[0] = ACK_OP;
 
@@ -349,7 +350,7 @@ switch( command )
             }
         
         /* Send response */
-        rs485_transmit_IT( &tanks_state, sizeof( tanks_state ) );
+        rs485_transmit( &tanks_state, sizeof( tanks_state ), HAL_DEFAULT_TIMEOUT );
         break;
         }
 
