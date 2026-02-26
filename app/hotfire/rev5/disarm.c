@@ -108,6 +108,7 @@ fuel_tank_press = sensor_conv_pressure( sensor_data.pt_pressures[ PT_FUEL_PRESS_
 is_press_atm    = ( lox_tank_press <= 100.0 ) && ( fuel_tank_press <= 100.0 );
 while ( ( !is_press_atm ) && ( vent_time <= VENT_TIMEOUT ) )
     {
+    sensor_dump( &sensor_data );
     lox_tank_press  = sensor_conv_pressure( sensor_data.pt_pressures[ PT_LOX_PRESS_INDEX ], 
                                             PT_LOX_PRESS_INDEX );
     fuel_tank_press = sensor_conv_pressure( sensor_data.pt_pressures[ PT_FUEL_PRESS_INDEX ], 
@@ -176,7 +177,7 @@ while ( !kbottle_closed_flag ){}
 
 /* Open all the solenoids */
 vc_open_solenoids( SOLENOID_LOX_PRESS | SOLENOID_FUEL_PRESS |
-                   SOLENOID_LOX_VENT  | SOLENOID_FUEL_PRESS |
+                   SOLENOID_LOX_VENT  | SOLENOID_FUEL_VENT  |
                    SOLENOID_LOX_PURGE | SOLENOID_FUEL_PURGE );
 
 /* Transition to post-fire state */

@@ -27,6 +27,7 @@
 #include "sdr_error.h"
 #include "valve_control.h"
 #include "terminal.h"
+#include "protocol.h"
 
 /* Low-level modules */
 #include "commands.h"
@@ -61,6 +62,7 @@ UART_HandleTypeDef huart4; /* Wireless interface UART handle */
 ------------------------------------------------------------------------------*/
 FSM_STATE fsm_state           = FSM_INIT_STATE; /* Finite State Machine state */
 volatile uint8_t   gs_command          = 0;              /* Ground Station commands    */
+volatile uint8_t   gs_command_pending  = 0;              /* Unprocessed command flag   */
 volatile bool stop_hotfire_flag   = false;      /* Manual hotfire termination */
 volatile bool stop_purge_flag     = false;      /* Manual purge termination   */
 volatile bool lox_purge_flag      = false;      /* LOX tank purge             */
@@ -100,6 +102,8 @@ THERMO_STATUS   thermo_status;    /* Thermocouple status code                   
 RS485_STATUS    rs485_status;     /* RS485 Module return codes                  */
 TERMINAL_STATUS terminal_status;  /* Return codes from SDEC terminal            */
 USB_STATUS      usb_status;       /* Return codes from usb module               */
+bool            has_gs_command;   /* True if a command is pending               */
+uint8_t         gs_command_local; /* Local copy of a pending ground cmd         */
 
 
 /*------------------------------------------------------------------------------
@@ -155,6 +159,8 @@ terminal_cmd                       = 0;
 flash_status                       = FLASH_OK;
 thermo_status                      = THERMO_OK;
 terminal_status                    = TERMINAL_OK;
+has_gs_command                     = false;
+gs_command_local                   = 0;
 
 
 /*------------------------------------------------------------------------------
@@ -257,6 +263,21 @@ if ( rs485_status != RS485_OK )
 						   DISARM     > MANUAL */
 while (1)
 	{
+	/* Process pending ground-station command outside ISR context */
+	has_gs_command = false;
+	__disable_irq();
+	if ( gs_command_pending )
+		{
+		gs_command_local  = gs_command;
+		gs_command_pending = 0;
+		has_gs_command    = true;
+		}
+	__enable_irq();
+	if ( has_gs_command )
+		{
+		protocol_command_handler( gs_command_local );
+		}
+
 	/* Run the current state */
 	switch ( fsm_state )
 		{

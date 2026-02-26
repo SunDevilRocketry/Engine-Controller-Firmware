@@ -100,8 +100,8 @@ if ( ( data_logger_addr + sizeof( DATA_LOG_DATA_FRAME ) ) > FLASH_MAX_ADDR )
     return DATA_LOG_OUT_OF_MEMORY;
     }
 
-/* Write the data to flash */
-while( flash_is_flash_busy() == FLASH_BUSY ){};
+/* Wait for previous write to complete, then write new data to flash */
+while ( flash_is_flash_busy() == FLASH_BUSY ){};
 flash_status = flash_write( &flash_handle );
 if ( flash_status != FLASH_OK )
     {
@@ -224,7 +224,7 @@ if ( flash_status != FLASH_OK )
     }
 
 /* Wait until the flash chip is fully erased */
-while ( !flash_is_flash_busy() ){}
+while ( flash_is_flash_busy() == FLASH_BUSY ){}
 return DATA_LOG_OK;
 } /* data_logger_erase_flash */
 

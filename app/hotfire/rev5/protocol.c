@@ -37,6 +37,12 @@
 
 
 /*------------------------------------------------------------------------------
+ Macros
+------------------------------------------------------------------------------*/
+#define TELREQ_MIN_PERIOD_MS      ( 25 )
+
+
+/*------------------------------------------------------------------------------
  Function Prototypes 
 ------------------------------------------------------------------------------*/
 
@@ -57,6 +63,7 @@ extern volatile bool      kbottle_closed_flag; /* Kbottle is closed           */
 extern volatile bool      tanks_safe_flag;     /* Safe tank pressures         */
 extern volatile bool      telreq_wait_flag;    /* Wait flag for telreq cmds   */
 extern SENSOR_DATA_PING_PONG sensor_ping_pong_buffer;
+static uint32_t           last_telreq_time = 0; /* Last successful TELREQ time */
 
 
 /*------------------------------------------------------------------------------
@@ -86,6 +93,8 @@ uint8_t          sol_state;                   /* State of solenoids           */
 SENSOR_DATA      sensor_data;                 /* Data from engine sensors     */
 uint8_t          sensor_data_bytes[ sizeof( SENSOR_DATA ) ]; 
 RS485_STATUS     rs485_status;                /* RS485 return codes           */
+SENSOR_STATUS    sensor_status;               /* Sensor module return codes   */
+VC_STATUS        vc_status;                   /* Valve control return codes   */
 VALVE_STATUS     valve_status;                /* Valve module return codes    */
 TANK_SAFE_STATES tanks_state;                 /* State of tank pressures      */
 VALVE_STATES     valve_states;                /* Open/close state of valves   */
@@ -95,6 +104,8 @@ VALVE_STATES     valve_states;                /* Open/close state of valves   */
  Initializations 
 ------------------------------------------------------------------------------*/
 rs485_status  = RS485_OK;
+sensor_status = SENSOR_OK;
+vc_status     = VC_OK;
 valve_status  = VALVE_OK;
 valve_states  = 0;
 sol_state     = 0;
@@ -200,23 +211,58 @@ switch( command )
     --------------------------------------------------------------------------*/
     case TELREQ_OP:
         {
+        uint8_t telemetry_busy_code;
+        uint32_t curr_time;
+
+        curr_time = HAL_GetTick();
+        if ( ( curr_time - last_telreq_time ) < TELREQ_MIN_PERIOD_MS )
+            {
+            telemetry_busy_code = TELREQ_BUSY_CODE;
+            rs485_transmit( &telemetry_busy_code,
+                            sizeof( telemetry_busy_code ),
+                            RS485_DEFAULT_TIMEOUT );
+            break;
+            }
+        last_telreq_time = curr_time;
+
         /* Send ACK */
         send_ack();
 
         /* Get sensor data */
-        sensor_dump( &sensor_data );
+        sensor_status = sensor_dump( &sensor_data );
+        if ( sensor_status != SENSOR_OK )
+            {
+            led_set_color( LED_YELLOW );
+            break;
+            }
         memcpy( &sensor_data_bytes[0], &sensor_data, sizeof( SENSOR_DATA ) );
 
         /* Get the state of the valves */
-        vc_getstate( &valve_states );
+        vc_status = vc_getstate( &valve_states );
+        if ( vc_status != VC_OK )
+            {
+            led_set_color( LED_YELLOW );
+            break;
+            }
 
         /* Transmit the sensor and valve data */
-        rs485_transmit( &sensor_data_bytes[0], 
-                        sizeof( SENSOR_DATA ), 
-                        RS485_DEFAULT_TIMEOUT*sizeof( SENSOR_DATA ));
-        rs485_transmit( &valve_states         , 
-                        sizeof( valve_states ), 
-                        RS485_DEFAULT_TIMEOUT );
+        rs485_status = rs485_transmit( &sensor_data_bytes[0], 
+                                       sizeof( SENSOR_DATA ), 
+                                       RS485_DEFAULT_TIMEOUT*sizeof( SENSOR_DATA ) );
+        if ( rs485_status != RS485_OK )
+            {
+            led_set_color( LED_YELLOW );
+            break;
+            }
+
+        rs485_status = rs485_transmit( &valve_states         , 
+                                       sizeof( valve_states ), 
+                                       RS485_DEFAULT_TIMEOUT );
+        if ( rs485_status != RS485_OK )
+            {
+            led_set_color( LED_YELLOW );
+            break;
+            }
         break;
         } /* TELREQ_OP */
 

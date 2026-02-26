@@ -97,6 +97,10 @@ vc_open_main_valves( MAIN_VALVE_FUEL_MAIN );
 /* Engine Burn */
 data_logger_init_timer();
 burn_time = data_logger_get_time();
+
+/* Get initial sensor data before entering the burn loop */
+data_logger_get_data( &sensor_data );
+
 while ( burn_time < 2000 )
     {
     /* Poll for abort */
@@ -111,10 +115,11 @@ while ( burn_time < 2000 )
         break;
         }
     
-    /* Log Data */
-    data_logger_get_data( &sensor_data );
-    data_logger_log_data( sensor_data  );
+    /* Log data from previous sensor read (flash write overlaps with next read) */
+    data_logger_log_data( sensor_data );
 
+    /* Read sensors for next iteration while flash programs in background */
+    data_logger_get_data( &sensor_data );
 
     /* Update timer */
     burn_time = data_logger_get_time();

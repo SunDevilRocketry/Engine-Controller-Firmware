@@ -24,7 +24,8 @@
  Global Variables 
 ------------------------------------------------------------------------------*/
 extern UART_HandleTypeDef huart4;     /* Wireless/RS485 UART     */
-extern uint8_t            gs_command; /* Ground station commands */
+extern volatile uint8_t   gs_command; /* Ground station commands */
+extern volatile uint8_t   gs_command_pending; /* Pending command flag */
 
 
 /*------------------------------------------------------------------------------
@@ -234,10 +235,10 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     if (huart == &huart4)
     {
-        /* Process the ground station command */
-        protocol_command_handler( gs_command );
+        /* Mark command for processing in the main loop */
+        gs_command_pending = 1;
 
-        /* Continue listening when done */
+        /* Continue listening immediately */
         rs485_receive_IT( &gs_command, sizeof( gs_command) );
     }
     

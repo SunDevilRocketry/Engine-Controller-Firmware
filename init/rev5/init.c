@@ -258,7 +258,7 @@ hadc2.Init.EOCSelection             = ADC_EOC_SINGLE_CONV;
 hadc2.Init.LowPowerAutoWait         = DISABLE;
 hadc2.Init.ContinuousConvMode       = DISABLE;
 hadc2.Init.NbrOfConversion          = 1;
-hadc1.Init.DiscontinuousConvMode    = DISABLE;
+hadc2.Init.DiscontinuousConvMode    = DISABLE;
 hadc2.Init.ExternalTrigConv         = ADC_SOFTWARE_START;
 hadc2.Init.ExternalTrigConvEdge     = ADC_EXTERNALTRIGCONVEDGE_NONE;
 hadc2.Init.ConversionDataManagement = ADC_CONVERSIONDATA_DR;
@@ -320,7 +320,7 @@ hadc3.Init.EOCSelection             = ADC_EOC_SINGLE_CONV;
 hadc3.Init.LowPowerAutoWait         = DISABLE;
 hadc3.Init.ContinuousConvMode       = DISABLE;
 hadc3.Init.NbrOfConversion          = 1;
-hadc1.Init.DiscontinuousConvMode    = DISABLE;
+hadc3.Init.DiscontinuousConvMode    = DISABLE;
 hadc3.Init.ExternalTrigConv         = ADC_SOFTWARE_START;
 hadc3.Init.ExternalTrigConvEdge     = ADC_EXTERNALTRIGCONVEDGE_NONE;
 hadc3.Init.ConversionDataManagement = ADC_CONVERSIONDATA_DR;
@@ -566,7 +566,7 @@ void Wireless_UART_Init
 {
 /* UART Initialization configuration */
 huart4.Instance                    = UART4;
-huart4.Init.BaudRate               = 9600;
+huart4.Init.BaudRate               = 115200;
 huart4.Init.WordLength             = UART_WORDLENGTH_8B;
 huart4.Init.StopBits               = UART_STOPBITS_1;
 huart4.Init.Parity                 = UART_PARITY_NONE;
@@ -690,7 +690,7 @@ HAL_GPIO_WritePin(FLASH_SS_GPIO_PORT, FLASH_SS_PIN, GPIO_PIN_SET);
 GPIO_InitStruct.Pin   = FLASH_SS_PIN;
 GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
 GPIO_InitStruct.Pull  = GPIO_NOPULL;
-GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 HAL_GPIO_Init(FLASH_SS_GPIO_PORT, &GPIO_InitStruct);
 
 /* Flash write protect Pin */
