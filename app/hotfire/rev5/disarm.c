@@ -24,7 +24,7 @@
 #include "pressure.h"
 #include "sensor.h"
 #include "sdr_error.h"
-
+#include "led.h"
 
 /*------------------------------------------------------------------------------
  Global Variables 
@@ -85,12 +85,13 @@ memset( &sensor_data, 0, sizeof( SENSOR_DATA ) );
  DISARM Sequence 
 ------------------------------------------------------------------------------*/
 
-/* Open Vent solenoids           */
-vc_open_solenoids( SOLENOID_LOX_VENT | SOLENOID_FUEL_VENT );
+// /* Open Vent solenoids           */
+// vc_open_solenoids( SOLENOID_LOX_VENT | SOLENOID_FUEL_VENT );
 
-/* Close purge solenoids         */
-vc_close_solenoids( SOLENOID_LOX_PURGE | SOLENOID_FUEL_PURGE );
+// /* Close purge solenoids         */
+// vc_close_solenoids( SOLENOID_LOX_PURGE | SOLENOID_FUEL_PURGE );
 
+led_set_color(LED_YELLOW);
 
 /* Wait for disarm command */
 while ( !stop_purge_flag ){}
