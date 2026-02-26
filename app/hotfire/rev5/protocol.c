@@ -58,8 +58,8 @@ extern volatile bool      tanks_safe_flag;     /* Safe tank pressures         */
 extern volatile bool      telreq_wait_flag;    /* Wait flag for telreq cmds   */
 extern SENSOR_DATA_PING_PONG sensor_ping_pong_buffer;
 
-static uint8_t tx_buf_size = 1 + sizeof( SENSOR_DATA ) + sizeof( VALVE_STATES );
-static uint8_t rs485_tx_buf[ tx_buf_size ];
+#define TX_BUF_SIZE ( sizeof( uint8_t ) + sizeof( SENSOR_DATA ) + sizeof( VALVE_STATES ) )
+static uint8_t rs485_tx_buf[ TX_BUF_SIZE ];
 
 
 /*------------------------------------------------------------------------------
@@ -216,7 +216,7 @@ switch( command )
 
         /* Transmit the sensor and valve data */
         rs485_transmit_IT( &rs485_tx_buf, 
-                        tx_buf_size );
+                        TX_BUF_SIZE );
         break;
         } /* TELREQ_OP */
 
