@@ -155,7 +155,7 @@ switch( command )
                 led_set_color( LED_YELLOW );
                 break;
                 }
-            rs485_transmit( &sol_state, sizeof( sol_state ), HAL_DEFAULT_TIMEOUT );
+            rs485_transmit_IT( &sol_state, sizeof( sol_state ) );
             }
         break;
         } /* SOL_OP */
@@ -200,23 +200,22 @@ switch( command )
     --------------------------------------------------------------------------*/
     case TELREQ_OP:
         {
-        /* Send ACK */
-        send_ack();
+        uint8_t tx_buf_size = 1 + sizeof( SENSOR_DATA ) + sizeof( valve_states );
+        uint8_t rs485_tx_buf[ tx_buf_size ];
+        /* set ACK */
+        rs485_tx_buf[0] = ACK_OP;
 
         /* Get sensor data */
         sensor_dump( &sensor_data );
-        memcpy( &sensor_data_bytes[0], &sensor_data, sizeof( SENSOR_DATA ) );
+        memcpy( &rs485_tx_buf[1], &sensor_data, sizeof( SENSOR_DATA ) );
 
         /* Get the state of the valves */
         vc_getstate( &valve_states );
+        memcpy( &rs485_tx_buf[1 + sizeof(SENSOR_DATA)], &valve_states, sizeof( valve_states ) );    
 
         /* Transmit the sensor and valve data */
-        rs485_transmit( &sensor_data_bytes[0], 
-                        sizeof( SENSOR_DATA ), 
-                        RS485_DEFAULT_TIMEOUT*sizeof( SENSOR_DATA ));
-        rs485_transmit( &valve_states         , 
-                        sizeof( valve_states ), 
-                        RS485_DEFAULT_TIMEOUT );
+        rs485_transmit_IT( &rs485_tx_buf, 
+                        tx_buf_size );
         break;
         } /* TELREQ_OP */
 
@@ -291,7 +290,7 @@ switch( command )
     case HOTFIRE_GETSTATE_OP:
         {
         /* Send the finite state machine state back to the ground station */
-        rs485_transmit( (void*) &fsm_state, sizeof( fsm_state ), RS485_DEFAULT_TIMEOUT );
+        rs485_transmit_IT( (void*) &fsm_state, sizeof( fsm_state ) );
         break;
         } /* HOTFIRE_GETSTATE_OP */
 
@@ -350,7 +349,7 @@ switch( command )
             }
         
         /* Send response */
-        rs485_transmit( &tanks_state, sizeof( tanks_state ), RS485_DEFAULT_TIMEOUT );
+        rs485_transmit_IT( &tanks_state, sizeof( tanks_state ) );
         break;
         }
 
