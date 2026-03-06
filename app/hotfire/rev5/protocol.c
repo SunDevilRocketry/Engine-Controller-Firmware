@@ -35,6 +35,7 @@
 #include "solenoid.h"
 #include "valve.h"
 #include "wireless.h"
+#include "math_sdr.h"
 
 
 /*------------------------------------------------------------------------------
@@ -382,20 +383,48 @@ switch( command )
 
         if ( rs485_status != RS485_OK ) { break; }
 
-        SEQUENCE_NODE sequences_nodes[sequence_size];
+        SEQUENCE_NODE sequence_nodes[sequence_size];
 
         for ( uint8_t i = 0; i < sequence_size; i++ ) {
             /* read sequence node data */
-            rs485_status = rs485_receive( &sequences_nodes[i]         , 
-                                    sizeof( SEQUENCE_NODE ), 
+            uint8_t buffer[9];
+
+            rs485_status = rs485_receive( &buffer, 
+                                    sizeof( buffer ), 
                                     RS485_DEFAULT_TIMEOUT );
 
             if ( rs485_status != RS485_OK ) { break; }
-            
+
+            /* parse fields */
+            sequence_nodes[i].time =
+                (uint16_t)buffer[0]
+                | ((uint16_t)buffer[1] << 8);
+
+            sequence_nodes[i].subcommand_code = buffer[2];
+            sequence_nodes[i].opcode          = buffer[3];
+            sequence_nodes[i].sequence_num    = buffer[4];
+
+            sequence_nodes[i].crc =
+                (uint32_t)buffer[5]
+                | ((uint32_t)buffer[6] << 8)
+                | ((uint32_t)buffer[7] << 16)
+                | ((uint32_t)buffer[8] << 24);
+
+            /* verify checksum */
+            uint32_t calc_crc = crc32(
+                (uint8_t*)&sequence_nodes[i],
+                5
+            );
+
+            if (calc_crc != sequence_nodes[i].crc)
+            {
+                // CRC error
+                break;
+            }
         }
 
         fsm_state = FSM_SEQUENCE_STATE;
-
+                
         break;
         } /* SEQUENCE_OP */
 

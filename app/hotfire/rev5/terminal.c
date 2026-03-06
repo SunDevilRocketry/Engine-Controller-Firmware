@@ -43,6 +43,7 @@
 #include "usb.h"
 #include "valve.h"
 #include "wireless.h"
+#include "math_sdr.h"
 
 
 /*------------------------------------------------------------------------------
@@ -362,13 +363,42 @@ switch( command )
 
         for ( uint8_t i = 0; i < sequence_size; i++ ) {
             /* read sequence node data */
-            usb_status = usb_receive( &sequence_nodes[i], 
-                        sizeof( SEQUENCE_NODE ), 
+            uint8_t buffer[9];
+
+            usb_status = usb_receive( &buffer, 
+                        sizeof( buffer ), 
                         HAL_DEFAULT_TIMEOUT );
 
             if ( usb_status != USB_OK )
             {
             Error_Handler( ERROR_USB_UART_ERROR);
+            }
+
+            /* parse fields */
+            sequence_nodes[i].time =
+                (uint16_t)buffer[0]
+                | ((uint16_t)buffer[1] << 8);
+
+            sequence_nodes[i].subcommand_code = buffer[2];
+            sequence_nodes[i].opcode          = buffer[3];
+            sequence_nodes[i].sequence_num    = buffer[4];
+
+            sequence_nodes[i].crc =
+                (uint32_t)buffer[5]
+                | ((uint32_t)buffer[6] << 8)
+                | ((uint32_t)buffer[7] << 16)
+                | ((uint32_t)buffer[8] << 24);
+
+            /* verify checksum */
+            uint32_t calc_crc = crc32(
+                (uint8_t*)&sequence_nodes[i],
+                5
+            );
+
+            if (calc_crc != sequence_nodes[i].crc)
+            {
+                // CRC error
+                break;
             }
 
         fsm_state = FSM_SEQUENCE_STATE;
