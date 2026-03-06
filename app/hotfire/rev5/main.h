@@ -74,7 +74,8 @@ typedef enum _FSM_STATE
 	FSM_DISARM_STATE        , /* Disarm state         (7) */
 	FSM_POST_FIRE_STATE     , /* Post-Fire state      (8) */
 	FSM_MANUAL_STATE        , /* Manual control mode      */
-	FSM_ABORT_STATE           /* Abort state              */
+	FSM_ABORT_STATE         , /* Abort state              */
+	FSM_SEQUENCE_STATE 		  /* Sequence State */
 	} FSM_STATE;
 
 /* Sensor Data Ping-pong buffer */
@@ -87,6 +88,12 @@ typedef struct _SENSOR_DATA_PING_PONG
 /*------------------------------------------------------------------------------
  State Run Functions 
 ------------------------------------------------------------------------------*/
+
+/* Sequence state */
+FSM_STATE run_sequence_state
+	(
+	void
+	);
 
 /* Ready state */
 FSM_STATE run_ready_state

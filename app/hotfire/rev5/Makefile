@@ -48,6 +48,7 @@ UTIL_DIR = $(LIB_DIR)/util
 C_SOURCES =                                                          \
 main.c                                                               \
 ready.c                                                              \
+sequence.c                                                           \
 prefire_purge.c                                                      \
 fill_chill.c                                                         \
 standby.c                                                            \

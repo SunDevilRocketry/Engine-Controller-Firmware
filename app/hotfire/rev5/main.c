@@ -260,6 +260,13 @@ while (1)
 	/* Run the current state */
 	switch ( fsm_state )
 		{
+		/* SEQUENCE state */
+		case FSM_SEQUENCE_STATE:
+			{
+			fsm_state = run_sequence_state();
+			break;
+			} /* case FSM_SEQUENCE_STATE */
+		
 		/* READY state */
 		case FSM_READY_STATE:
 			{

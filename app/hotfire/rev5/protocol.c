@@ -25,6 +25,7 @@
 #include "main.h"
 #include "valve_control.h"
 #include "protocol.h"
+#include "sequence.h"
 
 /* Module level */
 #include "commands.h"
@@ -366,6 +367,37 @@ switch( command )
         fsm_state = FSM_MANUAL_STATE;
         break;
         } /* KBOTTLE_CLOSED_OP */
+
+    /*--------------------------------------------------------------------------
+     Create Sequence Command 
+    --------------------------------------------------------------------------*/
+    case SEQUENCE_OP:
+        {
+        uint8_t sequence_size;
+
+        /* Get sequence size */
+        rs485_status = rs485_receive( &sequence_size         , 
+                                      sizeof( sequence_size ), 
+                                      RS485_DEFAULT_TIMEOUT );
+
+        if ( rs485_status != RS485_OK ) { break; }
+
+        SEQUENCE_NODE sequences_nodes[sequence_size];
+
+        for ( uint8_t i = 0; i < sequence_size; i++ ) {
+            /* read sequence node data */
+            rs485_status = rs485_receive( &sequences_nodes[i]         , 
+                                    sizeof( SEQUENCE_NODE ), 
+                                    RS485_DEFAULT_TIMEOUT );
+
+            if ( rs485_status != RS485_OK ) { break; }
+            
+        }
+
+        fsm_state = FSM_SEQUENCE_STATE;
+
+        break;
+        } /* SEQUENCE_OP */
 
     /*--------------------------------------------------------------------------
      Unrecognized Command 

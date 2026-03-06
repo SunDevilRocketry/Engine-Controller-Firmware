@@ -27,6 +27,7 @@
 #include "init.h"
 #include "sdr_error.h"
 #include "terminal.h"
+#include "sequence.h"
 
 /* Low-level modules */
 #include "commands.h"
@@ -47,7 +48,7 @@
 /*------------------------------------------------------------------------------
  Global Variables 
 ------------------------------------------------------------------------------*/
-
+extern volatile FSM_STATE fsm_state;           /* State of engine hotfire     */
 
 /*------------------------------------------------------------------------------
  Procedures 
@@ -340,6 +341,42 @@ switch( command )
             }
         break;
         } /* SOL_OP */
+
+    /*-----------------------------------------------------------------
+        Sequence Command	
+    ------------------------------------------------------------------*/
+    case SEQUENCE_OP:
+        {
+        uint8_t sequence_size;
+
+        usb_status = usb_receive( &sequence_size, 
+                        sizeof( sequence_size ), 
+                        HAL_DEFAULT_TIMEOUT );
+
+        if ( usb_status != USB_OK )
+            {
+            Error_Handler( ERROR_USB_UART_ERROR);
+            }
+
+        SEQUENCE_NODE sequence_nodes[sequence_size];
+
+        for ( uint8_t i = 0; i < sequence_size; i++ ) {
+            /* read sequence node data */
+            usb_status = usb_receive( &sequence_nodes[i], 
+                        sizeof( SEQUENCE_NODE ), 
+                        HAL_DEFAULT_TIMEOUT );
+
+            if ( usb_status != USB_OK )
+            {
+            Error_Handler( ERROR_USB_UART_ERROR);
+            }
+
+        fsm_state = FSM_SEQUENCE_STATE;
+            
+        }
+
+        break;
+        } /* SEQUENCE_OP */
 
 
     /*------------------------ Unrecognized Command ---------------------------*/

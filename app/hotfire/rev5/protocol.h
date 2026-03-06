@@ -43,6 +43,7 @@ extern "C" {
 #define KBOTTLE_CLOSED_OP       ( 0x9C )
 #define TANKSTAT_OP             ( 0x9D )
 #define MANUAL_OP               ( 0x9E )
+#define SEQUENCE_OP             ( 0xA0 )
 
 /* Response codes */
 #define TELREQ_BUSY_CODE        ( 0x99 )
@@ -72,7 +73,8 @@ typedef enum _PROTOCOL_OPCODE
     PROTOCOL_STANDBY_OPCODE = 0x93, /* Standby opcode            */
     PROTOCOL_FIRE_OPCODE    = 0x94, /* Engine Fire opcode        */ 
     PROTOCOL_STOP_OPCODE    = 0x97, /* Stop purge opcode         */
-    PROTOCOL_ACK_OPCODE     = 0x95  /* Frame Acknowledge opcde   */
+    PROTOCOL_ACK_OPCODE     = 0x95,  /* Frame Acknowledge opcde   */
+    PROTOCOL_SEQUENCE_OPCODE = 0xA0 /* Create Sequence opcode */
     } PROTOCOL_OPCODE;
 
 /* Solenoid subcommand codes */

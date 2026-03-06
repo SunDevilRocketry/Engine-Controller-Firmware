@@ -25,7 +25,7 @@ extern "C" {
 /*------------------------------------------------------------------------------
  Macros 
 ------------------------------------------------------------------------------*/
-
+#define SEQUENCE_OP             ( 0xA0 )
 
 /*------------------------------------------------------------------------------
  Typdefs 
@@ -43,6 +43,12 @@ typedef enum _TERMINAL_STATUS
     TERMINAL_DATA_LOG_ERROR   , /* Data logger error                  */
     TERMINAL_ERROR        
     } TERMINAL_STATUS;
+
+/* Operation codes */
+typedef enum _PROTOCOL_OPCODE
+    {
+    PROTOCOL_SEQUENCE_OPCODE = 0xA0 /* Create Sequence opcode */
+    } PROTOCOL_OPCODE;
 
 
 /*------------------------------------------------------------------------------
