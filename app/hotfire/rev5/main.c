@@ -27,6 +27,7 @@
 #include "sdr_error.h"
 #include "valve_control.h"
 #include "terminal.h"
+#include "sequence.h"
 
 /* Low-level modules */
 #include "commands.h"
@@ -71,6 +72,8 @@ volatile bool telreq_wait_flag    = false;      /* Controller busy            */
 /* Sensor data */
 SENSOR_DATA_PING_PONG sensor_ping_pong_buffer = {0};
 
+/* Manually created sequence */
+SEQUENCE_NODE global_sequence_nodes[99];
 
 /*------------------------------------------------------------------------------
  Application entry point                                                      

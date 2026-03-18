@@ -59,6 +59,7 @@ extern volatile bool      kbottle_closed_flag; /* Kbottle is closed           */
 extern volatile bool      tanks_safe_flag;     /* Safe tank pressures         */
 extern volatile bool      telreq_wait_flag;    /* Wait flag for telreq cmds   */
 extern SENSOR_DATA_PING_PONG sensor_ping_pong_buffer;
+extern SEQUENCE_NODE global_sequence_nodes[99];
 
 
 /*------------------------------------------------------------------------------
@@ -383,7 +384,7 @@ switch( command )
 
         if ( rs485_status != RS485_OK ) { break; }
 
-        SEQUENCE_NODE sequence_nodes[sequence_size];
+        SEQUENCE_NODE sequence_nodes[sequence_size + 1];
 
         for ( uint8_t i = 0; i < sequence_size; i++ ) {
             /* read sequence node data */
@@ -416,12 +417,21 @@ switch( command )
                 5
             );
 
-            if (calc_crc != sequence_nodes[i].crc)
+            if ( calc_crc != sequence_nodes[i].crc )
             {
                 // CRC error
                 break;
             }
         }
+
+        /* Create an end sequence node */
+        sequence_nodes[sequence_size].sequence_num = 99;
+
+        /* Clear global sequence nodes */
+        memset( global_sequence_nodes, 0, sizeof( global_sequence_nodes ) );
+        
+        /* Copy new sequence into the global sequence nodes */
+        memcpy( global_sequence_nodes, sequence_nodes, (sequence_size + 1) * sizeof( SEQUENCE_NODE ) );
 
         fsm_state = FSM_SEQUENCE_STATE;
                 

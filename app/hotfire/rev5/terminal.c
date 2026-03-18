@@ -50,6 +50,8 @@
  Global Variables 
 ------------------------------------------------------------------------------*/
 extern volatile FSM_STATE fsm_state;           /* State of engine hotfire     */
+extern SEQUENCE_NODE global_sequence_nodes[99];
+
 
 /*------------------------------------------------------------------------------
  Procedures 
@@ -359,7 +361,7 @@ switch( command )
             Error_Handler( ERROR_USB_UART_ERROR);
             }
 
-        SEQUENCE_NODE sequence_nodes[sequence_size];
+        SEQUENCE_NODE sequence_nodes[sequence_size + 1];
 
         for ( uint8_t i = 0; i < sequence_size; i++ ) {
             /* read sequence node data */
@@ -400,6 +402,15 @@ switch( command )
                 // CRC error
                 break;
             }
+
+        /* Create an end sequence node */
+        sequence_nodes[sequence_size].sequence_num = 99;
+
+        /* Clear global sequence nodes */
+        memset( global_sequence_nodes, 0, sizeof( global_sequence_nodes ) );
+        
+        /* Copy new sequence into the global sequence nodes */
+        memcpy( global_sequence_nodes, sequence_nodes, (sequence_size + 1) * sizeof( SEQUENCE_NODE ) );
 
         fsm_state = FSM_SEQUENCE_STATE;
             
